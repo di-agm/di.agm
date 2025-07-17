@@ -26,6 +26,21 @@
     margin-bottom: 2rem;
   }
 
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--btn-bg);
+    color: var(--btn-fg);
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  button:hover {
+    opacity: 0.8;
+  }
+
   @media (max-width: 600px) {
     h1 {
       font-size: 1.5rem;
@@ -39,54 +54,65 @@
       padding: 1rem;
     }
   }
+    /* Light theme colors */
+    :root {
+      --bg: #f9f9f9;
+      --fg: #333;
+      --btn-bg: #333;
+      --btn-fg: #f9f9f9;
+    }
+
+    /* Dark theme colors */
+    .dark {
+      --bg: #121212;
+      --fg: #e0e0e0;
+      --btn-bg: #e0e0e0;
+      --btn-fg: #121212;
+    }
 </style>
 </head>
 
 <body>
   <h1 align="center" id="welcome">Welcome</h1>
-  <p align="center" id="follow">Follow me on social media</p>
+  <p align="center" id="follow">Follow me on social media :)</p>
+
+  <button id="theme-toggle">Toggle Theme</button>
 
   <script>
     const translations = {
-      en: {
-        welcome: "Welcome",
-        follow: "Follow me on social media"
-      },
-      es: {
-        welcome: "Bienvenido",
-        follow: "Sígueme en redes sociales"
-      },
-      pt: {
-        welcome: "Bem-vindo",
-        follow: "Siga-me nas redes sociais"
-      },
-      fr: {
-        welcome: "Bienvenue",
-        follow: "Suivez-moi sur les réseaux sociaux"
-      },
-      ru: {
-        welcome: "Добро пожаловать",
-        follow: "Подпишитесь на меня в соцсетях"
-      },
-      de: {
-        welcome: "Willkommen",
-        follow: "Folge mir in den sozialen Medien"
-      },
-      ja: {
-        welcome: "ようこそ",
-        follow: "SNSでフォローしてね"
-      },
-      hi: {
-        welcome: "स्वागत है",
-        follow: "सोशल मीडिया पर मुझे फॉलो करें"
-      }
+      en: { welcome: "Welcome", follow: "Follow me on social media" },
+      es: { welcome: "Bienvenido", follow: "Sígueme en las redes sociales" },
+      pt: { welcome: "Bem-vindo", follow: "Siga-me nas redes sociais" },
+      fr: { welcome: "Bienvenue", follow: "Suivez-moi sur les réseaux sociaux" },
+      ru: { welcome: "Добро пожаловать", follow: "Подпишитесь на меня в соцсетях" },
+      de: { welcome: "Willkommen", follow: "Folge mir in den sozialen Medien" },
+      ja: { welcome: "ようこそ", follow: "SNSでフォローしてね" },
+      hi: { welcome: "स्वागत है", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
     };
 
-    const userLang = navigator.language.slice(0, 2); // e.g., "es", "en"
+    const userLang = navigator.language.slice(0, 2);
     const lang = translations[userLang] ? userLang : "en";
 
     document.getElementById("welcome").textContent = translations[lang].welcome;
     document.getElementById("follow").textContent = translations[lang].follow;
+
+    // Theme toggle logic
+    const toggleBtn = document.getElementById("theme-toggle");
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      // Optional: Save user preference to localStorage
+      if(document.body.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+      } else {
+        localStorage.setItem("theme", "light");
+      }
+    });
+
+    // Load saved theme preference on page load
+    const savedTheme = localStorage.getItem("theme");
+    if(savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
   </script>
 </body>
 </html>
