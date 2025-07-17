@@ -1,12 +1,90 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Linktree</title>
+  <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    padding: 2rem;
+    margin: 0;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+
+    body {
+      padding: 1rem;
+    }
+  }
+</style>
 </head>
+
 <body>
-  <h1>Welcome</h1>
-  <p>Follow my social media</p>
+  <h1 align="center" id="welcome">Welcome</h1>
+  <p align="center" id="follow">Follow me on social media</p>
+
+  <script>
+    const translations = {
+      en: {
+        welcome: "Welcome",
+        follow: "Follow me on social media"
+      },
+      es: {
+        welcome: "Bienvenido",
+        follow: "Sígueme en redes sociales"
+      },
+      pt: {
+        welcome: "Bem-vindo",
+        follow: "Siga-me nas redes sociais"
+      },
+      fr: {
+        welcome: "Bienvenue",
+        follow: "Suivez-moi sur les réseaux sociaux"
+      },
+      ru: {
+        welcome: "Добро пожаловать",
+        follow: "Подпишитесь на меня в соцсетях"
+      },
+      de: {
+        welcome: "Willkommen",
+        follow: "Folge mir in den sozialen Medien"
+      },
+      ja: {
+        welcome: "ようこそ",
+        follow: "SNSでフォローしてね"
+      },
+      hi: {
+        welcome: "स्वागत है",
+        follow: "सोशल मीडिया पर मुझे फॉलो करें"
+      }
+    };
+
+    const userLang = navigator.language.slice(0, 2); // e.g., "es", "en"
+    const lang = translations[userLang] ? userLang : "en";
+
+    document.getElementById("welcome").textContent = translations[lang].welcome;
+    document.getElementById("follow").textContent = translations[lang].follow;
+  </script>
 </body>
 </html>
