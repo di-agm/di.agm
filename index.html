@@ -52,23 +52,24 @@
       padding: 1rem;
     }
   }
-    /* Light theme colors */
-    :root {
-      --bg: #f9f9f9;
-      --fg: #333;
-      --btn-bg: #333;
-      --btn-fg: #f9f9f9;
-    }
+    
+  :root {
+    --bg: #f9f9f9;
+    --fg: #333;
+    --btn-bg: #333;
+    --btn-fg: #f9f9f9;
+  }
 
   .profile-photo {
     width: 120px;
     height: 120px;
-    border-radius: 50%; /* Makes it circular */
+    border-radius: 50%;
     object-fit: cover;
     margin: 1rem auto;
     display: block;
-    border: 2px solid var(--fg); /* Uses current theme color */
+    border: 2px solid var(--fg);
   }
+
   .color-ring {
     width: 160px;
     height: 160px;
@@ -79,6 +80,7 @@
     justify-content: center;
     margin: 2rem auto 1rem auto;
     transition: border-color 0.5s;
+    position: relative;
   }
 
   .color-ring img {
@@ -88,9 +90,14 @@
     object-fit: cover;
   }
 
-  #colorPicker {
-    margin-top: 1rem;
+  .color-ring input[type="color"] {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    opacity: 0;
     cursor: pointer;
+    z-index: 2;
   }
 
   .links a {
@@ -116,9 +123,9 @@
   <p align="center" id="follow">Follow me on social media :)</p>
 
   <div class="color-ring" id="colorRing">
-    <img src="https://github.com/DIcreative/linktree/blob/main/dicreative.jpg?raw=true" alt="Profile Photo" />  
+    <input type="color" id="colorPicker" title="Pick background color" />
+    <img src="https://github.com/DIcreative/linktree/blob/main/dicreative.jpg?raw=true" alt="Profile Photo" />
   </div>
-  <input type="color" id="colorPicker" title="Pick background color" />
 
   <script>
     const translations = {
@@ -143,21 +150,19 @@
 
     colorPicker.addEventListener("input", (e) => {
       const color = e.target.value;
-      document.body.style.setProperty("--bg-color", color);
-      // optional: update ring border color
+      document.body.style.backgroundColor = color;
       colorRing.style.borderColor = color;
     });
   </script>
-  
+
   <div class="links">
-  <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
-  <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
-  <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
-  <p align="center"><a href="https://pin.it/4kXf9Bu18" target="_blank">Pinterest</a></p>
-  <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
-  <p align="center"><a href="coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
-  <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
+    <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
+    <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
+    <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
+    <p align="center"><a href="https://pin.it/4kXf9Bu18" target="_blank">Pinterest</a></p>
+    <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
+    <p align="center"><a href="coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
+    <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
   </div>
-  
 </body>
 </html>
