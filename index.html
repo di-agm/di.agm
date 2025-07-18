@@ -26,19 +26,16 @@
     margin-bottom: 2rem;
   }
 
-  button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+  .logo-button {
+    width: 60px;
+    height: 60px;
     cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: var(--btn-bg);
-    color: var(--btn-fg);
-    transition: background-color 0.3s, color 0.3s;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
   }
 
-  button:hover {
-    opacity: 0.8;
+  .logo-button:hover {
+    transform: scale(1.05);
   }
 
   @media (max-width: 600px) {
@@ -86,9 +83,7 @@
   <h1 align="center" id="welcome">Welcome</h1>
   <p align="center" id="follow">Follow me on social media :)</p>
 
-  <img src="YOUR_IMAGE_URL_HERE" alt="Profile Photo" class="profile-photo" />
-
-  <button id="theme-toggle">Toggle Theme</button>
+  <img src="https://github.com/DIcreative/linktree/blob/main/dicreative.jpg?raw=true" alt="Cambiar tema" id="themeToggle" class="logo-button" />
 
   <script>
     const translations = {
@@ -109,22 +104,26 @@
     document.getElementById("follow").textContent = translations[lang].follow;
 
     // Theme toggle logic
-    const toggleBtn = document.getElementById("theme-toggle");
-    toggleBtn.addEventListener("click", () => {
+    const toggle = document.getElementById("themeToggle");
+  
+    toggle.addEventListener("click", () => {
       document.body.classList.toggle("dark");
-      // Optional: Save user preference to localStorage
-      if(document.body.classList.contains("dark")) {
+      // Guarda la preferencia
+      if (document.body.classList.contains("dark")) {
         localStorage.setItem("theme", "dark");
       } else {
         localStorage.setItem("theme", "light");
       }
     });
-
-    // Load saved theme preference on page load
-    const savedTheme = localStorage.getItem("theme");
-    if(savedTheme === "dark") {
-      document.body.classList.add("dark");
-    }
+  
+    // Carga la preferencia guardada
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark") {
+        document.body.classList.add("dark");
+      }
+    });
+    
   </script>
   <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
   <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
