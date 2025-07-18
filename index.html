@@ -69,12 +69,24 @@
       --btn-bg: #e0e0e0;
       --btn-fg: #121212;
     }
+    
+  .profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%; /* Makes it circular */
+    object-fit: cover;
+    margin: 1rem auto;
+    display: block;
+    border: 2px solid var(--fg); /* Uses current theme color */
+  }
 </style>
 </head>
 
 <body>
   <h1 align="center" id="welcome">Welcome</h1>
   <p align="center" id="follow">Follow me on social media :)</p>
+
+  <img src="YOUR_IMAGE_URL_HERE" alt="Profile Photo" class="profile-photo" />
 
   <button id="theme-toggle">Toggle Theme</button>
 
