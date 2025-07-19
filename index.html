@@ -27,18 +27,6 @@
         margin-bottom: 2rem;
     }
 
-    .logo-button {
-        width: 60px;
-        height: 60px;
-        cursor: pointer;
-        border-radius: 50%;
-        transition: transform 0.2s ease;
-    }
-
-    .logo-button:hover {
-        transform: scale(1.05);
-    }
-
     @media (max-width: 600px) {
         h1 {
         font-size: 1.5rem;
@@ -52,17 +40,10 @@
         padding: 1rem;
         }
     }
-        
-    :root {
-        --bg: #f9f9f9;
-        --fg: #333;
-        --btn-bg: #333;
-        --btn-fg: #f9f9f9;
-    }
 
     .profile-photo {
-        width: 120px;
-        height: 120px;
+        width: 200px;
+        height: 200px;
         border-radius: 50%;
         object-fit: cover;
         margin: 1rem auto;
@@ -72,17 +53,21 @@
 
     .ring-container {
         position: relative;
-        width: 160px;
-        height: 160px;
+        width: 40vw;
+        height: 40vw;
+        max-width: 350px; /* optional max limit */
+        max-height: 350px;
         margin: 2rem auto;
     }
 
     .color-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 160px;
+        height: 160px;
+        transform: translate(-50%, -50%);
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: border-color 0.5s;
         background: conic-gradient(
             hsl(0, 100%, 50%),
             hsl(60, 100%, 50%),
@@ -92,20 +77,11 @@
             hsl(300, 100%, 50%),
             hsl(360, 100%, 50%)
         );
-    }
-
-    .saturation-ring {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        margin: 2rem auto;
-        position: relative;
-        /* A simple gradient from low to high saturation */
-        background: conic-gradient(
-            from 0deg,
-            hsl(0, 0%, 50%),
-            hsl(0, 100%, 50%)
-        );
+        z-index: 2;
+        width: 30vw;
+        height: 30vw;
+        max-width: 300px;
+        max-height: 300px;
     }
 
     /* New value ring styles */
@@ -113,54 +89,64 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 180px; /* larger than the 160px hue ring */
-        height: 180px;
+        width: 200px;
+        height: 200px;
         transform: translate(-50%, -50%);
-        z-index: -1; /* behind the other rings */
         border-radius: 50%;
-        /* A conic gradient from dark (low value) to light (high value) */
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: conic-gradient(
             from 0deg,
             hsl(0, 0%, 0%),
             hsl(0, 0%, 100%)
         );
+        z-index: 1;
+        width: 50vw;
+        height: 50vw;
+        max-width: 360px;
+        max-height: 360px;
     }
 
     .color-ring-inner {
-        width: 112px; /* was 120px */
-        height: 112px; /* was 120px */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 200px;
+        height: 200px;
+        transform: translate(-50%, -50%);
         border-radius: 50%;
         background: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1;
+        z-index: 3; /* Ensure it's on top */
+        transition: transform 0.3s ease;
+        pointer-events: auto;
+        width: 50vw;
+        height: 50vw;
+        max-width: 360px;
+        max-height: 360px;
+    }
+    
+    .ring-container:hover .color-ring-inner {
+        transform: translate(-50%, -50%) scale(0.65);
     }
 
     .color-ring img {
-        width: 124px; /* was 120px */
-        height: 124px; /* was 120px */
+        width: 40vw;
+        height: 40vw;
+        max-width: 370px; /* optional max limit */
+        max-height: 370px;
         border-radius: 50%;
         object-fit: cover;
     }
 
     .ring-knob {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 24px;
-        height: 24px;
-        background: #fff;
-        border: 3px solid #333;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        background: transparent;
+        border: none;
+        box-shadow: none;
         z-index: 2;
-        pointer-events: none;
-        transition: border-color 0.3s;
     }
 
     .color-ring-input {
@@ -170,16 +156,6 @@
         opacity: 0;
         cursor: pointer;
         z-index: 3;
-    }
-
-    .color-ring, 
-    .saturation-ring {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        margin: 0;
     }
 
     .links a {
@@ -201,6 +177,7 @@
 </head>
 
 <body>
+<div id="homePage">
   <h1 align="center" id="welcome">Welcome</h1>
   <p align="center" id="follow">Follow me on social media :)</p>
 
@@ -210,29 +187,26 @@
             <div class="ring-knob" id="valueKnob"></div>
         </div>
 
-        <!-- Saturation ring -->
-        <div class="saturation-ring" id="saturationRing">
-            <div class="ring-knob" id="saturationKnob"></div>
-        </div>
-
         <!-- Hue ring on top -->
         <div class="color-ring" id="colorRing">
             <div class="ring-knob" id="ringKnob"></div>
             <div class="color-ring-inner">
-                <img src="https://github.com/DIcreative/linktree/blob/main/dicreative.jpg?raw=true" alt="Profile Photo" />
+                <div id="logoWrapper" onclick="event.stopPropagation(); showLinksPage()" style="cursor: pointer;">
+                    <img src="https://github.com/DIcreative/linktree/blob/main/logo.png?raw=true" alt="Profile Photo" />
+                </div>
             </div>
         </div>
     </div>
   <script>
     const translations = {
-      en: { welcome: "Welcome", follow: "Follow me on social media" },
-      es: { welcome: "Bienvenido", follow: "Sígueme en redes sociales" },
-      pt: { welcome: "Bem-vindo", follow: "Siga-me nas redes sociais" },
-      fr: { welcome: "Bienvenue", follow: "Suivez-moi sur les réseaux sociaux" },
-      ru: { welcome: "Добро пожаловать", follow: "Подпишитесь на меня в соцсетях" },
-      de: { welcome: "Willkommen", follow: "Folge mir in den sozialen Medien" },
-      ja: { welcome: "ようこそ", follow: "SNSでフォローしてね" },
-      hi: { welcome: "स्वागत है", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
+      en: { welcome: "Hello", follow: "Follow me on social media" },
+      es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
+      pt: { welcome: "Olá", follow: "Siga-me nas redes sociais" },
+      fr: { welcome: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux" },
+      ru: { welcome: "Привет", follow: "Подпишитесь на меня в соцсетях" },
+      de: { welcome: "Hallo", follow: "Folge mir in den sozialen Medien" },
+      ja: { welcome: "やあ", follow: "SNSでフォローしてね" },
+      hi: { welcome: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
     };
 
     const userLang = navigator.language.slice(0, 2);
@@ -244,18 +218,39 @@
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
 
-    const saturationRing = document.getElementById("saturationRing");
-    const saturationKnob = document.getElementById("saturationKnob");
-
     const valueRing = document.getElementById("valueRing");
     const valueKnob = document.getElementById("valueKnob");
 
     let currentHue = 0;
     let currentSaturation = 100;
     let currentValue = 90;
+    
+    let clickedLogo = false;
 
+    const logo = document.getElementById('logoWrapper');
+    logo.addEventListener('mousedown', (e) => {
+        clickedLogo = true;
+    });
+    
     function updateBackground() {
-        document.body.style.backgroundColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
+        const h = currentHue;
+        const s = currentSaturation;
+        const l = currentValue;
+
+        // Actualizar fondo
+        document.body.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+
+        // Calcular si es claro u oscuro
+        const isLight = l > 30;
+
+        // Cambiar color del texto en consecuencia
+        document.body.style.color = isLight ? "#000" : "#fff";
+
+        // También puedes cambiar el color de botones/enlaces si quieres
+        document.querySelectorAll('.links a').forEach(link => {
+            link.style.backgroundColor = isLight ? "#000" : "#fff";
+            link.style.color = isLight ? "#fff" : "#000";
+        });
     }
 
     function setHue(hue) {
@@ -263,11 +258,15 @@
         updateBackground();
         // Move knob
         const angle = (hue - 90) * Math.PI / 180; // -90 to start at top
-        const radius = 70; // (160 - 112) / 2 + 112/2 = 24 + 56 = 80, but visually 74 looks best
+        const ringRect = colorRing.getBoundingClientRect();
+        const radius = ringRect.width / 3
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
         ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
         ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
+        currentHue = hue;
+        updateBackground();
+        updateProfileLink();
     }
 
     // Helper to get angle from center
@@ -282,41 +281,21 @@
         if (angle < 0) angle += 360;
         return Math.round(angle);
     }
-    // Update the saturation ring knob position and border color
-    function setSaturation(saturation) {
-        currentSaturation = saturation;
-        updateBackground();
-
-        const angle = (saturation / 100 * 360) - 90;
-        const rad = angle * Math.PI / 180;
-        const radius = 70;
-        const x = Math.cos(rad) * radius;
-        const y = Math.sin(rad) * radius;
-        saturationKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
-        saturationKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, 50%)`;
-    }
-    // Get saturation percentage from event by mapping angle (0 - 360) to 0 - 100%
-    function getSaturationFromEvent(e) {
-        const rect = saturationRing.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
-        let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
-        if (angle < 0) angle += 360;
-        return Math.round(angle / 360 * 100);
-    }
     // Value (brightness) control
     function setValue(value) {
         currentValue = value;
         updateBackground();
         const angle = (value/100*360) - 90;
         const rad = angle * Math.PI/180;
-        const radius = 90; // adjust radius so that knob follows the outer value ring
+        const ringRect = colorRing.getBoundingClientRect();
+        const radius = ringRect.width / 2 - 20
         const x = Math.cos(rad) * radius;
         const y = Math.sin(rad) * radius;
         valueKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
         valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
+        currentValue = value;
+        updateBackground();
+        updateProfileLink();
     }
     function getValueFromEvent(e) {
         const rect = valueRing.getBoundingClientRect();
@@ -330,33 +309,29 @@
     }
 
     let draggingHue = false;
-        draggingSaturation = false;
-        draggingValue = false;
-
-    colorRing.addEventListener('mousedown', (e) => {
-        draggingHue = true;
-        setHue(getHueFromEvent(e));
-    });
-    colorRing.addEventListener('touchstart', (e) => {
-        draggingHue = true;
-        setHue(getHueFromEvent(e));
-    });
+    let draggingValue = false;
 
     // Add event listeners for hue
-    colorRing.addEventListener('mousedown', (e) => { draggingHue = true; setHue(getHueFromEvent(e)); });
-    colorRing.addEventListener('touchstart', (e) => { draggingHue = true; setHue(getHueFromEvent(e)); });
-    window.addEventListener('mousemove', (e) => { if(draggingHue) setHue(getHueFromEvent(e)); });
+    colorRing.addEventListener('mousedown', (e) => { 
+        const inner = document.querySelector('.color-ring-inner');
+        if (inner.contains(e.target)) return; // Avoid color change if click was inside logo
+        draggingHue = true;
+        setHue(getHueFromEvent(e));
+    });
+    colorRing.addEventListener('touchstart', (e) => { 
+        draggingHue = true;
+        setHue(getHueFromEvent(e));
+     });
+    window.addEventListener('mousemove', (e) => { 
+        if (clickedLogo) return;
+        if (draggingHue) setHue(getHueFromEvent(e));
+     });
     window.addEventListener('touchmove', (e) => { if(draggingHue) setHue(getHueFromEvent(e)); });
-    window.addEventListener('mouseup', () => draggingHue = false);
+    window.addEventListener('mouseup', () => {
+        draggingHue = false;
+        clickedLogo = false;
+    });
     window.addEventListener('touchend', () => draggingHue = false);
-
-    // Add event listeners for saturation
-    saturationRing.addEventListener('mousedown', (e) => { draggingSaturation = true; setSaturation(getSaturationFromEvent(e)); });
-    saturationRing.addEventListener('touchstart', (e) => { draggingSaturation = true; setSaturation(getSaturationFromEvent(e)); });
-    window.addEventListener('mousemove', (e) => { if(draggingSaturation) setSaturation(getSaturationFromEvent(e)); });
-    window.addEventListener('touchmove', (e) => { if(draggingSaturation) setSaturation(getSaturationFromEvent(e)); });
-    window.addEventListener('mouseup', () => draggingSaturation = false);
-    window.addEventListener('touchend', () => draggingSaturation = false);
 
     // Add event listeners for value
     valueRing.addEventListener('mousedown', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
@@ -370,9 +345,19 @@
     setHue(0);
     setSaturation(100);
     setValue(90);
-  </script>
 
-  <div class="links">
+    function updateProfileLink() {
+        const url = `profile.html?h=${currentHue}&s=${currentSaturation}&v=${currentValue}`;
+        document.getElementById("profileLink").href = url;
+    }
+    function showLinksPage() {
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("linksPage").style.display = "block";
+    }
+  </script>
+</div>
+
+<div id="linksPage" class="links" style="display:none;">
     <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
     <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
     <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
@@ -380,6 +365,7 @@
     <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
     <p align="center"><a href="coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
     <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
-  </div>
+</div>
+
 </body>
 </html>
