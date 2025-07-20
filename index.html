@@ -125,8 +125,17 @@
         height: 50vw;
         max-width: 360px;
         max-height: 360px;
+        overflow: hidden;
     }
-    
+        
+    .color-ring-inner img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
+    }
+
     .ring-container:hover .color-ring-inner {
         transform: translate(-50%, -50%) scale(0.65);
     }
@@ -138,6 +147,13 @@
         max-height: 370px;
         border-radius: 50%;
         object-fit: cover;
+    }
+    .color-ring-inner img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
     }
 
     .ring-knob {
