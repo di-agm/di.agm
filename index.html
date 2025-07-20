@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,7 +59,7 @@
         position: relative;
         width: 62vw;
         height: 62vw;
-        max-width: 350px;
+        max-width: 350px; /* optional max limit */
         max-height: 350px;
         margin: 2rem auto;
         z-index: 3;
@@ -86,32 +87,26 @@
         max-height: 300px;
     }
 
+    /* New value ring styles */
     .value-ring {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         border-radius: 50%;
-        background: conic-gradient(from 0deg, hsl(0, 0%, 0%), hsl(0, 0%, 100%));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: conic-gradient(
+            from 0deg,
+            hsl(0, 0%, 0%),
+            hsl(0, 0%, 100%)
+        );
         z-index: 2;
         width: 50vw;
         height: 50vw;
         max-width: 360px;
         max-height: 360px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-    }
-
-    .value-ring-hole {
-        width: 32vw;
-        height: 32vw;
-        max-width: 220px;
-        max-height: 220px;
-        border-radius: 50%;
-        background: transparent;
-        z-index: 2;
     }
 
     .color-ring-inner {
@@ -124,7 +119,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 3;
+        z-index: 3; /* Ensure it's on top */
         transition: transform 0.3s ease;
         pointer-events: auto;
         width: 50vw;
@@ -132,7 +127,7 @@
         max-width: 360px;
         max-height: 360px;
     }
-
+    
     .ring-container:hover .color-ring-inner {
         transform: translate(-50%, -50%) scale(0.65);
     }
@@ -140,7 +135,7 @@
     .color-ring img {
         width: 60vw;
         height: 60vw;
-        max-width: 370px;
+        max-width: 370px; /* optional max limit */
         max-height: 370px;
         border-radius: 50%;
         object-fit: cover;
@@ -182,15 +177,12 @@
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="welcome">Hello</h1>
+  <h1 align="center" id="welcome">Welcome</h1>
   <p align="center" id="follow">Follow me on social media :)</p>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
         <div class="value-ring" id="valueRing">
-            <div class="value-ring-hole"></div>
-            <div class="ring-knob" id="valueKnob"></div>
-        </div>
             <div class="ring-knob" id="valueKnob"></div>
         </div>
 
