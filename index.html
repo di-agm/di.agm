@@ -272,9 +272,8 @@
         const radius = ringRect.width / 3
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
-        ringKnob.style.transform = translate(-50%, -50%) translate(${x}px, ${y}px);
-        ringKnob.style.borderColor = hsl(${hue}, 100%, 50%);
-        currentHue = hue;
+        ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+        ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
         updateBackground();
         updateProfileLink();
     }
