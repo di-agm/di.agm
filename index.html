@@ -248,13 +248,13 @@
         const l = currentValue;
 
         // Actualizar fondo
-        document.body.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+        document.documentElement.style.setProperty('--bg', `hsl(${h}, ${s}%, ${l}%)`);
 
         // Calcular si es claro u oscuro
         const isLight = l > 30;
 
         // Cambiar color del texto en consecuencia
-        document.body.style.color = isLight ? "#000" : "#fff";
+        document.documentElement.style.setProperty('--fg', isLight ? "#000" : "#fff");
 
         // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
