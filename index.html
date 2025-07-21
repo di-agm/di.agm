@@ -244,7 +244,7 @@
     
     function updateBackground() {
         const h = currentHue;
-        const s = currentSaturation;
+        //const s = currentSaturation;
         const l = currentValue;
 
         // Actualizar fondo
@@ -254,7 +254,7 @@
         const isLight = l > 30;
 
         // Cambiar color del texto en consecuencia
-        document.body.style.color = `isLight ? "#000" : "#fff"`;
+        document.body.style.color = isLight ? "#000" : "#fff";
 
         // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
@@ -301,8 +301,8 @@
         const radius = ringRect.width / 2 - 20
         const x = Math.cos(rad) * radius;
         const y = Math.sin(rad) * radius;
-        valueKnob.style.transform = translate(-50%, -50%) translate(${x}px, ${y}px);
-        valueKnob.style.borderColor = hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%);
+        valueKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+        valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
         currentValue = value;
         updateBackground();
         updateProfileLink();
@@ -356,7 +356,7 @@
     setValue(90);
 
     function updateProfileLink() {
-        const url = profile.html?h=${currentHue}&s=${currentSaturation}&v=${currentValue};
+        const url = `profile.html?h=${currentHue}&s=${currentSaturation}&v=${currentValue}`;
     }
     function showLinksPage() {
         document.getElementById("homePage").style.display = "none";
