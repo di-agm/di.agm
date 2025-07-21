@@ -17,8 +17,7 @@
         background-color: var(--bg);
         color: var(--fg);
         transition: background-color 0.3s, color 0.3s;
-        max-width: 100vmin;
-        overflow: hidden;
+        max-width: 100%;
         box-sizing: border-box;
     }
 
@@ -32,7 +31,7 @@
         margin-bottom: 2rem;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 100%) {
         body {
             padding: 1rem 0.5rem;
             display: flex;
@@ -249,13 +248,13 @@
         const l = currentValue;
 
         // Actualizar fondo
-        document.body.style.backgroundColor = hsl(${h}, ${s}%, ${l}%);
+        document.body.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 
         // Calcular si es claro u oscuro
         const isLight = l > 30;
 
         // Cambiar color del texto en consecuencia
-        document.body.style.color = isLight ? "#000" : "#fff";
+        document.body.style.color = `isLight ? "#000" : "#fff"`;
 
         // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
