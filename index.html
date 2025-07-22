@@ -221,9 +221,9 @@
     const userLang = navigator.language.slice(0, 2);
     const lang = translations[userLang] ? userLang : "en";
 
-    document.getElementById("hello").textContent = translations[lang].welcome;
+    document.getElementById("hello").textContent = translations[lang].hello;
     document.getElementById("followLinks").textContent = translations[lang].follow;
-    document.getElementById("support").textContent = translations[lang].follow;
+    document.getElementById("support").textContent = translations[lang].support;
 
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
