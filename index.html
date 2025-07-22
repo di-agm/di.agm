@@ -223,7 +223,7 @@
     const lang = translations[userLang] ? userLang : "en";
 
     document.getElementById("welcome").textContent = translations[lang].welcome;
-    document.getElementById("follow").textContent = translations[lang].follow;
+    document.getElementById("followLinks").textContent = translations[lang].follow;
 
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
@@ -372,6 +372,8 @@
 </div>
 
 <div id="linksPage" class="links" style="display:none;">
+    <h2 id="followLinks" align="center"></h2>
+
     <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
     <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
     <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
