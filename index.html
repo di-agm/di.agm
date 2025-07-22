@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
     
     <style>
-    body {
+    body, #linksPage {
         position: relative;
         height: 100vh;
         font-family: 'Didact Gothic', sans-serif;
@@ -266,9 +266,8 @@
             link.style.backgroundColor = isLight ? "#000" : "#fff";
             link.style.color = isLight ? "#fff" : "#000";
 
-        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg');
-        document.body.style.color = getComputedStyle(document.documentElement).getPropertyValue('--fg')
-        });
+            document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg');
+            document.body.style.color = getComputedStyle(document.documentElement).getPropertyValue('--fg')});
     }
 
     function setHue(hue) {
