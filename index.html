@@ -261,13 +261,12 @@
         // Cambiar color del texto en consecuencia
         document.documentElement.style.setProperty('--fg', isLight ? "#000" : "#fff");
 
-        // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
             link.style.backgroundColor = isLight ? "#000" : "#fff";
             link.style.color = isLight ? "#fff" : "#000";
         });
         
-        // Aplica también el color al fondo general del body
+        // Aplicar fondo y color al <body>
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg');
         document.body.style.color = getComputedStyle(document.documentElement).getPropertyValue('--fg');
 
