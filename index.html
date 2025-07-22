@@ -265,6 +265,9 @@
         document.querySelectorAll('.links a').forEach(link => {
             link.style.backgroundColor = isLight ? "#000" : "#fff";
             link.style.color = isLight ? "#fff" : "#000";
+
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg');
+        document.body.style.color = getComputedStyle(document.documentElement).getPropertyValue('--fg')
         });
     }
 
