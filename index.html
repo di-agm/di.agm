@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
     
     <style>
-    body, #linksPage {
+    body {
         position: relative;
         height: 100vh;
         font-family: 'Didact Gothic', sans-serif;
@@ -181,17 +181,13 @@
     .links a:hover {
         background-color: #444;
     }
-
-    :root {
-      --bg: hsl(0, 100%, 90%);
-      --fg: #000;
-    }
 </style>
 </head>
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="hello">Hello!</h1>
+  <h1 align="center" id="welcome">Welcome</h1>
+  <p align="center" id="follow">Follow me on social media :)</p>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
@@ -213,22 +209,21 @@
     </div>
   <script>
     const translations = {
-      en: { hello: "Hello", follow: "Follow me on social media", support: "and/or support me, it really helps :)" },
-      es: { hello: "Hola", follow: "Sígueme en redes sociales", support: "and/or support me, it really helps :)" },
-      pt: { hello: "Olá", follow: "Siga-me nas redes sociais", support: "and/or support me, it really helps :)" },
-      fr: { hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", support: "and/or support me, it really helps :)" },
-      ru: { hello: "Привет", follow: "Подпишитесь на меня в соцсетях", support: "and/or support me, it really helps :)" },
-      de: { hello: "Hallo", follow: "Folge mir in den sozialen Medien", support: "and/or support me, it really helps :)" },
-      ja: { hello: "やあ", follow: "SNSでフォローしてね", support: "and/or support me, it really helps :)" },
-      hi: { hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", support: "and/or support me, it really helps :)" }
+      en: { welcome: "Hello", follow: "Follow me on social media" },
+      es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
+      pt: { welcome: "Olá", follow: "Siga-me nas redes sociais" },
+      fr: { welcome: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux" },
+      ru: { welcome: "Привет", follow: "Подпишитесь на меня в соцсетях" },
+      de: { welcome: "Hallo", follow: "Folge mir in den sozialen Medien" },
+      ja: { welcome: "やあ", follow: "SNSでフォローしてね" },
+      hi: { welcome: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
     };
 
     const userLang = navigator.language.slice(0, 2);
     const lang = translations[userLang] ? userLang : "en";
 
-    document.getElementById("hello").textContent = translations[lang].hello;
-    document.getElementById("followLinks").textContent = translations[lang].follow;
-    document.getElementById("support").textContent = translations[lang].support;
+    document.getElementById("welcome").textContent = translations[lang].welcome;
+    document.getElementById("follow").textContent = translations[lang].follow;
 
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
@@ -261,14 +256,12 @@
         // Cambiar color del texto en consecuencia
         document.documentElement.style.setProperty('--fg', isLight ? "#000" : "#fff");
 
+        // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
             link.style.backgroundColor = isLight ? "#000" : "#fff";
             link.style.color = isLight ? "#fff" : "#000";
         });
-        
-        // Aplicar fondo y color al <body>
-        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg');
-        document.body.style.color = getComputedStyle(document.documentElement).getPropertyValue('--fg');
+    }
 
     function setHue(hue) {
         currentHue = hue;
@@ -379,22 +372,10 @@
 </div>
 
 <div id="linksPage" class="links" style="display:none;">
-    <h2 id="followLinks" align="center"></h2>
-
-    <p align="center">
-    <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" style="height: 40px;" /></a>
-    </p>
-    <p align="center">
-    <a href="https://www.tumblr.com/dicreative?source=share" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Tumblr.png?raw=true" alt="Tumblr" style="height: 40px;" /></a>
-    </p>
-    <p align="center">
-    <a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="Reddit" style="height: 40px;" /></a>
-    </p>
-    <p align="center">
-    <a href="https://pin.it/4kXf9Bu18" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" style="height: 40px;" /></a>
-    </p>
-
-    <h2 id="support" align="center"></h2>
+    <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
+    <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
+    <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
+    <p align="center"><a href="https://pin.it/4kXf9Bu18" target="_blank">Pinterest</a></p>
     <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
     <p align="center"><a href="https://coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
     <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
