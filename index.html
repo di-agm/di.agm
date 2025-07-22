@@ -186,7 +186,7 @@
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="welcome">Welcome</h1>
+  <h1 align="center" id="hello">Hello!</h1>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
@@ -208,21 +208,22 @@
     </div>
   <script>
     const translations = {
-      en: { welcome: "Hello", follow: "Follow me on social media" },
-      es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
-      pt: { welcome: "Olá", follow: "Siga-me nas redes sociais" },
-      fr: { welcome: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux" },
-      ru: { welcome: "Привет", follow: "Подпишитесь на меня в соцсетях" },
-      de: { welcome: "Hallo", follow: "Folge mir in den sozialen Medien" },
-      ja: { welcome: "やあ", follow: "SNSでフォローしてね" },
-      hi: { welcome: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
+      en: { hello: "Hello", follow: "Follow me on social media", support: "and/or support me, it really helps :)" },
+      es: { hello: "Hola", follow: "Sígueme en redes sociales", support: "and/or support me, it really helps :)" },
+      pt: { hello: "Olá", follow: "Siga-me nas redes sociais", support: "and/or support me, it really helps :)" },
+      fr: { hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", support: "and/or support me, it really helps :)" },
+      ru: { hello: "Привет", follow: "Подпишитесь на меня в соцсетях", support: "and/or support me, it really helps :)" },
+      de: { hello: "Hallo", follow: "Folge mir in den sozialen Medien", support: "and/or support me, it really helps :)" },
+      ja: { hello: "やあ", follow: "SNSでフォローしてね", support: "and/or support me, it really helps :)" },
+      hi: { hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", support: "and/or support me, it really helps :)" }
     };
 
     const userLang = navigator.language.slice(0, 2);
     const lang = translations[userLang] ? userLang : "en";
 
-    document.getElementById("welcome").textContent = translations[lang].welcome;
+    document.getElementById("hello").textContent = translations[lang].welcome;
     document.getElementById("followLinks").textContent = translations[lang].follow;
+    document.getElementById("support").textContent = translations[lang].follow;
 
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
@@ -377,6 +378,8 @@
     <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
     <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
     <p align="center"><a href="https://pin.it/4kXf9Bu18" target="_blank">Pinterest</a></p>
+
+    <h2 id="support" align="center"></h2>
     <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
     <p align="center"><a href="https://coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
     <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
