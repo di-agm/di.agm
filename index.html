@@ -258,8 +258,12 @@
 
         // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
-            link.style.backgroundColor = isLight ? "#000" : "#fff";
-            link.style.color = isLight ? "#fff" : "#000";
+            link.style.backgroundColor = "transparent"; // keep image-only look
+        });
+        
+        document.querySelectorAll('.label').forEach(label => {
+            label.style.backgroundColor = isLight ? "#000" : "#fff";
+            label.style.color = isLight ? "#fff" : "#000";
         });
     }
 
@@ -404,9 +408,9 @@
     <div class="link-icon"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="reddit" /><span class="label">Reddit</span></a></div>
     <div class="link-icon"><a href="https://pin.it/4kXf9Bu18" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" /><span class="label">Pinterest</span></a></div>
     
-    <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
-    <p align="center"><a href="https://coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
-    <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
+    <div class="link-icon"><a href="https://ko-fi.com/dicreative" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" /><span class="label">KoFi</span></a></div>
+    <div class="link-icon"><a href="https://coff.ee/dicreative" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/BmaC.png?raw=true" alt="Buy me a coffee" /><span class="label">Buy me a coffee</span></a></div>
+    <div class="link-icon"><a href="https://dicreativemag.myshopify.com/" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true" alt="Shopify" /><span class="label">Shopify</span></a></div>
 </div>
 
 </body>
