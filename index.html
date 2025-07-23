@@ -180,20 +180,26 @@
     }
         
     .link-icon .label {
-        display: block;
-        background-color: var(--fg);
-        color: var(--bg);
-        padding: 0.4rem 0.8rem;
-        margin-top: 0.5rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-        
-    .link-icon:hover .label {
-        opacity: 1;
-    }
+    display: block;
+    background-color: var(--fg);
+    color: var(--bg);
+    padding: 0.4rem 0.8rem;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    height: 0;
+    overflow: hidden;
+}
+
+.link-icon:hover .label {
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+    overflow: visible;
+}
 </style>
 </head>
 
