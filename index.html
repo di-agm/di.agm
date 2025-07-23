@@ -175,31 +175,25 @@
     }
         
     .link-icon img {
-        height: 40px;
+        height: 10vmin;
         transition: transform 0.3s;
     }
         
     .link-icon .label {
-    display: block;
-    background-color: var(--fg);
-    color: var(--bg);
-    padding: 0.4rem 0.8rem;
-    margin-top: 0.5rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
-    height: 0;
-    overflow: hidden;
-}
+        display: none;
+        background-color: var(--fg);
+        color: var(--bg);
+        padding: 0.4rem 0.8rem;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+    .link-icon:hover .label {
+        display: inline-block;
+        opacity: 1;
+    }
 
-.link-icon:hover .label {
-    visibility: visible;
-    opacity: 1;
-    height: auto;
-    overflow: visible;
-}
 </style>
 </head>
 
