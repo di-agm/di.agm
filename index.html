@@ -206,8 +206,7 @@
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="welcome">Welcome</h1>
-  <p align="center" id="follow">Follow me on social media :)</p>
+  <h1 align="center" id="Hello">Hello</h1>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
@@ -229,21 +228,22 @@
     </div>
   <script>
     const translations = {
-      en: { welcome: "Hello", follow: "Follow me on social media" },
-      es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
-      pt: { welcome: "Olá", follow: "Siga-me nas redes sociais" },
-      fr: { welcome: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux" },
-      ru: { welcome: "Привет", follow: "Подпишитесь на меня в соцсетях" },
-      de: { welcome: "Hallo", follow: "Folge mir in den sozialen Medien" },
-      ja: { welcome: "やあ", follow: "SNSでフォローしてね" },
-      hi: { welcome: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
+      en: { Hello: "Hello", follow: "Follow me on social media", support: "Your support really helps :)" },
+      es: { Hello: "Hola", follow: "Sígueme en redes sociales", support: "Tu apoyo realmente me ayuda :)" },
+      pt: { Hello: "Olá", follow: "Siga-me nas redes sociais", support: "Seu apoio realmente ajuda :)" },
+      fr: { Hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", support: "Ton soutien aide vraiment :)" },
+      ru: { Hello: "Привет", follow: "Подпишитесь на меня в соцсетях", support: "Твоя поддержка действительно помогает :)" },
+      de: { Hello: "Hallo", follow: "Folge mir in den sozialen Medien", support: "Deine Unterstützung hilft wirklich :)" },
+      ja: { Hello: "やあ", follow: "SNSでフォローしてね", support: "あなたの支えは本当に助かります :)" },
+      hi: { Hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", support: "आपका समर्थन वाकई मदद करता है :)" }
     };
 
     const userLang = navigator.language.slice(0, 2);
     const lang = translations[userLang] ? userLang : "en";
 
-    document.getElementById("welcome").textContent = translations[lang].welcome;
+    document.getElementById("Hello").textContent = translations[lang].Hello;
     document.getElementById("follow").textContent = translations[lang].follow;
+    document.getElementById("follow").textContent = translations[lang].support;
 
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
@@ -392,6 +392,7 @@
 </div>
     
 <div id="linksPage" class="links" style="display:none;">
+    <p align="center" id="follow">Follow me on social media :)</p>
     <div class="link-icon">
       <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
@@ -416,6 +417,7 @@
         <span class="label">Pinterest</span>
       </a>
     </div>
+    <p align="center" id="support">Your support really helps :)</p>
     <div class="link-icon">
       <a href="https://ko-fi.com/dicreative" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
