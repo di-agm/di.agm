@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Linktree</title>
     <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
     
@@ -206,11 +208,6 @@
         </div>
     </div>
   <script>
-    :root {
-        --bg: hsl(0, 100%, 90%);
-        --fg: #000;
-    }
-
     const translations = {
       en: { welcome: "Hello", follow: "Follow me on social media" },
       es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
@@ -261,12 +258,8 @@
 
         // También puedes cambiar el color de botones/enlaces si quieres
         document.querySelectorAll('.links a').forEach(link => {
-            link.style.backgroundColor = "transparent"; // keep image-only look
-        });
-        
-        document.querySelectorAll('.label').forEach(label => {
-            label.style.backgroundColor = isLight ? "#000" : "#fff";
-            label.style.color = isLight ? "#fff" : "#000";
+            link.style.backgroundColor = isLight ? "#000" : "#fff";
+            link.style.color = isLight ? "#fff" : "#000";
         });
     }
 
@@ -372,48 +365,20 @@
     logo.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') showLinksPage();
     });
-
-    .link-icon {
-        position: relative;
-        display: inline-block;
-        margin: 1rem;
-        text-align: center;
-    }
-        
-    .link-icon img {
-        height: 40px;
-        transition: transform 0.3s;
-    }
-        
-    .link-icon .label {
-        display: block;
-        background-color: #000;
-        color: white;
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-        
-    .link-icon:hover .label {
-        opacity: 1;
-    }
-
   </script>
-    
+    <meta name="description" content="My colorful Linktree-style page with dynamic background and links." />
+    <meta property="og:title" content="DIcreative Links" />
+    <meta property="og:image" content="https://github.com/DIcreative/linktree/blob/main/logo.png?raw=true" />
 </div>
 
 <div id="linksPage" class="links" style="display:none;">
-    <div class="link-icon"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" /><span class="label">Instagram</span></a></div>
-    <div class="link-icon"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Tumblr.png?raw=true" alt="Tumblr" /><span class="label">Tumblr</span></a></div>
-    <div class="link-icon"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="reddit" /><span class="label">Reddit</span></a></div>
-    <div class="link-icon"><a href="https://pin.it/4kXf9Bu18" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" /><span class="label">Pinterest</span></a></div>
-    
-    <div class="link-icon"><a href="https://ko-fi.com/dicreative" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" /><span class="label">KoFi</span></a></div>
-    <div class="link-icon"><a href="https://coff.ee/dicreative" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/BmaC.png?raw=true" alt="Buy me a coffee" /><span class="label">Buy me a coffee</span></a></div>
-    <div class="link-icon"><a href="https://dicreativemag.myshopify.com/" target="_blank"><img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true" alt="Shopify" /><span class="label">Shopify</span></a></div>
+    <p align="center"><a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">Instagram</a></p>
+    <p align="center"><a href="https://www.tumblr.com/dicreative?source=share" target="_blank">Tumblr</a></p>
+    <p align="center"><a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">Reddit</a></p>
+    <p align="center"><a href="https://pin.it/4kXf9Bu18" target="_blank">Pinterest</a></p>
+    <p align="center"><a href="https://ko-fi.com/dicreative" target="_blank">Ko-fi</a></p>
+    <p align="center"><a href="https://coff.ee/dicreative" target="_blank">Buy me a coffee</a></p>
+    <p align="center"><a href="https://dicreativemag.myshopify.com/" target="_blank">Shopify</a></p>
 </div>
 
 </body>
