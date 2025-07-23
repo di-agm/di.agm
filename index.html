@@ -10,6 +10,7 @@
     :root {
         --bg: hsl(0, 100%, 90%);
         --fg: #000;
+        transition: all 0.4s ease;
     }
     body {
         position: relative;
@@ -162,7 +163,7 @@
     }
 
     .link-icon img {
-        height: 30vmin;
+        height: 50vmin;
         transition: transform 0.3s;
         border-radius: 50%;
         background-color: transparent;
@@ -194,8 +195,7 @@
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="welcome">Welcome</h1>
-  <p align="center" id="follow">Follow me on social media</p>
+  <h1 align="center" id="hello">hello</h1>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
@@ -215,168 +215,170 @@
         </div>
         </div>
     </div>
-  <script>
-    const translations = {
-      en: { welcome: "Hello", follow: "Follow me on social media" },
-      es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
-      pt: { welcome: "Olá", follow: "Siga-me nas redes sociais" },
-      fr: { welcome: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux" },
-      ru: { welcome: "Привет", follow: "Подпишитесь на меня в соцсетях" },
-      de: { welcome: "Hallo", follow: "Folge mir in den sozialen Medien" },
-      ja: { welcome: "やあ", follow: "SNSでフォローしてね" },
-      hi: { welcome: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
-    };
 
-    const userLang = navigator.language.slice(0, 2);
-    const lang = translations[userLang] ? userLang : "en";
+    <script>
+        const translations = {
+        en: { hello: "Hello", follow: "Follow me on social media", support:"Your support really helps" },
+        es: { hello: "Hola", follow: "Sígueme en redes sociales", support:"Tu apoyo realmente ayuda" },
+        pt: { hello: "Olá", follow: "Siga-me nas redes sociais", support:"Seu apoio realmente ajuda" },
+        fr: { hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", support:"Votre soutien aide vraiment" },
+        ru: { hello: "Привет", follow: "Подпишитесь на меня в соцсетях", support:"Ваша поддержка действительно помогает" },
+        de: { hello: "Hallo", follow: "Folge mir in den sozialen Medien", support:"Deine Unterstützung hilft wirklich" },
+        ja: { hello: "やあ", follow: "SNSでフォローしてね", support:"あなたのサポートは本当に助かります" },
+        hi: { hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", support:"आपका समर्थन वास्तव में मदद करता है" }
+        };
 
-    document.getElementById("welcome").textContent = translations[lang].welcome;
-    document.getElementById("follow").textContent = translations[lang].follow;
+        const userLang = navigator.language.slice(0, 2);
+        const lang = translations[userLang] ? userLang : "en";
 
-    const colorRing = document.getElementById("colorRing");
-    const ringKnob = document.getElementById("ringKnob");    
+        document.getElementById("hello").textContent = translations[lang].hello;
+        const followText = document.getElementById("follow");
+        if (followText) {
+            followText.textContent = translations[lang].follow;
+        }
+        const supportText = document.getElementById("support");
+        if (supportText) {
+            supportText.textContent = translations[lang].support;
+        }
 
-    const valueRing = document.getElementById("valueRing");
-    const valueKnob = document.getElementById("valueKnob");
+        const colorRing = document.getElementById("colorRing");
+        const ringKnob = document.getElementById("ringKnob");    
 
-    let currentHue = 0;
-    let currentSaturation = 100;
-    let currentValue = 90;
+        const valueRing = document.getElementById("valueRing");
+        const valueKnob = document.getElementById("valueKnob");
 
-    let clickedLogo = false;
+        let currentHue = 0;
+        let currentSaturation = 100;
+        let currentValue = 90;
 
-    const logo = document.getElementById('logoWrapper');
-    logo.addEventListener('mousedown', (e) => {
-        clickedLogo = true;
-    });
+        let clickedLogo = false;
 
-    function updateBackground() {
-        const h = currentHue;
-        const s = currentSaturation;
-        const l = currentValue;
-
-        // Actualizar fondo
-        document.documentElement.style.setProperty('--bg', `hsl(${h}, ${s}%, ${l}%)`);
-
-        // Calcular si es claro u oscuro
-        const isLight = l > 30;
-
-        // Cambiar color del texto en consecuencia
-        document.documentElement.style.setProperty('--fg', isLight ? "#000" : "#fff");
-
-        // También puedes cambiar el color de botones/enlaces si quieres
-        document.querySelectorAll('.links a').forEach(link => {
-            link.style.backgroundColor = "transparent"; // elimina fondo negro
-            link.style.color = isLight ? "#000" : "#fff";
+        const logo = document.getElementById('logoWrapper');
+        logo.addEventListener('mousedown', (e) => {
+            clickedLogo = true;
         });
-    }
 
-    function setHue(hue) {
-        currentHue = hue;
-        updateBackground();
-        // Move knob
-        const angle = (hue - 90) * Math.PI / 180; // -90 to start at top
-        const ringRect = colorRing.getBoundingClientRect();
-        const radius = ringRect.width / 3
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
-        ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
-        updateBackground();
-        updateProfileLink();
-    }
+        function updateBackground() {
+            const h = currentHue;
+            const s = currentSaturation;
+            const l = currentValue;
 
-    // Helper to get angle from center
-    function getHueFromEvent(e) {
-        const rect = colorRing.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        console.log("Center:", cx, cy);
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
-        let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
-        if (angle < 0) angle += 360;
-        return Math.round(angle);
-    }
-    // Value (brightness) control
-    function setValue(value) {
-        currentValue = value;
-        updateBackground();
-        const angle = (value/100*360) - 90;
-        const rad = angle * Math.PI/180;
-        const ringRect = colorRing.getBoundingClientRect();
-        const radius = ringRect.width / 2 - 20
-        const x = Math.cos(rad) * radius;
-        const y = Math.sin(rad) * radius;
-        valueKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
-        valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
-        currentValue = value;
-        updateBackground();
-        updateProfileLink();
-    }
-    function getValueFromEvent(e) {
-        const rect = valueRing.getBoundingClientRect();
-        const cx = rect.left + rect.width/2;
-        const cy = rect.top + rect.height/2;
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
-        let angle = Math.atan2(y, x)*180/Math.PI+90;
-        if(angle<0) angle+=360;
-        return Math.round(angle/360*100);
-    }
+            // Actualizar fondo
+            document.documentElement.style.setProperty('--bg', `hsl(${h}, ${s}%, ${l}%)`);
 
-    let draggingHue = false;
-    let draggingValue = false;
+            // Calcular si es claro u oscuro
+            const isLight = l > 30;
 
-    // Add event listeners for hue
-    colorRing.addEventListener('mousedown', (e) => { 
-        const inner = document.querySelector('.color-ring-inner');
-        if (inner.contains(e.target)) return; // Avoid color change if click was inside logo
-        draggingHue = true;
-        setHue(getHueFromEvent(e));
-    });
-    colorRing.addEventListener('touchstart', (e) => { 
-        draggingHue = true;
-        setHue(getHueFromEvent(e));
-     });
-    window.addEventListener('mousemove', (e) => { 
-        if (clickedLogo) return;
-        if (draggingHue) setHue(getHueFromEvent(e));
-     });
-    window.addEventListener('touchmove', (e) => { if(draggingHue) setHue(getHueFromEvent(e)); });
-    window.addEventListener('mouseup', () => {
-        draggingHue = false;
-        clickedLogo = false;
-    });
-    window.addEventListener('touchend', () => draggingHue = false);
+            // Cambiar color del texto en consecuencia
+            document.documentElement.style.setProperty('--fg', isLight ? "#000" : "#fff");
 
-    // Add event listeners for value
-    valueRing.addEventListener('mousedown', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
-    valueRing.addEventListener('touchstart', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
-    window.addEventListener('mousemove', (e) => { if(draggingValue) setValue(getValueFromEvent(e)); });
-    window.addEventListener('touchmove', (e) => { if(draggingValue) setValue(getValueFromEvent(e)); });
-    window.addEventListener('mouseup', () => draggingValue = false);
-    window.addEventListener('touchend', () => draggingValue = false);
+            // También puedes cambiar el color de botones/enlaces si quieres
+            document.querySelectorAll('.links a').forEach(link => {
+                link.style.backgroundColor = "transparent"; // elimina fondo negro
+                link.style.color = isLight ? "#000" : "#fff";
+            });
+        }
 
-    // Set initial values
-    setHue(0);
-    setValue(90);
+        function setHue(hue) {
+            currentHue = hue;
+            // Move knob
+            const angle = (hue - 90) * Math.PI / 180; // -90 to start at top
+            const ringRect = colorRing.getBoundingClientRect();
+            const radius = ringRect.width / 3
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
+            updateBackground();
+            updateProfileLink();
+        }
 
-    function showLinksPage() {
-        document.getElementById("homePage").style.display = "none";
-        document.getElementById("linksPage").style.display = "block";
-    }
+        // Helper to get angle from center
+        function getHueFromEvent(e) {
+            const rect = colorRing.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            console.log("Center:", cx, cy);
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
+            let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
+            if (angle < 0) angle += 360;
+            return Math.round(angle);
+        }
+        // Value (brightness) control
+        function setValue(value) {
+            currentValue = value;
+            const angle = (value/100*360) - 90;
+            const rad = angle * Math.PI/180;
+            const ringRect = colorRing.getBoundingClientRect();
+            const radius = ringRect.width / 2 - 20
+            const x = Math.cos(rad) * radius;
+            const y = Math.sin(rad) * radius;
+            valueKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
+            currentValue = value;
+            updateBackground();
+            updateProfileLink();
+        }
+        function getValueFromEvent(e) {
+            const rect = valueRing.getBoundingClientRect();
+            const cx = rect.left + rect.width/2;
+            const cy = rect.top + rect.height/2;
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
+            let angle = Math.atan2(y, x)*180/Math.PI+90;
+            if(angle<0) angle+=360;
+            return Math.round(angle/360*100);
+        }
 
-    logo.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') showLinksPage();
-    });
-  </script>
+        let draggingHue = false;
+        let draggingValue = false;
+
+        // Add event listeners for hue
+        colorRing.addEventListener('mousedown', (e) => { 
+            const inner = document.querySelector('.color-ring-inner');
+            if (inner.contains(e.target)) return; // Avoid color change if click was inside logo
+            draggingHue = true;
+            setHue(getHueFromEvent(e));
+        });
+        colorRing.addEventListener('touchstart', (e) => { 
+            draggingHue = true;
+            setHue(getHueFromEvent(e));
+        });
+        window.addEventListener('mousemove', (e) => { 
+            if (clickedLogo) return;
+            if (draggingHue) setHue(getHueFromEvent(e));
+        });
+        window.addEventListener('touchmove', (e) => { if(draggingHue) setHue(getHueFromEvent(e)); });
+        window.addEventListener('mouseup', () => {
+            draggingHue = false;
+            clickedLogo = false;
+        });
+        window.addEventListener('touchend', () => draggingHue = false);
+
+        // Add event listeners for value
+        valueRing.addEventListener('mousedown', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
+        valueRing.addEventListener('touchstart', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
+        window.addEventListener('mousemove', (e) => { if(draggingValue) setValue(getValueFromEvent(e)); });
+        window.addEventListener('touchmove', (e) => { if(draggingValue) setValue(getValueFromEvent(e)); });
+        window.addEventListener('mouseup', () => draggingValue = false);
+        window.addEventListener('touchend', () => draggingValue = false);
+
+        // Set initial values
+        setHue(0);
+        setValue(90);
+
+        logo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') showLinksPage();
+        });
+    </script>
     <meta name="description" content="My colorful Linktree-style page with dynamic background and links." />
     <meta property="og:title" content="DIcreative Links" />
     <meta property="og:image" content="https://github.com/DIcreative/linktree/blob/main/logo.png?raw=true" />
 </div>
 
 <div id="linksPage" class="links" style="display:none;">
+  <p align="center" id="follow">Follow me on social media</p>
     <div class="link-icon">
       <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
@@ -401,6 +403,7 @@
         <span class="label">Pinterest</span>
       </a>
     </div>
+    <p align="center" id="support">Your support really helps</p>
     <div class="link-icon">
       <a href="https://ko-fi.com/dicreative" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
@@ -420,5 +423,40 @@
       </a>
     </div>
 </div>
+    <script>
+        // Mostrar página principal
+        function showHomePage() {
+            document.getElementById("homePage").style.display = "block";
+            document.getElementById("linksPage").style.display = "none";
+        }
+
+        // Mostrar página de enlaces
+        function showLinksPage() {
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("linksPage").style.display = "block";
+            history.pushState({ page: "links" }, "", "#links");
+        }
+
+        // Al cargar, establecer el estado inicial
+        document.addEventListener("DOMContentLoaded", () => {
+            history.replaceState({ page: "home" }, "", "#");
+
+            // Detectar si se cargó directamente en #links
+            if (location.hash === "#links") {
+                showLinksPage();
+            } else {
+                showHomePage();
+            }
+        });
+
+        // Escuchar el botón de atrás o avance del navegador
+        window.addEventListener("popstate", (event) => {
+            if (event.state && event.state.page === "links") {
+                showLinksPage();
+            } else {
+                showHomePage();
+            }
+        });
+    </script>
 </body>
 </html>
