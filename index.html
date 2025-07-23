@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Linktree</title>
     <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
-    
+
     <style>
     body {
         position: relative;
@@ -19,10 +19,6 @@
         transition: background-color 0.3s, color 0.3s;
         max-width: 100%;
         box-sizing: border-box;
-    }
-    :root {
-      --bg: hsl(0, 100%, 90%);
-      --fg: #000;
     }
 
     h1 {
@@ -127,7 +123,7 @@
         height: 60vmin;
         overflow: hidden;
     }
-        
+
     .color-ring-inner img {
           width: 100%;
           height: 100%;
@@ -177,13 +173,14 @@
         background-color: transparent;
         padding: 0;
     }
-        
+
     .link-icon img {
+        height: 20vmin;
         height: 30vmin;
         transition: transform 0.3s;
         border-radius: 50%;
     }
-        
+
     .link-icon .label {
     display: block;
     background-color: var(--fg);
@@ -210,7 +207,8 @@
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="Hello">Hello</h1>
+  <h1 align="center" id="welcome">Welcome</h1>
+  <p align="center" id="follow">Follow me on social media :)</p>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
@@ -222,7 +220,7 @@
         <div class="color-ring" id="colorRing">
             <div class="ring-knob" id="ringKnob"></div>
         </div>
-        
+
         <div class="color-ring-inner">
             <div id="logoWrapper" onclick="event.stopPropagation(); showLinksPage()" style="cursor: pointer;">
                 <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
@@ -232,22 +230,21 @@
     </div>
   <script>
     const translations = {
-      en: { Hello: "Hello", follow: "Follow me on social media", support: "Your support really helps :)" },
-      es: { Hello: "Hola", follow: "Sígueme en redes sociales", support: "Tu apoyo realmente me ayuda :)" },
-      pt: { Hello: "Olá", follow: "Siga-me nas redes sociais", support: "Seu apoio realmente ajuda :)" },
-      fr: { Hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", support: "Ton soutien aide vraiment :)" },
-      ru: { Hello: "Привет", follow: "Подпишитесь на меня в соцсетях", support: "Твоя поддержка действительно помогает :)" },
-      de: { Hello: "Hallo", follow: "Folge mir in den sozialen Medien", support: "Deine Unterstützung hilft wirklich :)" },
-      ja: { Hello: "やあ", follow: "SNSでフォローしてね", support: "あなたの支えは本当に助かります :)" },
-      hi: { Hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", support: "आपका समर्थन वाकई मदद करता है :)" }
+      en: { welcome: "Hello", follow: "Follow me on social media" },
+      es: { welcome: "Hola", follow: "Sígueme en redes sociales" },
+      pt: { welcome: "Olá", follow: "Siga-me nas redes sociais" },
+      fr: { welcome: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux" },
+      ru: { welcome: "Привет", follow: "Подпишитесь на меня в соцсетях" },
+      de: { welcome: "Hallo", follow: "Folge mir in den sozialen Medien" },
+      ja: { welcome: "やあ", follow: "SNSでフォローしてね" },
+      hi: { welcome: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें" }
     };
 
     const userLang = navigator.language.slice(0, 2);
     const lang = translations[userLang] ? userLang : "en";
 
-    document.getElementById("Hello").textContent = translations[lang].Hello;
+    document.getElementById("welcome").textContent = translations[lang].welcome;
     document.getElementById("follow").textContent = translations[lang].follow;
-    document.getElementById("support").textContent = translations[lang].support;
 
     const colorRing = document.getElementById("colorRing");
     const ringKnob = document.getElementById("ringKnob");    
@@ -258,14 +255,14 @@
     let currentHue = 0;
     let currentSaturation = 100;
     let currentValue = 90;
-    
+
     let clickedLogo = false;
 
     const logo = document.getElementById('logoWrapper');
     logo.addEventListener('mousedown', (e) => {
         clickedLogo = true;
     });
-    
+
     function updateBackground() {
         const h = currentHue;
         const s = currentSaturation;
@@ -394,9 +391,8 @@
     <meta property="og:title" content="DIcreative Links" />
     <meta property="og:image" content="https://github.com/DIcreative/linktree/blob/main/logo.png?raw=true" />
 </div>
-    
+
 <div id="linksPage" class="links" style="display:none;">
-    <p align="center" id="follow">Follow me on social media :)</p>
     <div class="link-icon">
       <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
@@ -421,7 +417,6 @@
         <span class="label">Pinterest</span>
       </a>
     </div>
-    <p align="center" id="support">Your support really helps :)</p>
     <div class="link-icon">
       <a href="https://ko-fi.com/dicreative" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
@@ -436,6 +431,7 @@
     </div>
     <div class="link-icon">
       <a href="https://dicreativemag.myshopify.com/" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true" alt="Shopify" />
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true"/>
         <span class="label">Shopify</span>
       </a>
