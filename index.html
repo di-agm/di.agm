@@ -195,7 +195,7 @@
 
 <body>
 <div id="homePage">
-  <h1 align="center" id="hello">hello</h1>
+  <h1 align="center" id="hello">Hello</h1>
 
     <div class="ring-container">
         <!-- Value ring behind all others -->
@@ -371,6 +371,22 @@
         logo.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') showLinksPage();
         });
+        
+        function updateTranslations() {
+            document.getElementById("hello").textContent = translations[lang].hello;
+
+            const followText = document.getElementById("follow");
+            if (followText) {
+                followText.textContent = translations[lang].follow;
+            }
+
+            const supportText = document.getElementById("support");
+            if (supportText) {
+                supportText.textContent = translations[lang].support;
+            }
+        }
+
+        updateTranslations();
     </script>
     <meta name="description" content="My colorful Linktree-style page with dynamic background and links." />
     <meta property="og:title" content="DIcreative Links" />
@@ -378,7 +394,7 @@
 </div>
 
 <div id="linksPage" class="links" style="display:none;">
-  <p align="center" id="follow">Follow me on social media</p>
+  <h1 align="center" id="follow">Follow me on social media</h1>
     <div class="link-icon">
       <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
@@ -404,7 +420,7 @@
         <span class="label">Pinterest</span>
       </a>
     </div>
-    <p align="center" id="support">Your support really helps</p>
+    <h1 align="center" id="support">Your support really helps</h1>
     <div class="link-icon">
       <a href="https://ko-fi.com/dicreative" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
@@ -436,6 +452,7 @@
             document.getElementById("homePage").style.display = "none";
             document.getElementById("linksPage").style.display = "block";
             history.pushState({ page: "links" }, "", "#links");
+            updateTranslations();
         }
 
         // Al cargar, establecer el estado inicial
