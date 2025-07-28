@@ -430,8 +430,17 @@
         });
 
         window.addEventListener("popstate", (event) => {
-          const page = event.state?.page || "home";
-          switch (page) {
+          const state = event.state;
+        
+          if (!state || !state.page) {
+            showhome(false);
+            return;
+          }
+        
+          switch (state.page) {
+            case "home":
+              showhome(false);
+              break;
             case "menu":
               showmenu(false);
               break;
@@ -443,6 +452,7 @@
               break;
             default:
               showhome(false);
+              break;
           }
         });
     </script>
