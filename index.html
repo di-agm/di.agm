@@ -391,6 +391,7 @@
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "none";
             updateTranslations();
+            history.pushState({ page: "links" }, "", "#links");
         }
 
         // Mostrar lista
@@ -400,6 +401,7 @@
             document.getElementById("menu").style.display = "block";
             document.getElementById("help").style.display = "none";
             updateTranslations();
+            history.pushState({ page: "links" }, "", "#links");
         }
 
         // Mostrar página de enlaces
@@ -419,26 +421,21 @@
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "block";
             updateTranslations();
+            history.pushState({ page: "links" }, "", "#links");
         }
 
         // Al cargar, establecer el estado inicial
         document.addEventListener("DOMContentLoaded", () => {
-            history.replaceState({ page: "home" }, "", "#");
-
-            // Detectar si se cargó directamente en #links
-            if (location.hash === "#links") {
-                showLinksPage();
-            } else {
-                showHomePage();
-            }
+            history.replaceState({ page: "home" }, "", "#home");
         });
 
-        // Escuchar el botón de atrás o avance del navegador
         window.addEventListener("popstate", (event) => {
-            if (event.state && event.state.page === "links") {
+            if (event.state && event.state.page === "menu") {
+                showmenu();
+            } else if (event.state && event.state.page === "links") {
                 showLinksPage();
             } else {
-                showHomePage();
+                showhome();
             }
         });
     </script>
@@ -460,19 +457,21 @@
         <span class="label">Instagram</span>
       </a>
     </div>
+    <br/>
     <div class="link-icon">
       <a href="https://www.tumblr.com/dicreative?source=share" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Tumblr.png?raw=true" alt="Tumblr" />
         <span class="label">Tumblr</span>
       </a>
     </div>
-    <p></p>
+    <br/>
     <div class="link-icon">
       <a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="Reddit" />
         <span class="label">Reddit</span>
       </a>
     </div>
+    <br/>
     <div class="link-icon">
       <a href="https://pin.it/4kXf9Bu18" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" />
@@ -488,12 +487,14 @@
         <span class="label">KoFi</span>
       </a>
     </div>
+    <br/>
     <div class="link-icon">
       <a href="https://coff.ee/dicreative" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/BmaC.png?raw=true" alt="Buy me a coffee" />
         <span class="label">Buy me a coffee</span>
       </a>
     </div>
+    <br/>
     <div class="link-icon">
       <a href="https://dicreativemag.myshopify.com/" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true" alt="Shopify" />
