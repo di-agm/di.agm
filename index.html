@@ -209,7 +209,7 @@
         </div>
 
         <div class="color-ring-inner">
-            <div id="logoWrapper" onclick="event.stopPropagation(); showLinksPage()" style="cursor: pointer;">
+            <div id="logoWrapper" onclick="event.stopPropagation(); showmenu()" style="cursor: pointer;">
                 <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
             </div>
         </div>
@@ -369,32 +369,91 @@
         setValue(90);
 
         logo.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') showLinksPage();
+            if (e.key === 'Enter') showmenu();
         });
         
         function updateTranslations() {
-            document.getElementById("hello").textContent = translations[lang].hello;
+            const t = translations[lang];
 
-            const followText = document.getElementById("follow");
-            if (followText) {
-                followText.textContent = translations[lang].follow;
-            }
+            const hello = document.getElementById("hello");
+            if (hello) hello.textContent = t.hello;
 
-            const supportText = document.getElementById("support");
-            if (supportText) {
-                supportText.textContent = translations[lang].support;
-            }
+            document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
+            document.querySelectorAll(".support").forEach(el => el.textContent = t.support);
         }
 
         updateTranslations();
-    </script>
-    <meta name="description" content="My colorful Linktree-style page with dynamic background and links." />
-    <meta property="og:title" content="DIcreative Links" />
-    <meta property="og:image" content="https://github.com/DIcreative/linktree/blob/main/logo.png?raw=true" />
-</div>
 
+        // Mostrar página principal
+        function showHomePage() {
+            document.getElementById("homePage").style.display = "block";
+            document.getElementById("linksPage").style.display = "none";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "none";
+            updateTranslations();
+        }
+
+        // Mostrar lista
+        function showmenu() {
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("linksPage").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+            document.getElementById("help").style.display = "none";
+            updateTranslations();
+        }
+
+        // Mostrar página de enlaces
+        function showLinksPage() {
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("linksPage").style.display = "block";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "none";
+            updateTranslations();
+            history.pushState({ page: "links" }, "", "#links");
+        }
+
+        // Mostrar lista
+        function showhelp() {
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("linksPage").style.display = "none";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "block";
+            updateTranslations();
+        }
+
+        // Al cargar, establecer el estado inicial
+        document.addEventListener("DOMContentLoaded", () => {
+            history.replaceState({ page: "home" }, "", "#");
+
+            // Detectar si se cargó directamente en #links
+            if (location.hash === "#links") {
+                showLinksPage();
+            } else {
+                showHomePage();
+            }
+        });
+
+        // Escuchar el botón de atrás o avance del navegador
+        window.addEventListener("popstate", (event) => {
+            if (event.state && event.state.page === "links") {
+                showLinksPage();
+            } else {
+                showHomePage();
+            }
+        });
+    </script>
+</div>
+<div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
+    <h1 align="center">Menu</h1>
+    <div onclick="event.stopPropagation(); showLinksPage()" style="cursor: pointer;">
+        <h1 align="center" class="follow">Follow me on social media</h1>
+    </div>
+    <div onclick="event.stopPropagation(); showhelp()" style="cursor: pointer;">
+        <h1 align="center" class="support">Your support really helps</h1>
+    </div>
+</div>
 <div id="linksPage" class="links" style="display:none;">
-  <h1 align="center" id="follow">Follow me on social media</h1>
+    <h1 align="center" class="follow">Follow me on social media</h1>
     <div class="link-icon">
       <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
@@ -420,7 +479,9 @@
         <span class="label">Pinterest</span>
       </a>
     </div>
-    <h1 align="center" id="support">Your support really helps</h1>
+</div>
+<div id="help" class="links" style="display:none;">
+    <h1 align="center" class="support">Your support really helps</h1>
     <div class="link-icon">
       <a href="https://ko-fi.com/dicreative" target="_blank">
         <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
@@ -440,41 +501,5 @@
       </a>
     </div>
 </div>
-    <script>
-        // Mostrar página principal
-        function showHomePage() {
-            document.getElementById("homePage").style.display = "block";
-            document.getElementById("linksPage").style.display = "none";
-        }
-
-        // Mostrar página de enlaces
-        function showLinksPage() {
-            document.getElementById("homePage").style.display = "none";
-            document.getElementById("linksPage").style.display = "block";
-            history.pushState({ page: "links" }, "", "#links");
-            updateTranslations();
-        }
-
-        // Al cargar, establecer el estado inicial
-        document.addEventListener("DOMContentLoaded", () => {
-            history.replaceState({ page: "home" }, "", "#");
-
-            // Detectar si se cargó directamente en #links
-            if (location.hash === "#links") {
-                showLinksPage();
-            } else {
-                showHomePage();
-            }
-        });
-
-        // Escuchar el botón de atrás o avance del navegador
-        window.addEventListener("popstate", (event) => {
-            if (event.state && event.state.page === "links") {
-                showLinksPage();
-            } else {
-                showHomePage();
-            }
-        });
-    </script>
 </body>
 </html>
