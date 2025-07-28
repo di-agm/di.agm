@@ -194,7 +194,7 @@
 </head>
 
 <body>
-<div id="homePage">
+<div id="home">
   <h1 align="center" id="hello">Hello</h1>
 
     <div class="ring-container">
@@ -385,19 +385,19 @@
         updateTranslations();
 
         // Mostrar página principal
-        function showHomePage(push = true) {
-            document.getElementById("homePage").style.display = "block";
-            document.getElementById("linksPage").style.display = "none";
+        function showhome(push = true) {
+            document.getElementById("home").style.display = "block";
+            document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "none";
             updateTranslations();
-            if (push) history.pushState({ page: "homePage" }, "", "#homePage");
+            if (push) history.pushState({ page: "home" }, "", "#home");
         }
 
         // Mostrar lista
         function showmenu(push = true) {
-            document.getElementById("homePage").style.display = "none";
-            document.getElementById("linksPage").style.display = "none";
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "block";
             document.getElementById("help").style.display = "none";
             updateTranslations();
@@ -405,19 +405,19 @@
         }
 
         // Mostrar página de enlaces
-        function showLinksPage(push = true) {
-            document.getElementById("homePage").style.display = "none";
-            document.getElementById("linksPage").style.display = "block";
+        function showlinks(push = true) {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "block";
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "none";
             updateTranslations();
-            if (push) history.pushState({ page: "LinksPage" }, "", "#LinksPage");
+            if (push) history.pushState({ page: "links" }, "", "#links");
         }
 
         // Mostrar lista
         function showhelp(push = true) {
-            document.getElementById("homePage").style.display = "none";
-            document.getElementById("linksPage").style.display = "none";
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "block";
             updateTranslations();
@@ -433,23 +433,23 @@
             if (event.state && event.state.page === "menu") {
                 showmenu();
             } else if (event.state && event.state.page === "links") {
-                showLinksPage();
+                showlinks();
             } else {
-                showhomePage();
+                showhome();
             }
         });    
     </script>
 </div>
 <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
     <h1 align="center">Menu</h1>
-    <div onclick="event.stopPropagation(); showLinksPage()" style="cursor: pointer;">
+    <div onclick="event.stopPropagation(); showlinks()" style="cursor: pointer;">
         <h1 align="center" class="follow">Follow me on social media</h1>
     </div>
     <div onclick="event.stopPropagation(); showhelp()" style="cursor: pointer;">
         <h1 align="center" class="support">Your support really helps</h1>
     </div>
 </div>
-<div id="linksPage" class="links" style="display:none;">
+<div id="links" class="links" style="display:none;">
     <h1 align="center" class="follow">Follow me on social media</h1>
     <div class="link-icon">
       <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
