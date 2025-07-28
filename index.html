@@ -454,7 +454,15 @@
               showhome(false);
               break;
           }
-        });
+        window.addEventListener("popstate", (event) => {
+            if (event.state && event.state.page === "menu") {
+                showmenu();
+            } else if (event.state && event.state.page === "links") {
+                showLinksPage();
+            } else {
+                showhome();
+            }
+        });    
     </script>
 </div>
 <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
