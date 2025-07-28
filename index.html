@@ -430,31 +430,6 @@
         });
 
         window.addEventListener("popstate", (event) => {
-          const state = event.state;
-        
-          if (!state || !state.page) {
-            showhome(false);
-            return;
-          }
-        
-          switch (state.page) {
-            case "home":
-              showhome(false);
-              break;
-            case "menu":
-              showmenu(false);
-              break;
-            case "links":
-              showLinksPage(false);
-              break;
-            case "help":
-              showHelpPage(false);
-              break;
-            default:
-              showhome(false);
-              break;
-          }
-        window.addEventListener("popstate", (event) => {
             if (event.state && event.state.page === "menu") {
                 showmenu();
             } else if (event.state && event.state.page === "links") {
