@@ -425,18 +425,25 @@
         }
 
         // Al cargar, establecer el estado inicial
-        document.addEventListener("DOMContentLoaded", () => {
-            history.replaceState({ page: "home" }, "", "#home");
+        window.addEventListener("DOMContentLoaded", () => {
+          history.replaceState({ page: "home" }, "", "#home");
         });
 
         window.addEventListener("popstate", (event) => {
-            if (event.state && event.state.page === "menu") {
-                showmenu(false);
-            } else if (event.state && event.state.page === "links") {
-                showLinksPage(false);
-            } else {
-                showhome(false);
-            }
+          const page = event.state?.page || "home";
+          switch (page) {
+            case "menu":
+              showmenu(false);
+              break;
+            case "links":
+              showLinksPage(false);
+              break;
+            case "help":
+              showHelpPage(false);
+              break;
+            default:
+              showhome(false);
+          }
         });
     </script>
 </div>
