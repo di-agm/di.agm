@@ -407,6 +407,10 @@
 
                 // Mostrar página de enlaces
                 function showlinks(push = true) {
+                    // If not coming from menu, push menu to history first
+                    if (location.hash !== "#menu") {
+                        showmenu(true);
+                    }
                     document.getElementById("home").style.display = "none";
                     document.getElementById("links").style.display = "block";
                     document.getElementById("menu").style.display = "none";
@@ -445,7 +449,7 @@
         </div>
         <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
             <h1 align="center">Menu</h1>
-            <div onclick="event.stopPropagation(); showlinks()" style="cursor: pointer;">
+            <div onclick="event.stopPropagation(); showmenu(false); showlinks(true);" style="cursor: pointer;">
                 <h1 align="center" class="follow">Follow me on social media</h1>
             </div>
             <div onclick="event.stopPropagation(); showhelp()" style="cursor: pointer;">
