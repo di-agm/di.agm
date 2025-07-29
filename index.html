@@ -392,7 +392,7 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    history.pushState(null, '', '#home');
+                    if (push) history.pushState(null, '', '#home');
                     showPage('#home');
                 }
 
@@ -403,7 +403,7 @@
                     document.getElementById("menu").style.display = "block";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    history.pushState(null, '', '#menu');
+                    if (push) history.pushState(null, '', '#menu');
                     showPage('#menu');
                 }
 
@@ -414,7 +414,7 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    history.pushState(null, '', '#links');
+                    if (push) history.pushState(null, '', '#links');
                     showPage('#links');
                 }
 
@@ -425,7 +425,7 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "block";
                     updateTranslations();
-                    history.pushState(null, '', '#help');
+                    if (push) history.pushState(null, '', '#help');
                     showPage('#help');
                 }
 
@@ -435,9 +435,12 @@
                 });
 
                 window.addEventListener('popstate', function(event) {
-                const hash = location.hash || '#home';
-                showPage(hash);
-            });
+                    const hash = location.hash || '#home';
+                    if (hash === '#home') showhome(false);
+                    else if (hash === '#menu') showmenu(false);
+                    else if (hash === '#links') showlinks(false);
+                    else if (hash === '#help') showhelp(false);
+                });
             
             function showPage(hash) {
                 document.getElementById('home').style.display = 'none';
