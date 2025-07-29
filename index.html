@@ -433,7 +433,11 @@
                     const hash = location.hash || '#home';
                     showPage(hash);
                 });
-            
+
+                window.addEventListener('hashchange', function() {
+                    showPage(location.hash || '#home');
+                });
+          
                 function showPage(hash) {
                     document.getElementById('home').style.display = 'none';
                     document.getElementById('menu').style.display = 'none';
