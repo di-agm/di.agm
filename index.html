@@ -213,8 +213,6 @@
             <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
           </div>
         </div>
-        </div>
-      </div>
     <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
         <h1 align="center">Menu</h1>
         <div onclick="event.stopPropagation(); showlinks()" style="cursor: pointer;">
@@ -448,37 +446,21 @@
 
     // Mostrar página principal
     function showhome(push = true) {
-      document.getElementById("home").style.display = "block";
-      document.getElementById("links").style.display = "none";
-      document.getElementById("menu").style.display = "none";
-      document.getElementById("help").style.display = "none";
       updateTranslations();
       if (push) location.hash = '#home';
     }
 
     function showmenu(push = true) {
-      document.getElementById("home").style.display = "none";
-      document.getElementById("links").style.display = "none";
-      document.getElementById("menu").style.display = "block";
-      document.getElementById("help").style.display = "none";
       updateTranslations();
       if (push) location.hash = '#menu';
     }
 
     function showlinks(push = true) {
-      document.getElementById("home").style.display = "none";
-      document.getElementById("links").style.display = "block";
-      document.getElementById("menu").style.display = "none";
-      document.getElementById("help").style.display = "none";
       updateTranslations();
       if (push) location.hash = '#links';
     }
 
     function showhelp(push = true) {
-      document.getElementById("home").style.display = "none";
-      document.getElementById("links").style.display = "none";
-      document.getElementById("menu").style.display = "none";
-      document.getElementById("help").style.display = "block";
       updateTranslations();
       if (push) location.hash = '#help';
     }
