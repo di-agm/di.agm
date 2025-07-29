@@ -386,34 +386,64 @@
                 updateTranslations();
 
                 // Mostrar página principal
-                // Mostrar página principal
-                function showSectionFromHash() {
-                    const hash = location.hash || "#home";
-                    document.getElementById("home").style.display  = (hash === "#home")  ? "block" : "none";
-                    document.getElementById("menu").style.display  = (hash === "#menu")  ? "block" : "none";
-                    document.getElementById("links").style.display = (hash === "#links") ? "block" : "none";
-                    document.getElementById("help").style.display  = (hash === "#help")  ? "block" : "none";
+                function showhome(push = true) {
+                    document.getElementById("home").style.display = "block";
+                    document.getElementById("links").style.display = "none";
+                    document.getElementById("menu").style.display = "none";
+                    document.getElementById("help").style.display = "none";
                     updateTranslations();
+                    if (push) history.pushState({ page: "home" }, "", "#home");
+                }
+
+                // Mostrar lista
+                function showmenu(push = true) {
+                    document.getElementById("home").style.display = "none";
+                    document.getElementById("links").style.display = "none";
+                    document.getElementById("menu").style.display = "block";
+                    document.getElementById("help").style.display = "none";
+                    updateTranslations();
+                    if (push) history.pushState({ page: "menu" }, "", "#menu");
+                }
+
+                // Mostrar página de enlaces
+                function showlinks(push = true) {
+                    document.getElementById("home").style.display = "none";
+                    document.getElementById("links").style.display = "block";
+                    document.getElementById("menu").style.display = "none";
+                    document.getElementById("help").style.display = "none";
+                    updateTranslations();
+                    if (push) history.pushState({ page: "links" }, "", "#links");
+                }
+
+                // Mostrar lista
+                function showhelp(push = true) {
+                    document.getElementById("home").style.display = "none";
+                    document.getElementById("links").style.display = "none";
+                    document.getElementById("menu").style.display = "none";
+                    document.getElementById("help").style.display = "block";
+                    updateTranslations();
+                    if (push) history.pushState({ page: "help" }, "", "#help");
                 }
 
                 // Al cargar, establecer el estado inicial
-                window.addEventListener("hashchange", showSectionFromHash);
-                window.addEventListener("DOMContentLoaded", showSectionFromHash);
-            
-            function showPage(hash) {
-                document.getElementById('home').style.display = 'none';
-                document.getElementById('menu').style.display = 'none';
-                document.getElementById('links').style.display = 'none';
-                document.getElementById('help').style.display = 'none';
-                
-                if (hash === '#home') document.getElementById('home').style.display = 'block';
-                else if (hash === '#menu') document.getElementById('menu').style.display = 'block';
-                else if (hash === '#links') document.getElementById('links').style.display = 'block';
-                else if (hash === '#help') document.getElementById('help').style.display = 'block';
-            };
-        </script>
+                window.addEventListener("DOMContentLoaded", () => {
+                history.replaceState({ page: "home" }, "", "#home");
+                });
+
+                window.addEventListener("popstate", (event) => {
+                    if (event.state && event.state.page === "menu") {
+                        showmenu(false);
+                    } else if (event.state && event.state.page === "links") {
+                        showlinks(false);
+                    } else if (event.state && event.state.page === "help") {
+                        showhelp(false);
+                    } else {
+                        showhome(false);
+                    }
+                });
+            </script>
         </div>
-        <div onclick="location.hash='#menu'" style="cursor: pointer;">
+        <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
             <h1 align="center">Menu</h1>
             <div onclick="event.stopPropagation(); showlinks()" style="cursor: pointer;">
                 <h1 align="center" class="follow">Follow me on social media</h1>
