@@ -392,7 +392,8 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState({ page: "home" }, "", "#home");
+                    history.pushState(null, '', '#home');
+                    showPage('#home');
                 }
 
                 // Mostrar lista
@@ -402,7 +403,8 @@
                     document.getElementById("menu").style.display = "block";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState({ page: "menu" }, "", "#menu");
+                    history.pushState(null, '', '#menu');
+                    showPage('#menu');
                 }
 
                 // Mostrar página de enlaces
@@ -412,7 +414,8 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState({ page: "links" }, "", "#links");
+                    history.pushState(null, '', '#links');
+                    showPage('#links');
                 }
 
                 // Mostrar lista
@@ -422,7 +425,8 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "block";
                     updateTranslations();
-                    if (push) history.pushState({ page: "help" }, "", "#help");
+                    history.pushState(null, '', '#help');
+                    showPage('#help');
                 }
 
                 // Al cargar, establecer el estado inicial
@@ -430,18 +434,23 @@
                 history.replaceState({ page: "home" }, "", "#home");
                 });
 
-                window.addEventListener("popstate", (event) => {
-                    if (event.state && event.state.page === "menu") {
-                        showmenu(false);
-                    } else if (event.state && event.state.page === "links") {
-                        showlinks(false);
-                    } else if (event.state && event.state.page === "help") {
-                        showhelp(false);
-                    } else {
-                        showhome(false);
-                    }
-                });
-            </script>
+                window.addEventListener('popstate', function(event) {
+                const hash = location.hash || '#home';
+                showPage(hash);
+            });
+            
+            function showPage(hash) {
+                document.getElementById('home').style.display = 'none';
+                document.getElementById('menu').style.display = 'none';
+                document.getElementById('links').style.display = 'none';
+                document.getElementById('help').style.display = 'none';
+                
+                if (hash === '#home') document.getElementById('home').style.display = 'block';
+                else if (hash === '#menu') document.getElementById('menu').style.display = 'block';
+                else if (hash === '#links') document.getElementById('links').style.display = 'block';
+                else if (hash === '#help') document.getElementById('help').style.display = 'block';
+            };
+        </script>
         </div>
         <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
             <h1 align="center">Menu</h1>
