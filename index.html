@@ -395,7 +395,7 @@
                     if (push) history.pushState(null, '', '#home');
                     showPage('#home');
                 }
-                
+            
                 function showmenu(push = true) {
                     document.getElementById("home").style.display = "none";
                     document.getElementById("links").style.display = "none";
@@ -405,7 +405,7 @@
                     if (push) history.pushState(null, '', '#menu');
                     showPage('#menu');
                 }
-                
+            
                 function showlinks(push = true) {
                     document.getElementById("home").style.display = "none";
                     document.getElementById("links").style.display = "block";
@@ -415,7 +415,7 @@
                     if (push) history.pushState(null, '', '#links');
                     showPage('#links');
                 }
-                
+            
                 function showhelp(push = true) {
                     document.getElementById("home").style.display = "none";
                     document.getElementById("links").style.display = "none";
@@ -425,28 +425,30 @@
                     if (push) history.pushState(null, '', '#help');
                     showPage('#help');
                 }
-                // Al cargar, establecer el estado inicial
+            
+                // ✅ Single event listener on page load
                 window.addEventListener("DOMContentLoaded", () => {
-                    history.replaceState({ page: "home" }, "", "#home");
+                    history.replaceState({ page: "home" }, "", location.hash || "#home");
                     showPage(location.hash || "#home");
                 });
-                
+            
+                // ✅ Single popstate handler
                 window.addEventListener('popstate', function(event) {
                     const hash = location.hash || '#home';
-                    showPage(hash);  // FIXED: use the real function
+                    showPage(hash);
                 });
-
-            function showPage(hash) {
-                document.getElementById('home').style.display = 'none';
-                document.getElementById('menu').style.display = 'none';
-                document.getElementById('links').style.display = 'none';
-                document.getElementById('help').style.display = 'none';
-                
-                if (hash === '#home') document.getElementById('home').style.display = 'block';
-                else if (hash === '#menu') document.getElementById('menu').style.display = 'block';
-                else if (hash === '#links') document.getElementById('links').style.display = 'block';
-                else if (hash === '#help') document.getElementById('help').style.display = 'block';
-            };
+            
+                function showPage(hash) {
+                    document.getElementById('home').style.display = 'none';
+                    document.getElementById('menu').style.display = 'none';
+                    document.getElementById('links').style.display = 'none';
+                    document.getElementById('help').style.display = 'none';
+            
+                    if (hash === '#home') document.getElementById('home').style.display = 'block';
+                    else if (hash === '#menu') document.getElementById('menu').style.display = 'block';
+                    else if (hash === '#links') document.getElementById('links').style.display = 'block';
+                    else if (hash === '#help') document.getElementById('help').style.display = 'block';
+                }
         </script>
         </div>
         <div id="menu" style="display:none;" onclick="event.stopPropagation(); showmenu()">
