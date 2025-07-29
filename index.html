@@ -387,42 +387,26 @@
 
                 // Mostrar página principal
                 function showhome(push = true) {
-                    document.getElementById("home").style.display = "block";
-                    document.getElementById("links").style.display = "none";
-                    document.getElementById("menu").style.display = "none";
-                    document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState({ page: "home" }, "", "#home");
+                    location.hash = '#home';
                 }
 
                 // Mostrar lista
                 function showmenu(push = true) {
-                    document.getElementById("home").style.display = "none";
-                    document.getElementById("links").style.display = "none";
-                    document.getElementById("menu").style.display = "block";
-                    document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState({ page: "menu" }, "", "#menu");
+                    location.hash = '#menu';
                 }
 
                 // Mostrar página de enlaces
                 function showlinks(push = true) {
-                    document.getElementById("home").style.display = "none";
-                    document.getElementById("links").style.display = "block";
-                    document.getElementById("menu").style.display = "none";
-                    document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState({ page: "links" }, "", "#links");
+                    location.hash = '#links';
                 }
 
                 // Mostrar lista
                 function showhelp(push = true) {
-                    document.getElementById("home").style.display = "none";
-                    document.getElementById("links").style.display = "none";
-                    document.getElementById("menu").style.display = "none";
-                    document.getElementById("help").style.display = "block";
                     updateTranslations();
-                    if (push) history.pushState({ page: "help" }, "", "#help");
+                    location.hash = '#help';
                 }
 
                 // Al cargar, establecer el estado inicial
