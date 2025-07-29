@@ -427,14 +427,15 @@
                 }
                 // Al cargar, establecer el estado inicial
                 window.addEventListener("DOMContentLoaded", () => {
-                history.replaceState({ page: "home" }, "", "#home");
+                    history.replaceState({ page: "home" }, "", "#home");
+                    showPage(location.hash || "#home");
+                });
+                
+                window.addEventListener('popstate', function(event) {
+                    const hash = location.hash || '#home';
+                    showPage(hash);  // FIXED: use the real function
                 });
 
-                window.addEventListener('popstate', function(event) {
-                  const hash = location.hash || '#home';
-                  showPageFromHash(hash);  // We show the correct screen
-                });
-            
             function showPage(hash) {
                 document.getElementById('home').style.display = 'none';
                 document.getElementById('menu').style.display = 'none';
