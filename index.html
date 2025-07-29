@@ -392,8 +392,7 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState(null, '', '#home');
-                    showPage('#home');
+                    if (push) location.hash = '#home';
                 }
             
                 function showmenu(push = true) {
@@ -402,8 +401,7 @@
                     document.getElementById("menu").style.display = "block";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState(null, '', '#menu');
-                    showPage('#menu');
+                    if (push) location.hash = '#menu';
                 }
             
                 function showlinks(push = true) {
@@ -412,8 +410,7 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "none";
                     updateTranslations();
-                    if (push) history.pushState(null, '', '#links');
-                    showPage('#links');
+                    if (push) location.hash = '#links';
                 }
             
                 function showhelp(push = true) {
@@ -422,8 +419,7 @@
                     document.getElementById("menu").style.display = "none";
                     document.getElementById("help").style.display = "block";
                     updateTranslations();
-                    if (push) history.pushState(null, '', '#help');
-                    showPage('#help');
+                    if (push) location.hash = '#help';
                 }
             
                 // ✅ Single event listener on page load
