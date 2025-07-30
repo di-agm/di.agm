@@ -440,7 +440,28 @@
                 showhome(false);
             }
         });
-    </script>
+        
+        function showSectionFromHash() {
+            switch (window.location.hash) {
+                case "#menu":
+                    showmenu(false);
+                    break;
+                case "#links":
+                    showlinks(false);
+                    break;
+                case "#help":
+                    showhelp(false);
+                    break;
+                default:
+                    showhome(false);
+            }
+        }
+        
+        // On page load, show the correct section
+        window.addEventListener("DOMContentLoaded", showSectionFromHash);
+        // When the hash changes (back/forward), show the correct section
+        window.addEventListener("hashchange", showSectionFromHash);
+</script>
 </div>
 <div id="menu" style="display:none;">
     <h1 align="center">Menu</h1>
