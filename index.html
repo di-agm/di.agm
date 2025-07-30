@@ -194,28 +194,6 @@
 </head>
 
 <body>
-<div id="home">
-  <h1 align="center" id="hello">Hello</h1>
-
-    <div class="ring-container">
-        <!-- Value ring behind all others -->
-        <div class="value-ring" id="valueRing">
-            <div class="ring-knob" id="valueKnob"></div>
-        </div>
-
-        <!-- Hue ring on top -->
-        <div class="color-ring" id="colorRing">
-            <div class="ring-knob" id="ringKnob"></div>
-        </div>
-
-        <div class="color-ring-inner">
-            <div id="logoWrapper" onclick="event.stopPropagation(); showmenu()" style="cursor: pointer;">
-                <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
-            </div>
-        </div>
-        </div>
-    </div>
-
 <script>
         const translations = {
         en: { hello: "Hello", follow: "Follow me on social media", support:"Your support really helps" },
@@ -443,6 +421,27 @@
         window.addEventListener("hashchange", showSectionFromHash);
 </script>
     
+<div id="home">
+  <h1 align="center" id="hello">Hello</h1>
+
+    <div class="ring-container">
+        <!-- Value ring behind all others -->
+        <div class="value-ring" id="valueRing">
+            <div class="ring-knob" id="valueKnob"></div>
+        </div>
+
+        <!-- Hue ring on top -->
+        <div class="color-ring" id="colorRing">
+            <div class="ring-knob" id="ringKnob"></div>
+        </div>
+
+        <div class="color-ring-inner">
+            <div id="logoWrapper" onclick="event.stopPropagation(); showmenu()" style="cursor: pointer;">
+                <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
+            </div>
+        </div>
+        </div>
+    </div>
 </div>
 <div id="menu" style="display:none;">
     <h1 align="center">Menu</h1>
