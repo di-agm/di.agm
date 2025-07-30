@@ -386,6 +386,7 @@
 
         // Mostrar página principal
         function showhome(push = true) {
+            if (window.location.hash === "#home") push = false;
             document.getElementById("home").style.display = "block";
             document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "none";
@@ -393,9 +394,9 @@
             updateTranslations();
             if (push) history.pushState({ page: "home" }, "", "#home");
         }
-
-        // Mostrar lista
+        
         function showmenu(push = true) {
+            if (window.location.hash === "#menu") push = false;
             document.getElementById("home").style.display = "none";
             document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "block";
@@ -403,9 +404,9 @@
             updateTranslations();
             if (push) history.pushState({ page: "menu" }, "", "#menu");
         }
-
-        // Mostrar página de enlaces
+        
         function showlinks(push = true) {
+            if (window.location.hash === "#links") push = false;
             document.getElementById("home").style.display = "none";
             document.getElementById("links").style.display = "block";
             document.getElementById("menu").style.display = "none";
@@ -413,9 +414,9 @@
             updateTranslations();
             if (push) history.pushState({ page: "links" }, "", "#links");
         }
-
-        // Mostrar lista
+        
         function showhelp(push = true) {
+            if (window.location.hash === "#help") push = false;
             document.getElementById("home").style.display = "none";
             document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "none";
@@ -423,7 +424,6 @@
             updateTranslations();
             if (push) history.pushState({ page: "help" }, "", "#help");
         }
-
         // Al cargar, establecer el estado inicial
         window.addEventListener("DOMContentLoaded", () => {
           history.replaceState({ page: "home" }, "", "#home");
