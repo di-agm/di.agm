@@ -385,57 +385,41 @@
         updateTranslations();
 
         // Mostrar página principal
-        function showhome(push = true) {
-            if (window.location.hash === "#home") push = false;
+        function showhome() {
             document.getElementById("home").style.display = "block";
             document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "none";
             updateTranslations();
-            if (push) history.pushState({ page: "home" }, "", "#home");
+            window.location.hash = "#home";
         }
         
-        function showmenu(push = true) {
-            if (window.location.hash === "#menu") push = false;
+        function showmenu() {
             document.getElementById("home").style.display = "none";
             document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "block";
             document.getElementById("help").style.display = "none";
             updateTranslations();
-            if (push) history.pushState({ page: "menu" }, "", "#menu");
+            window.location.hash = "#menu";
         }
         
-        function showlinks(push = true) {
-            if (window.location.hash === "#links") push = false;
+        function showlinks() {
             document.getElementById("home").style.display = "none";
             document.getElementById("links").style.display = "block";
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "none";
             updateTranslations();
-            if (push) history.pushState({ page: "links" }, "", "#links");
+            window.location.hash = "#links";
         }
         
-        function showhelp(push = true) {
-            if (window.location.hash === "#help") push = false;
+        function showhelp() {
             document.getElementById("home").style.display = "none";
             document.getElementById("links").style.display = "none";
             document.getElementById("menu").style.display = "none";
             document.getElementById("help").style.display = "block";
             updateTranslations();
-            if (push) history.pushState({ page: "help" }, "", "#help");
+            window.location.hash = "#help";
         }
-        
-        window.addEventListener("popstate", (event) => {
-            if (event.state && event.state.page === "menu") {
-                showmenu(false);
-            } else if (event.state && event.state.page === "links") {
-                showlinks(false);
-            } else if (event.state && event.state.page === "help") {
-                showhelp(false);
-            } else {
-                showhome(false);
-            }
-        });
         
         function showSectionFromHash() {
             switch (window.location.hash) {
