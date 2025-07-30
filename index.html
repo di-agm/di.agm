@@ -424,11 +424,7 @@
             updateTranslations();
             if (push) history.pushState({ page: "help" }, "", "#help");
         }
-        // Al cargar, establecer el estado inicial
-        window.addEventListener("DOMContentLoaded", () => {
-          history.replaceState({ page: "home" }, "", "#home");
-        });
-
+        
         window.addEventListener("popstate", (event) => {
             if (event.state && event.state.page === "menu") {
                 showmenu(false);
