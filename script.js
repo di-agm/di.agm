@@ -56,7 +56,7 @@ function showhome() {
         // When the hash changes (back/forward), show the correct section
         window.addEventListener("hashchange", showSectionFromHash);
 //COLOR
-        const colorRing = document.getElementById("colorRing");
+const colorRing = document.getElementById("colorRing");
         const ringKnob = document.getElementById("ringKnob");    
 
         const valueRing = document.getElementById("valueRing");
@@ -105,7 +105,7 @@ function showhome() {
             ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
             ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
             updateBackground();
-            updateProfileLink();
+            //updateProfileLink();
         }
 
         // Helper to get angle from center
@@ -133,7 +133,7 @@ function showhome() {
             valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
             currentValue = value;
             updateBackground();
-            updateProfileLink();
+            //updateProfileLink();
         }
         function getValueFromEvent(e) {
             const rect = valueRing.getBoundingClientRect();
