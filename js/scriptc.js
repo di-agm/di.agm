@@ -1,3 +1,5 @@
+
+//COLOR
 const colorRing = document.getElementById("colorRing");
         const ringKnob = document.getElementById("ringKnob");    
 
