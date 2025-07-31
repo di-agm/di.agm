@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linktree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
+
+    <style>
+    :root {
+        --bg: hsl(0, 100%, 90%);
+        --fg: #000;
+        transition: all 0.4s ease;
+    }
+    body {
+        position: relative;
+        height: 100vh;
+        font-family: 'Didact Gothic', sans-serif;
+        text-align: center;
+        padding: 2rem;
+        margin: 0;
+        background-color: var(--bg);
+        color: var(--fg);
+        transition: background-color 0.3s, color 0.3s;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 100vw) {
+        body {
+            padding: 1rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .color-ring img {
+            width: 60vmin;
+            height: 60vmin;
+        }
+    }
+
+    .profile-photo {
+        width: 65vmin;
+        height: 65vmin;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 1rem auto;
+        display: block;
+        border: 2px solid var(--fg);
+        z-index: 3;
+    }
+
+    .ring-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 62vmin;
+        height: 62vmin;
+        margin: 2rem auto;
+        z-index: 3;
+    }
+
+    .color-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: conic-gradient(
+            hsl(0, 100%, 50%),
+            hsl(60, 100%, 50%),
+            hsl(120, 100%, 50%),
+            hsl(180, 100%, 50%),
+            hsl(240, 100%, 50%),
+            hsl(300, 100%, 50%),
+            hsl(360, 100%, 50%)
+        );
+        z-index: 1;
+        width: 60vmin;
+        height: 60vmin;
+    }
+
+    /* New value ring styles */
+    .value-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: conic-gradient(
+            from 0deg,
+            hsl(0, 0%, 0%),
+            hsl(0, 0%, 100%)
+        );
+        z-index: 2;
+        width: 50vmin;
+        height: 50vmin;
+    }
+
+    .color-ring-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3; /* Ensure it's on top */
+        transition: transform 0.3s ease;
+        pointer-events: auto;
+        width: 60vmin;
+        height: 60vmin;
+        overflow: hidden;
+    }
+
+    .ring-container:hover .color-ring-inner {
+        transform: translate(-50%, -50%) scale(0.65);
+    }
+
+    .color-ring img {
+        width: 60vmin;
+        height: 60vmin;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .color-ring-inner img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
+    }
+
+    .ring-knob {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        z-index: 2;
+    }
+
+    .link-icon {
+        display: inline-block;
+        text-align: center;
+        margin: 1rem;
+        background-color: transparent;
+        padding: 0;
+    }
+
+    .link-icon img {
+        height: 50vmin;
+        transition: transform 0.3s;
+        border-radius: 50%;
+        background-color: transparent;
+    }
+
+    .link-icon .label {
+        display: block;
+        background-color: var(--fg);
+        color: var(--bg);
+        padding: 0.4rem 0.8rem;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0.3s;
+        height: 0;
+        overflow: hidden;
+    }
+
+    .link-icon:hover .label {
+        visibility: visible;
+        opacity: 1;
+        height: auto;
+        overflow: visible;
+    }
+</style>
+</head>
+
+<body>
+    <script>
+        // Mostrar página principal
+        function showhome() {
+            document.getElementById("home").style.display = "block";
+            document.getElementById("links").style.display = "none";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "none";
+            updateTranslations();
+            window.location.hash = "#home";
+        }
+        
+        function showmenu() {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+            document.getElementById("help").style.display = "none";
+            updateTranslations();
+            window.location.hash = "#menu";
+        }
+        
+        function showlinks() {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "block";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "none";
+            updateTranslations();
+            window.location.hash = "#links";
+        }
+        
+        function showhelp() {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "none";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "block";
+            updateTranslations();
+            window.location.hash = "#help";
+        }
+        
+        function showSectionFromHash() {
+            switch (window.location.hash) {
+                case "#menu":
+                    showmenu(false);
+                    break;
+                case "#links":
+                    showlinks(false);
+                    break;
+                case "#help":
+                    showhelp(false);
+                    break;
+                default:
+                    showhome(false);
+            }
+        }
+        
+        // On page load, show the correct section
+        window.addEventListener("DOMContentLoaded", showSectionFromHash);
+        // When the hash changes (back/forward), show the correct section
+        window.addEventListener("hashchange", showSectionFromHash);
+    </script>
+<div id="home">
+  <h1 align="center" id="hello">Hello</h1>
+
+    <div class="ring-container">
+        <!-- Value ring behind all others -->
+        <div class="value-ring" id="valueRing">
+            <div class="ring-knob" id="valueKnob"></div>
+        </div>
+
+        <!-- Hue ring on top -->
+        <div class="color-ring" id="colorRing">
+            <div class="ring-knob" id="ringKnob"></div>
+        </div>
+
+        <div class="color-ring-inner">
+            <div id="logoWrapper" onclick="event.stopPropagation(); showmenu()" style="cursor: pointer;">
+                <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
+            </div>
+        </div>
+        </div>
+    </div>
+
+<script>
+        const translations = {
+        en: { hello: "Hello", follow: "Follow me on social media", support:"Your support really helps" },
+        es: { hello: "Hola", follow: "Sígueme en redes sociales", support:"Tu apoyo realmente ayuda" },
+        pt: { hello: "Olá", follow: "Siga-me nas redes sociais", support:"Seu apoio realmente ajuda" },
+        fr: { hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", support:"Votre soutien aide vraiment" },
+        ru: { hello: "Привет", follow: "Подпишитесь на меня в соцсетях", support:"Ваша поддержка действительно помогает" },
+        de: { hello: "Hallo", follow: "Folge mir in den sozialen Medien", support:"Deine Unterstützung hilft wirklich" },
+        ja: { hello: "やあ", follow: "SNSでフォローしてね", support:"あなたのサポートは本当に助かります" },
+        hi: { hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", support:"आपका समर्थन वास्तव में मदद करता है" }
+        };
+
+        const userLang = navigator.language.slice(0, 2);
+        const lang = translations[userLang] ? userLang : "en";
+
+        document.getElementById("hello").textContent = translations[lang].hello;
+        const followText = document.getElementById("follow");
+        if (followText) {
+            followText.textContent = translations[lang].follow;
+        }
+        const supportText = document.getElementById("support");
+        if (supportText) {
+            supportText.textContent = translations[lang].support;
+        }
+
+        const colorRing = document.getElementById("colorRing");
+        const ringKnob = document.getElementById("ringKnob");    
+
+        const valueRing = document.getElementById("valueRing");
+        const valueKnob = document.getElementById("valueKnob");
+
+        let currentHue = 0;
+        let currentSaturation = 100;
+        let currentValue = 90;
+
+        let clickedLogo = false;
+
+        const logo = document.getElementById('logoWrapper');
+        logo.addEventListener('mousedown', (e) => {
+            clickedLogo = true;
+        });
+
+        function updateBackground() {
+            const h = currentHue;
+            const s = currentSaturation;
+            const l = currentValue;
+
+            // Actualizar fondo
+            document.documentElement.style.setProperty('--bg', `hsl(${h}, ${s}%, ${l}%)`);
+
+            // Calcular si es claro u oscuro
+            const isLight = l > 30;
+
+            // Cambiar color del texto en consecuencia
+            document.documentElement.style.setProperty('--fg', isLight ? "#000" : "#fff");
+
+            // También puedes cambiar el color de botones/enlaces si quieres
+            document.querySelectorAll('.links a').forEach(link => {
+                link.style.backgroundColor = "transparent"; // elimina fondo negro
+                link.style.color = isLight ? "#000" : "#fff";
+            });
+        }
+
+        function setHue(hue) {
+            currentHue = hue;
+            // Move knob
+            const angle = (hue - 90) * Math.PI / 180; // -90 to start at top
+            const ringRect = colorRing.getBoundingClientRect();
+            const radius = ringRect.width / 3
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
+            updateBackground();
+            updateProfileLink();
+        }
+
+        // Helper to get angle from center
+        function getHueFromEvent(e) {
+            const rect = colorRing.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            console.log("Center:", cx, cy);
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
+            let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
+            if (angle < 0) angle += 360;
+            return Math.round(angle);
+        }
+        // Value (brightness) control
+        function setValue(value) {
+            currentValue = value;
+            const angle = (value/100*360) - 90;
+            const rad = angle * Math.PI/180;
+            const ringRect = colorRing.getBoundingClientRect();
+            const radius = ringRect.width / 2 - 20
+            const x = Math.cos(rad) * radius;
+            const y = Math.sin(rad) * radius;
+            valueKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
+            currentValue = value;
+            updateBackground();
+            updateProfileLink();
+        }
+        function getValueFromEvent(e) {
+            const rect = valueRing.getBoundingClientRect();
+            const cx = rect.left + rect.width/2;
+            const cy = rect.top + rect.height/2;
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
+            let angle = Math.atan2(y, x)*180/Math.PI+90;
+            if(angle<0) angle+=360;
+            return Math.round(angle/360*100);
+        }
+
+        let draggingHue = false;
+        let draggingValue = false;
+
+        // Add event listeners for hue
+        colorRing.addEventListener('mousedown', (e) => { 
+            const inner = document.querySelector('.color-ring-inner');
+            if (inner.contains(e.target)) return; // Avoid color change if click was inside logo
+            draggingHue = true;
+            setHue(getHueFromEvent(e));
+        });
+        colorRing.addEventListener('touchstart', (e) => { 
+            draggingHue = true;
+            setHue(getHueFromEvent(e));
+        });
+        window.addEventListener('mousemove', (e) => { 
+            if (clickedLogo) return;
+            if (draggingHue) setHue(getHueFromEvent(e));
+        });
+        window.addEventListener('touchmove', (e) => { if(draggingHue) setHue(getHueFromEvent(e)); });
+        window.addEventListener('mouseup', () => {
+            draggingHue = false;
+            clickedLogo = false;
+        });
+        window.addEventListener('touchend', () => draggingHue = false);
+
+        // Add event listeners for value
+        valueRing.addEventListener('mousedown', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
+        valueRing.addEventListener('touchstart', (e) => { draggingValue = true; setValue(getValueFromEvent(e)); });
+        window.addEventListener('mousemove', (e) => { if(draggingValue) setValue(getValueFromEvent(e)); });
+        window.addEventListener('touchmove', (e) => { if(draggingValue) setValue(getValueFromEvent(e)); });
+        window.addEventListener('mouseup', () => draggingValue = false);
+        window.addEventListener('touchend', () => draggingValue = false);
+
+        // Set initial values
+        setHue(0);
+        setValue(90);
+
+        logo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') showmenu();
+        });
+        
+        function updateTranslations() {
+            const t = translations[lang];
+
+            const hello = document.getElementById("hello");
+            if (hello) hello.textContent = t.hello;
+
+            document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
+            document.querySelectorAll(".support").forEach(el => el.textContent = t.support);
+        }
+
+        updateTranslations();
+</script>
+    
+</div>
+<div id="menu" style="display:none;">
+    <h1 align="center">Menu</h1>
+    <div onclick="showlinks()" style="cursor: pointer;">
+        <h1 align="center" class="follow">Follow me on social media</h1>
+    </div>
+    <div onclick="showhelp()" style="cursor: pointer;">
+        <h1 align="center" class="support">Your support really helps</h1>
+    </div>
+</div>
+<div id="links" class="links" style="display:none;">
+    <h1 align="center" class="follow">Follow me on social media</h1>
+    <div class="link-icon">
+      <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
+        <span class="label">Instagram</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://www.tumblr.com/dicreative?source=share" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Tumblr.png?raw=true" alt="Tumblr" />
+        <span class="label">Tumblr</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="Reddit" />
+        <span class="label">Reddit</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://pin.it/4kXf9Bu18" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" />
+        <span class="label">Pinterest</span>
+      </a>
+    </div>
+</div>
+<div id="help" class="links" style="display:none;">
+    <h1 align="center" class="support">Your support really helps</h1>
+    <div class="link-icon">
+      <a href="https://ko-fi.com/dicreative" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
+        <span class="label">KoFi</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://coff.ee/dicreative" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/BmaC.png?raw=true" alt="Buy me a coffee" />
+        <span class="label">Buy me a coffee</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://dicreativemag.myshopify.com/" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true" alt="Shopify" />
+        <span class="label">Shopify</span>
+      </a>
+    </div>
+</div>
+</body>
+</html>
