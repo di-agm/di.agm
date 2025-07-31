@@ -277,26 +277,34 @@
     </div>
 <script>
         const supportedLangs = ['en', 'es', 'fr', 'pt', 'de', 'ru', 'ja', 'hi'];
-        const userLang = navigator.language.slice(0, 2);
-        const langToLoad = supportedLangs.includes(userLang) ? userLang : 'en';
+          const userLang = navigator.language.slice(0, 2);
+          const langToLoad = supportedLangs.includes(userLang) ? userLang : 'en';
         
-        fetch('translations/translations.json')
-        .then(res => res.json())
-        .then(data => {
-            const translations = data[langToLoad] || data['en'];
-            updateTranslations(translations);
-        })
-        .catch(err => {
-            console.error("Failed to load translations:", err);
-        });
+          const translationPath = `translations/translations-${langToLoad}.json`;
         
-        function updateTranslations(t) {
+          fetch(translationPath)
+            .then(res => {
+              if (!res.ok) throw new Error("Language file not found");
+              return res.json();
+            })
+            .then(data => {
+              updateTranslations(data);
+            })
+            .catch(err => {
+              // Fallback to English if something goes wrong
+              fetch('translations/translations-en.json')
+                .then(res => res.json())
+                .then(data => updateTranslations(data))
+                .catch(console.error);
+            });
+        
+          function updateTranslations(t) {
             const hello = document.getElementById("hello");
             if (hello) hello.textContent = t.hello;
         
             document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
             document.querySelectorAll(".support").forEach(el => el.textContent = t.support);
-        }
+          }
     
         const colorRing = document.getElementById("colorRing");
         const ringKnob = document.getElementById("ringKnob");    
