@@ -1,0 +1,6 @@
+//japones
+ja: { 
+  hello: "やあ", 
+  follow: "SNSでフォローしてね", 
+  support:"あなたのサポートは本当に助かります" 
+}
