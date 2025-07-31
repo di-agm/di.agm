@@ -1,0 +1,6 @@
+//Ingles
+en: { 
+  hello: "Hello", 
+  follow: "Follow me on social media", 
+  support:"Your support really helps" 
+}
