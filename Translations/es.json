@@ -1,0 +1,6 @@
+//español
+es: { 
+  hello: "Hola", 
+  follow: "Sígueme en redes sociales", 
+  support:"Tu apoyo realmente ayuda" 
+}
