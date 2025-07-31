@@ -277,17 +277,15 @@
     </div>
 <script>
         const userLang = navigator.language.slice(0, 2);
-        const lang = translations[userLang] ? userLang : "en";
-
-        document.getElementById("hello").textContent = translations[lang].hello;
-        const followText = document.getElementById("follow");
-        if (followText) {
-            followText.textContent = translations[lang].follow;
-        }
-        const supportText = document.getElementById("support");
-        if (supportText) {
-            supportText.textContent = translations[lang].support;
-        }
+        const supportedLangs = ['en', 'es', 'fr', 'pt', 'de', 'ru', 'ja', 'hi'];
+        const langToLoad = supportedLangs.includes(userLang) ? userLang : 'en';
+        
+        fetch(`translations/${langToLoad}.json`)
+          .then(res => res.ok ? res.json() : fetch('translations/en.json').then(r => r.json()))
+          .then(translations => {
+            updateTranslations(translations);
+          })
+          .catch(err => console.error('Failed to load translations:', err));
 
         const colorRing = document.getElementById("colorRing");
         const ringKnob = document.getElementById("ringKnob");    
@@ -420,14 +418,12 @@
             if (e.key === 'Enter') showmenu();
         });
         
-        function updateTranslations() {
-            const t = translations[lang];
-
+        function updateTranslations(translations) {
             const hello = document.getElementById("hello");
-            if (hello) hello.textContent = t.hello;
-
-            document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
-            document.querySelectorAll(".support").forEach(el => el.textContent = t.support);
+            if (hello) hello.textContent = translations.hello;
+        
+            document.querySelectorAll(".follow").forEach(el => el.textContent = translations.follow);
+            document.querySelectorAll(".support").forEach(el => el.textContent = translations.support);
         }
 
         updateTranslations();
