@@ -1,0 +1,183 @@
+:root {
+        --bg: hsl(0, 100%, 90%);
+        --fg: #000;
+        transition: all 0.4s ease;
+    }
+    body {
+        position: relative;
+        height: 100vh;
+        font-family: 'Didact Gothic', sans-serif;
+        text-align: center;
+        padding: 2rem;
+        margin: 0;
+        background-color: var(--bg);
+        color: var(--fg);
+        transition: background-color 0.3s, color 0.3s;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 100vw) {
+        body {
+            padding: 1rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .color-ring img {
+            width: 60vmin;
+            height: 60vmin;
+        }
+    }
+
+    .profile-photo {
+        width: 65vmin;
+        height: 65vmin;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 1rem auto;
+        display: block;
+        border: 2px solid var(--fg);
+        z-index: 3;
+    }
+
+    .ring-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 62vmin;
+        height: 62vmin;
+        margin: 2rem auto;
+        z-index: 3;
+    }
+
+    .color-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: conic-gradient(
+            hsl(0, 100%, 50%),
+            hsl(60, 100%, 50%),
+            hsl(120, 100%, 50%),
+            hsl(180, 100%, 50%),
+            hsl(240, 100%, 50%),
+            hsl(300, 100%, 50%),
+            hsl(360, 100%, 50%)
+        );
+        z-index: 1;
+        width: 60vmin;
+        height: 60vmin;
+    }
+
+    /* New value ring styles */
+    .value-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: conic-gradient(
+            from 0deg,
+            hsl(0, 0%, 0%),
+            hsl(0, 0%, 100%)
+        );
+        z-index: 2;
+        width: 50vmin;
+        height: 50vmin;
+    }
+
+    .color-ring-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3; /* Ensure it's on top */
+        transition: transform 0.3s ease;
+        pointer-events: auto;
+        width: 60vmin;
+        height: 60vmin;
+        overflow: hidden;
+    }
+
+    .ring-container:hover .color-ring-inner {
+        transform: translate(-50%, -50%) scale(0.65);
+    }
+
+    .color-ring img {
+        width: 60vmin;
+        height: 60vmin;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .color-ring-inner img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
+    }
+
+    .ring-knob {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        z-index: 2;
+    }
+
+    .link-icon {
+        display: inline-block;
+        text-align: center;
+        margin: 1rem;
+        background-color: transparent;
+        padding: 0;
+    }
+
+    .link-icon img {
+        height: 50vmin;
+        transition: transform 0.3s;
+        border-radius: 50%;
+        background-color: transparent;
+    }
+
+    .link-icon .label {
+        display: block;
+        background-color: var(--fg);
+        color: var(--bg);
+        padding: 0.4rem 0.8rem;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0.3s;
+        height: 0;
+        overflow: hidden;
+    }
+
+    .link-icon:hover .label {
+        visibility: visible;
+        opacity: 1;
+        height: auto;
+        overflow: visible;
+    }
