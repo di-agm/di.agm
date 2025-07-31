@@ -276,17 +276,28 @@
         </div>
     </div>
 <script>
-        const userLang = navigator.language.slice(0, 2);
         const supportedLangs = ['en', 'es', 'fr', 'pt', 'de', 'ru', 'ja', 'hi'];
+        const userLang = navigator.language.slice(0, 2);
         const langToLoad = supportedLangs.includes(userLang) ? userLang : 'en';
         
-        fetch(`translations/${langToLoad}.json`)
-          .then(res => res.ok ? res.json() : fetch('translations/en.json').then(r => r.json()))
-          .then(translations => {
+        fetch('translations/translations.json')
+        .then(res => res.json())
+        .then(data => {
+            const translations = data[langToLoad] || data['en'];
             updateTranslations(translations);
-          })
-          .catch(err => console.error('Failed to load translations:', err));
-
+        })
+        .catch(err => {
+            console.error("Failed to load translations:", err);
+        });
+        
+        function updateTranslations(t) {
+            const hello = document.getElementById("hello");
+            if (hello) hello.textContent = t.hello;
+        
+            document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
+            document.querySelectorAll(".support").forEach(el => el.textContent = t.support);
+        }
+    
         const colorRing = document.getElementById("colorRing");
         const ringKnob = document.getElementById("ringKnob");    
 
@@ -417,16 +428,6 @@
         logo.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') showmenu();
         });
-        
-        function updateTranslations(translations) {
-            const hello = document.getElementById("hello");
-            if (hello) hello.textContent = translations.hello;
-        
-            document.querySelectorAll(".follow").forEach(el => el.textContent = translations.follow);
-            document.querySelectorAll(".support").forEach(el => el.textContent = translations.support);
-        }
-
-        updateTranslations();
 </script>
     
 </div>
