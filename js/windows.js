@@ -94,6 +94,15 @@ function showSectionFromHash() {
                 case "#help":
                     showhelp(false);
                     break;
+                case "#am":
+                    showhelp(false);
+                    break;
+                case "#P":
+                    showhelp(false);
+                    break;
+                case "#CV":
+                    showhelp(false);
+                    break;
                 default:
                     showhome(false);
             }
