@@ -76,29 +76,39 @@ function showCV() {
             updateTranslations();
 }
 
+function goHome() {
+    window.location.hash = "#home";
+}
+
 function showSectionFromHash() {
-            switch (window.location.hash) {
-                case "#menu":
-                    showmenu(false);
-                    break;
-                case "#links":
-                    showlinks(false);
-                    break;
-                case "#help":
-                    showhelp(false);
-                    break;
-                case "#am":
-                    showam(false);
-                    break;
-                case "#P":
-                    showP(false);
-                    break;
-                case "#CV":
-                    showCV(false);
-                    break;
-                default:
-                    showhome(false);
-            }
+    const hash = window.location.hash;
+
+    switch (hash) {
+        case "#home":
+            showhome();
+            break;
+        case "#menu":
+            showmenu();
+            break;
+        case "#links":
+            showlinks();
+            break;
+        case "#help":
+            showhelp();
+            break;
+        case "#am":
+            showam();
+            break;
+        case "#P":
+            showP();
+            break;
+        case "#CV":
+            showCV();
+            break;
+        default:
+            // If unknown hash or empty, do nothing (or redirect)
+            break;
+    }
 }
 
 // On page load, show the correct section
