@@ -47,6 +47,7 @@ const colorRing = document.getElementById("colorRing");
             const y = Math.sin(angle) * radius;
             ringKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
             ringKnob.style.borderColor = `hsl(${hue}, 100%, 50%)`;
+            localStorage.setItem("hue", hue);
             updateBackground();
             //updateProfileLink();
         }
@@ -74,7 +75,7 @@ const colorRing = document.getElementById("colorRing");
             const y = Math.sin(rad) * radius;
             valueKnob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
             valueKnob.style.borderColor = `hsl(${currentHue}, ${currentSaturation}%, ${currentValue}%)`;
-            currentValue = value;
+            localStorage.setItem("value", value);
             updateBackground();
             //updateProfileLink();
         }
