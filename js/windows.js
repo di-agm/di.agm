@@ -8,7 +8,6 @@ function showhome() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#home";
 }
 
 function showmenu() {
@@ -20,7 +19,6 @@ function showmenu() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#menu";
 }
 
 function showlinks() {
@@ -32,7 +30,6 @@ function showlinks() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#links";
 }
 
 function showhelp() {
@@ -44,7 +41,6 @@ function showhelp() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#help";
 }
 
 function showam() {
@@ -56,7 +52,6 @@ function showam() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#am";
 }
 
 function showP() {
@@ -68,7 +63,6 @@ function showP() {
             document.getElementById("P").style.display = "block";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#P";
 }
 
 function showCV() {
@@ -80,7 +74,6 @@ function showCV() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "block";
             updateTranslations();
-            window.location.hash = "#CV";
 }
 
 function showSectionFromHash() {
