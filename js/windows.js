@@ -7,6 +7,7 @@ function showhome() {
             document.getElementById("am").style.display = "none";
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "none";
             updateTranslations();
 }
 
@@ -18,6 +19,7 @@ function showmenu() {
             document.getElementById("am").style.display = "none";
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "none";
             updateTranslations();
 }
 
@@ -29,6 +31,7 @@ function showlinks() {
             document.getElementById("am").style.display = "none";
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "none";
             updateTranslations();
 }
 
@@ -40,6 +43,7 @@ function showhelp() {
             document.getElementById("am").style.display = "none";
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "none";
             updateTranslations();
 }
 
@@ -51,6 +55,7 @@ function showam() {
             document.getElementById("am").style.display = "block";
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "none";
             updateTranslations();
 }
 
@@ -62,6 +67,7 @@ function showP() {
             document.getElementById("am").style.display = "none";
             document.getElementById("P").style.display = "block";
             document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "none";
             updateTranslations();
 }
 
@@ -73,6 +79,19 @@ function showCV() {
             document.getElementById("am").style.display = "none";
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "block";
+            document.getElementById("Tools").style.display = "none";
+            updateTranslations();
+}
+
+function showTools() {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("links").style.display = "none";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("help").style.display = "none";
+            document.getElementById("am").style.display = "none";
+            document.getElementById("P").style.display = "none";
+            document.getElementById("CV").style.display = "none";
+            document.getElementById("Tools").style.display = "block";
             updateTranslations();
 }
 
@@ -104,6 +123,9 @@ function showSectionFromHash() {
             break;
         case "#CV":
             showCV();
+            break;
+        case "#Tools":
+            showTools();
             break;
         default:
             // If unknown hash or empty, do nothing (or redirect)
