@@ -96,9 +96,6 @@ function showSectionFromHash() {
                 case "#CV":
                     showCV(false);
                     break;
-                default:
-                    showhome(false);
-            }
 }
 
 // On page load, show the correct section
