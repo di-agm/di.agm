@@ -95,13 +95,13 @@ function showSectionFromHash() {
                     showhelp(false);
                     break;
                 case "#am":
-                    showhelp(false);
+                    showam(false);
                     break;
                 case "#P":
-                    showhelp(false);
+                    showP(false);
                     break;
                 case "#CV":
-                    showhelp(false);
+                    showCV(false);
                     break;
                 default:
                     showhome(false);
