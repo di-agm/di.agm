@@ -77,25 +77,33 @@ function showCV() {
 }
 
 function showSectionFromHash() {
-            switch (window.location.hash) {
-                case "#menu":
-                    showmenu(false);
-                    break;
-                case "#links":
-                    showlinks(false);
-                    break;
-                case "#help":
-                    showhelp(false);
-                    break;
-                case "#am":
-                    showam(false);
-                    break;
-                case "#P":
-                    showP(false);
-                    break;
-                case "#CV":
-                    showCV(false);
-                    break;
+    const hash = window.location.hash;
+
+    if (!hash) {
+        // If there's no hash, don't do anything
+        return;
+    }
+
+    switch (hash) {
+        case "#menu":
+            showmenu();
+            break;
+        case "#links":
+            showlinks();
+            break;
+        case "#help":
+            showhelp();
+            break;
+        case "#am":
+            showam();
+            break;
+        case "#P":
+            showP();
+            break;
+        case "#CV":
+            showCV();
+            break;
+    }
 }
 
 // On page load, show the correct section
