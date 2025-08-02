@@ -123,8 +123,11 @@ const colorRing = document.getElementById("colorRing");
         window.addEventListener('touchend', () => draggingValue = false);
 
         // Set initial values
-        setHue(0);
-        setValue(90);
+        const savedHue = localStorage.getItem("hue");
+        const savedValue = localStorage.getItem("value");
+        
+        setHue(savedHue !== null ? parseInt(savedHue) : 0);
+        setValue(savedValue !== null ? parseInt(savedValue) : 90);
 
         logo.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') showmenu();
