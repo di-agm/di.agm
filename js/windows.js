@@ -8,7 +8,7 @@ function showhome() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#home";
+            window.location.assign("#home");
 }
 
 function showmenu() {
@@ -20,7 +20,7 @@ function showmenu() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#menu";
+            window.location.assign("#menu");
 }
 
 function showlinks() {
@@ -32,7 +32,7 @@ function showlinks() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#links";
+            window.location.assign("#links");
 }
 
 function showhelp() {
@@ -44,7 +44,7 @@ function showhelp() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#help";
+            window.location.assign("#help");
 }
 
 function showam() {
@@ -56,7 +56,7 @@ function showam() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#am";
+            window.location.assign("#am");
 }
 
 function showP() {
@@ -68,7 +68,7 @@ function showP() {
             document.getElementById("P").style.display = "block";
             document.getElementById("CV").style.display = "none";
             updateTranslations();
-            window.location.hash = "#P";
+            window.location.assign("#P");
 }
 
 function showCV() {
@@ -80,11 +80,11 @@ function showCV() {
             document.getElementById("P").style.display = "none";
             document.getElementById("CV").style.display = "block";
             updateTranslations();
-            window.location.hash = "#CV";
+            window.location.assign("#CV");
 }
 
 function showSectionFromHash() {
-            switch (window.location.hash) {
+            switch (window.location.assign) {
                 case "#menu":
                     showmenu(false);
                     break;
