@@ -27,6 +27,11 @@
         margin-bottom: 2rem;
     }
 
+    a {
+          text-decoration: none;
+          color: inherit;              
+    }
+
     @media (max-width: 100vw) {
         body {
             padding: 1rem 0.5rem;
