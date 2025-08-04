@@ -23,13 +23,26 @@ const translations = {
             storesText.textContent = translations[lang].stores;
         }
 function updateTranslations() {
-            const t = translations[lang];
+    const t = translations[lang];
 
-            const hello = document.getElementById("hello");
-            if (hello) hello.textContent = t.hello;
+    const hello = document.getElementById("hello");
+    if (hello && t.hello) hello.textContent = t.hello;
 
-            document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
-            document.querySelectorAll(".stores").forEach(el => el.textContent = t.stores);
-        }
+    if (t.follow) {
+        document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
+    }
 
-        updateTranslations();
+    if (t.stores) {
+        document.querySelectorAll(".stores").forEach(el => el.textContent = t.stores);
+    }
+}
+
+function checkMissingKeys(lang) {
+    const required = ["hello", "follow", "stores"];
+    const t = translations[lang];
+    required.forEach(key => {
+        if (!t[key]) console.warn(`Missing translation: ${lang}.${key}`);
+    });
+}
+
+checkMissingKeys(lang);
