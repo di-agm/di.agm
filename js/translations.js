@@ -22,27 +22,33 @@ const translations = {
         if (storesText) {
             storesText.textContent = translations[lang].stores;
         }
-function updateTranslations() {
-    const t = translations[lang];
+window.addEventListener("DOMContentLoaded", () => {
+    const userLang = navigator.language.slice(0, 2);
+    const lang = translations[userLang] ? userLang : "en";
 
-    const hello = document.getElementById("hello");
-    if (hello && t.hello) hello.textContent = t.hello;
+    function updateTranslations() {
+        const t = translations[lang];
 
-    if (t.follow) {
-        document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
+        const hello = document.getElementById("hello");
+        if (hello && t.hello) hello.textContent = t.hello;
+
+        if (t.follow) {
+            document.querySelectorAll(".follow").forEach(el => el.textContent = t.follow);
+        }
+
+        if (t.stores) {
+            document.querySelectorAll(".stores").forEach(el => el.textContent = t.stores);
+        }
     }
 
-    if (t.stores) {
-        document.querySelectorAll(".stores").forEach(el => el.textContent = t.stores);
+    function checkMissingKeys(lang) {
+        const required = ["hello", "follow", "stores"];
+        const t = translations[lang];
+        required.forEach(key => {
+            if (!t[key]) console.warn(`Missing translation: ${lang}.${key}`);
+        });
     }
-}
 
-function checkMissingKeys(lang) {
-    const required = ["hello", "follow", "stores"];
-    const t = translations[lang];
-    required.forEach(key => {
-        if (!t[key]) console.warn(`Missing translation: ${lang}.${key}`);
-    });
-}
-
-checkMissingKeys(lang);
+    updateTranslations();
+    checkMissingKeys(lang);
+});
