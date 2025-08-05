@@ -1,4 +1,4 @@
-window.translations = { 
+export default = { 
   hello: "やあ", 
   follow: "SNSでフォローしてね", 
   stores:"あなたのサポートは本当に助かります" 
