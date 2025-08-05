@@ -1,5 +1,5 @@
 { 
-  hello: "Olá", 
-  follow: "Siga-me nas redes sociais", 
-  stores:"Seu apoio realmente ajuda" 
+  "hello": "Olá", 
+  "follow": "Siga-me nas redes sociais", 
+  "stores": "Seu apoio realmente ajuda" 
 }
