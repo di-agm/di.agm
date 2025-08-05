@@ -1,20 +1,26 @@
-const translations = {
-    en: { hello: "Hello", follow: "Follow me on social media", stores: "Store" },
-    es: { hello: "Hola", follow: "Sígueme en redes sociales", stores: "Tienda" },
-    pt: { hello: "Olá", follow: "Siga-me nas redes sociais", stores: "Loja" },
-    fr: { hello: "Bonjour", follow: "Suivez-moi sur les réseaux sociaux", stores: "Magasin" },
-    ru: { hello: "Привет", follow: "Подпишитесь на меня в соцсетях", stores: "Магазин" },
-    de: { hello: "Hallo", follow: "Folge mir in den sozialen Medien", stores: "Laden" },
-    ja: { hello: "やあ", follow: "SNSでフォローしてね", stores: "店" },
-    hi: { hello: "नमस्ते", follow: "सोशल मीडिया पर मुझे फॉलो करें", stores: "दुकान" }
-};
-
 window.addEventListener("DOMContentLoaded", () => {
     const userLang = navigator.language.slice(0, 2);
-    const lang = translations[userLang] ? userLang : "en";
+    const supportedLangs = ["en", "es", "pt", "fr", "ru", "de", "ja", "hi"];
+    const lang = supportedLangs.includes(userLang) ? userLang : "en";
+
+    loadLanguage(lang, () => {
+        updateTranslations();
+        checkMissingKeys(lang);
+    });
+
+    function loadLanguage(langCode, callback) {
+        const script = document.createElement('script');
+        script.src = `translations/${langCode}.js`;
+        script.onload = () => callback();
+        script.onerror = () => {
+            console.warn(`Could not load ${langCode}.js, falling back to en.js`);
+            if (langCode !== 'en') loadLanguage('en', callback);
+        };
+        document.head.appendChild(script);
+    }
 
     function updateTranslations() {
-        const t = translations[lang];
+        const t = translations;
 
         const hello = document.getElementById("hello");
         if (hello && t.hello) hello.textContent = t.hello;
@@ -28,14 +34,10 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function checkMissingKeys(lang) {
+    function checkMissingKeys(langCode) {
         const required = ["hello", "follow", "stores"];
-        const t = translations[lang];
         required.forEach(key => {
-            if (!t[key]) console.warn(`Missing translation: ${lang}.${key}`);
+            if (!translations[key]) console.warn(`Missing translation: ${langCode}.${key}`);
         });
     }
-
-    updateTranslations();
-    checkMissingKeys(lang);
 });
