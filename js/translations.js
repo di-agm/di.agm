@@ -4,7 +4,7 @@ async function loadTranslations() {
     const lang = navigator.language.slice(0, 2);
     let response = await fetch(`./translations/${lang}.json`);
     if (!response.ok) {
-        response = await fetch('./translations/en.json');
+        response = await fetch('./Translations/en.json');
     }
     Object.assign(translations, await response.json());
 }
