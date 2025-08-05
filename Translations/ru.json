@@ -1,5 +1,4 @@
-//ruso
-window.translations = { 
+export default = { 
   hello: "Привет", 
   follow: "Подпишитесь на меня в соцсетях", 
   stores:"Ваша поддержка действительно помогает" 
