@@ -96,9 +96,7 @@ function showTools() {
 }
 
 function goHome() {
-    if (window.location.hash !== "#home") {
         window.location.hash = "#home";
-    }
 }
 
 function showSectionFromHash() {
