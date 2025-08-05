@@ -12,6 +12,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Defino updateTranslations dentro para que esté disponible cuando se cargue el script
     function updateTranslations() {
+        console.log("Updating translations");
         const t = window.translations;
         
         const hello = document.getElementById("hello");
