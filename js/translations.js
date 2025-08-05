@@ -1,4 +1,3 @@
-//TRANSLATIONS
 window.addEventListener("DOMContentLoaded", () => {
     const userLang = navigator.language.slice(0, 2);
     const supportedLangs = ['en', 'es', 'pt', 'fr', 'ru', 'de', 'ja', 'hi'];
