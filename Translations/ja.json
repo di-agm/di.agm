@@ -1,5 +1,5 @@
 //japones
-ja: { 
+window.translations = { 
   hello: "やあ", 
   follow: "SNSでフォローしてね", 
   stores:"あなたのサポートは本当に助かります" 
