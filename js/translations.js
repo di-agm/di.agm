@@ -9,7 +9,8 @@ window.addEventListener("DOMContentLoaded", () => {
         if (window.translations) updateTranslations();
     };
     document.head.appendChild(script);
-    
+
+    // Defino updateTranslations dentro para que esté disponible cuando se cargue el script
     function updateTranslations() {
         const t = window.translations;
         
@@ -24,3 +25,4 @@ window.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll(".stores").forEach(el => el.textContent = t.stores);
         }
     }
+});
