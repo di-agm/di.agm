@@ -1,5 +1,5 @@
 //aleman
-de: { 
+window.translations = { 
   hello: "Hallo", 
   follow: "Folge mir in den sozialen Medien", 
   stores:"Deine Unterstützung hilft wirklich" 
