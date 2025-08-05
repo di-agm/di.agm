@@ -1,5 +1,5 @@
 { 
-  hello: "Bonjour", 
-  follow: "Suivez-moi sur les réseaux sociaux", 
-  stores:"Votre soutien aide vraiment" 
+  "hello": "Bonjour", 
+  "follow": "Suivez-moi sur les réseaux sociaux", 
+  "stores": "Votre soutien aide vraiment" 
 }
