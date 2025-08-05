@@ -1,5 +1,5 @@
 //español
-es: { 
+window.translations = { 
   hello: "Hola", 
   follow: "Sígueme en redes sociales", 
   stores:"Tu apoyo realmente ayuda" 
