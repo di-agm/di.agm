@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const lang = supportedLangs.includes(userLang) ? userLang : "en";
     
     const script = document.createElement("script");
-    script.src = `lang/${lang}.js`;
+    script.src = `translations/${lang}.js`;
     script.onload = () => {
         if (window.translations) updateTranslations();
     };
