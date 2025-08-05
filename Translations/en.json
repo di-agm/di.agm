@@ -1,5 +1,5 @@
 //Ingles
-en: { 
+window.translations = { 
   hello: "Hello", 
   follow: "Follow me on social media", 
   stores:"Your support really helps" 
