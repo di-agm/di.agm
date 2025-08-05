@@ -96,7 +96,12 @@ function showTools() {
 }
 
 function goHome() {
+    if (window.location.hash !== "#home") {
         window.location.hash = "#home";
+    } else {
+        // Fuerza el evento hashchange si ya estamos en #home
+        showSectionFromHash();
+    }
 }
 
 function showSectionFromHash() {
@@ -133,7 +138,5 @@ function showSectionFromHash() {
     }
 }
 
-// On page load, show the correct section
 window.addEventListener("DOMContentLoaded", showSectionFromHash);
-// When the hash changes (back/forward), show the correct section
 window.addEventListener("hashchange", showSectionFromHash);
