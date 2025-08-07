@@ -20,3 +20,14 @@ function updateTranslations() {
 document.addEventListener("DOMContentLoaded", () => {
     loadTranslations().then(updateTranslations);
 });
+
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+        {
+            pageLanguage: 'es',
+            includedLanguages: 'en,es,fr,de,it,pt,ja,zh-CN',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        },
+        'google_translate_element'
+    );
+}
