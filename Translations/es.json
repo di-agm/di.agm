@@ -1,5 +1,9 @@
 { 
   "hello": "Hola", 
   "follow": "Sígueme en redes sociales", 
-  "stores": "Tienda" 
+  "stores": "Tienda" ,
+  "AM": "Sobre mí",
+  "Portfolio": "Portafolio",
+  "Skills": "Mis habilidades",
+  "Blog": "Blog"
 }
