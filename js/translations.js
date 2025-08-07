@@ -2,7 +2,7 @@ const translations = {};
 
 async function loadTranslations() {
     const lang = navigator.language.slice(0, 2);
-    let response = await fetch(`./translations/${lang}.json`);
+    let response = await fetch(`./Translations/${lang}.json`);
     if (!response.ok) {
         response = await fetch('./Translations/en.json');
     }
