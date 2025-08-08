@@ -94,82 +94,11 @@
     </div>
 </div>
 <div id="AM" align="justify">
-  <h2 class="AM"></h2>
+  <h2>About Me</h2>
   <p>¡Hola! Esto es <strong>di.agm</strong>, mi pasión es el diseño industrial.</p>
   <p>Me especializo en diseño asistido por computadora: CAD, y amo el diseño universal. Soy autista, aunque no tengo un diagnostigo oficial porque no puedo pagarlo por el momento, o soy autista o tengo otros 50 diagnósticos diferentes. Esto significa que hay cosas que realmente me apasionan, aunque siempre me gusta experimentar cosas nuevas mientras esten en mi zona segura.</p>
   <p>También me encanta la ilustración, leer y escribir, o experimentar con programación.</p>
   <p>Mi sueño es emprender y utilizar el diseño industrial para ayudar a personas con discapacidad.</p>
-</div>
-
-<div id="Portfolio" align="justify">
-  <h2 class="Portfolio"></h2>
-</div>
-
-<div id="Tools" align="justify">
-  <h1 class="Tools"></h1>
-    <h2>Maquetación</h2>
-    <div id="app" class="links" style="display:none;">
-      <div class="blabel">
-        <label for="pageSize">Page Size:</label>
-        <select id="pageSize">
-          <option value="a4">A4 (210×297 mm)</option>
-          <option value="letter">Letter (8.5×11 in)</option>
-          <option value="legal">Legal (8.5×14 in)</option>
-          <option value="custom">Custom...</option>
-        </select>
-    
-        <div id="customSizeInputs" style="display: none; margin-top: 1rem;">
-          <label>Width (mm or in): <input type="number" id="customWidth" /></label>
-          <label>Height (mm or in): <input type="number" id="customHeight" /></label>
-          <label>Name (optional): <input type="text" id="customName" /></label>
-          <button id="saveCustomSize">Save Custom Size</button>
-        </div>
-    
-        <label for="pageCount">Number of Pages:</label>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <button type="button" id="decreasePage">–</button>
-          <input type="number" id="pageCount" value="1" min="1" style="width: 4rem;" />
-          <button type="button" id="increasePage">+</button>
-        </div>
-    
-      <label>Title</label>
-        <input type="text" id="docTitle" />
-    
-        <label>Subtitle</label>
-        <input type="text" id="docSubtitle" />
-    
-        <label>Content</label>
-        <textarea id="docContent"></textarea>
-    
-        <label>Font</label>
-        <select id="fontFamily">
-          <option value="Inter">Inter</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Courier New">Courier New</option>
-        </select>
-    
-        <label>Font size</label>
-        <select id="fontSize">
-          <option value="14px">Small</option>
-          <option value="16px" selected>Medium</option>
-          <option value="20px">Large</option>
-        </select>
-    
-        <label>Text color</label>
-        <input type="color" id="textColor" value="#333333" />
-    
-        <label>Background color</label>
-        <input type="color" id="bgColor" value="#ffffff" />
-    
-        <label>Margins (mm)</label>
-        <input type="number" id="marginValue" value="10" min="0" max="50" />
-    
-        <button onclick="generatePreview()">Preview</button>
-      </div>
-      <div class="page"></div>
-      <div id="pagesContainer"></div>
-    </div>
-    
 </div>
 
     <script src="js/windows.js" defer></script>
