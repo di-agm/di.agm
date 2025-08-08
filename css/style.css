@@ -197,13 +197,3 @@
         height: auto;
         overflow: visible;
     }
-
-.paper {
-  width: 90%;              /* take up most of the screen width */
-  max-width: 800px;        /* don’t get bigger than 800px */
-  aspect-ratio: 8.5 / 11;  /* keeps proportions like real paper */
-  background: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  padding: 2rem;           /* space for content */
-}
