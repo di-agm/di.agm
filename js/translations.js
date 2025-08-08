@@ -25,7 +25,7 @@ function googleTranslateElementInit() {
     new google.translate.TranslateElement(
         {
             pageLanguage: 'es',
-            includedLanguages: 'en,es,fr,de,it,pt,ja,zh-CN',
+            includedLanguages: 'en,es,fr,de,pt,ja,ru',
             layout: google.translate.TranslateElement.InlineLayout.SIMPLE
         },
         'google_translate_element'
