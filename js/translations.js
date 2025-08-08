@@ -15,6 +15,10 @@ function updateTranslations() {
 
     document.querySelectorAll(".follow").forEach(el => el.textContent = translations.follow);
     document.querySelectorAll(".stores").forEach(el => el.textContent = translations.stores);
+    document.querySelectorAll(".AM").forEach(el => el.textContent = translations.AM);
+    document.querySelectorAll(".Portfolio").forEach(el => el.textContent = translations.Portfolio);
+    document.querySelectorAll(".Skills").forEach(el => el.textContent = translations.Skills);
+    document.querySelectorAll(".Tools").forEach(el => el.textContent = translations.Tools);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
