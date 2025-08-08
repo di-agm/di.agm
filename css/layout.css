@@ -8,18 +8,18 @@
   padding: 2rem;           /* space for content */
 }
 
-.page {
-  width: 200px;
-  height: 300px;
-  background-color: lightgray;
-  margin: 1rem auto;
-  border: 2px solid black;
-}
-
 #pagesContainer {
-  width: 250px;
-  height: 350px;
-  background-color: #eee;
-  margin: 1rem auto;
-  border: 2px dashed blue;
+  width: 320px;
+  height: 480px;
+  overflow: hidden;
+  position: relative;
+  /* no border or background */
+}
+.page {
+  background: white; /* pages have background */
+  border: 1px solid #ccc;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0; left: 0;
 }
