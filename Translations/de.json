@@ -2,4 +2,8 @@
   "hello": "Hallo", 
   "follow": "Folge mir in den sozialen Medien", 
   "stores":"Geschäft" 
+  "AM": "Über mich",
+  "Portfolio": "Portfolio",
+  "Skills": "Meine Fähigkeiten",
+  "Tools": "Werkzeuge"
 }
