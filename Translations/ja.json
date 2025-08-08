@@ -2,4 +2,8 @@
   "hello": "やあ", 
   "follow": "SNSでフォローしてね", 
   "stores": "店" 
+  "AM": "Sobre mí",
+  "Portfolio": "Portafolio",
+  "Skills": "スキル",
+  "Tools": "ツール"
 }
