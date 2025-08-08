@@ -2,4 +2,8 @@
   "hello": "Bonjour", 
   "follow": "Suivez-moi sur les réseaux sociaux", 
   "stores": "Magasin" 
+  "AM": "À propos de moi",
+  "Portfolio": "Portfolio",
+  "Skills": "Mes compétences",
+  "Tools": "Outils",
 }
