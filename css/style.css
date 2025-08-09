@@ -24,8 +24,8 @@ html, body {
 
  #home, #menu, {
         margin-top: 0%;
-        margin-left: 10%;
-        margin-right: 10%;
+        margin-left: 15%;
+        margin-right: 15%;
         height: 100vh; /* Full viewport height */
         display: flex;
         flex-direction: column;
