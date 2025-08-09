@@ -32,8 +32,8 @@ html, body {
 }
 
 #P, #AM, #Tools, #links, #stores {
-        margin-top: 10%;
-        margin-bottom: 10%;
+        margin-top: 5%;
+        margin-bottom: 5%;
         margin-left: 10%;
         margin-right: 10%;
         min-height: 100vh;
