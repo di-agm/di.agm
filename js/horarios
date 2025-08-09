@@ -1,0 +1,48 @@
+function trim(str) { return str.trim(); }
+function convertirHoraAMinutos(hora) {
+  const [h, m] = hora.split(":").map(Number);
+  return h * 60 + m;
+}
+function evaluateExpression(expr) {
+  try { return Function('return ' + expr)(); } catch { return 0; }
+}
+function calcularMCD(a, b) { return b ? calcularMCD(b, a % b) : a; }
+function calcularMCDArr(arr) {
+  return arr.reduce((acc, val) => calcularMCD(acc, val), arr[0] || 1);
+}
+function generateSchedule() {
+  const daysCount = 7;
+  const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
+  const cols = evaluateExpression(document.getElementById('daysExpr').value) + 2;
+  const [startStr, endStr] = document.getElementById('timeRange').value.split('-').map(trim);
+  const startTime = convertirHoraAMinutos(startStr);
+  const endTime = convertirHoraAMinutos(endStr);
+  const totalMinutes = endTime - startTime;
+  const intervalMinutes = 60; // Simplified example
+  const numRows = Math.ceil(totalMinutes / intervalMinutes) + 1;
+  let matrix = Array.from({length: numRows}, () => Array(cols).fill(" "));
+  matrix[0][0] = "Inicio";
+  matrix[0][1] = "Final";
+  for (let j = 2; j < cols; j++) matrix[0][j] = daysOfWeek[(j - 2) % daysCount];
+  let currentTime = startTime;
+  for (let i = 1; i < numRows; i++) {
+    let nextTime = currentTime + intervalMinutes;
+    matrix[i][0] = toHHMM(currentTime);
+    matrix[i][1] = toHHMM(nextTime);
+    currentTime = nextTime;
+  }
+  renderTable(matrix);
+}
+function toHHMM(minutes) {
+  let h = Math.floor(minutes / 60) % 24;
+  let m = minutes % 60;
+  return String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0');
+}
+function renderTable(matrix) {
+  let html = '<table>';
+  matrix.forEach(row => {
+    html += '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+  });
+  html += '</table>';
+  document.getElementById('output').innerHTML = html;
+}
