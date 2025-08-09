@@ -45,6 +45,18 @@
       tabloid: { widthIN: 11, heightIN: 17 }
     };
 
+    function addCustomPaperSize(name, width, height, unit = 'px') {
+      paperSizes[name.toLowerCase()] = unit === 'mm'
+        ? { widthMM: width, heightMM: height }
+        : unit === 'in'
+          ? { widthIN: width, heightIN: height }
+          : { widthPX: width, heightPX: height };
+    }
+    
+    // Example usage:
+    addCustomPaperSize('MyPoster', 500, 700, 'px');
+    console.log(paperSizes);
+
     function mmToPx(mm) { return mm * 3.78; }
     function inToPx(inches) { return inches * 96; }
 
