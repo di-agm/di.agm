@@ -22,8 +22,19 @@ html, body {
         height: 100%;
 }
 
- #home, #menu, #AM {
-        margin-top: 2%;
+ #home, #menu, {
+        margin-left: 10%;
+        margin-right: 10%;
+        height: 100vh; /* Full viewport height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Prevent scrollbars */
+}
+
+#AM {
+        margin-top: 5%;
         margin-left: 10%;
         margin-right: 10%;
         height: 100vh; /* Full viewport height */
