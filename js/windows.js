@@ -1,5 +1,5 @@
 function showSectionFromHash() {
-    const sections = ["home", "menu", "links", "stores", "AM", "P", "CV", "Tools"];
+    const sections = ["home", "menu", "links", "stores", "AM", "P", "CV", "Tools", "tt", "LS", "layout"];
     const hash = window.location.hash.slice(1) || "home"; // remove "#" or default to home
 
     sections.forEach(id => {
