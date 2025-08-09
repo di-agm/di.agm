@@ -254,6 +254,16 @@
   <div id="pageNumber">Page 1</div>
 </div>
 
+<div class="tt">
+    <h1>Horario Planner</h1>
+    <div>
+      <label>Días (expresión): <input type="text" id="daysExpr"></label><br>
+      <label>Hora inicio-fin (HH:MM - HH:MM): <input type="text" id="timeRange"></label><br>
+      <button onclick="generateSchedule()">Generar Horario</button>
+    </div>
+    <div id="output"></div>
+</div>
+
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
     <script src="js/translations.js" defer></script>
