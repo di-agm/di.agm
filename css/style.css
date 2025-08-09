@@ -32,9 +32,9 @@ html, body {
 }
 
 #P, #AM, #Tools, #links, #stores {
+        margin: 10%;
         min-height: 100vh;
         overflow-y: auto; /* allow vertical scroll */
-        margin: 10%;
 }
 
     h1 {
