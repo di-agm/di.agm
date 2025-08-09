@@ -18,18 +18,18 @@
     }
 
 html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden; /* Prevent scrollbars */
+        margin: 0;
+        padding: 0;
+        height: 100%;
 }
 
-#home, #menu {
-  height: 100vh; /* Full viewport height */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+ #home, #menu {
+        height: 100vh; /* Full viewport height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Prevent scrollbars */
 }
 
     h1 {
