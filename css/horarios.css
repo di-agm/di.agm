@@ -1,0 +1,4 @@
+body { padding: 20px; }
+table { border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #ccc; padding: 5px; text-align: left; }
+input, select { margin: 5px; }
