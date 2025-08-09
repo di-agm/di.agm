@@ -32,6 +32,11 @@ html, body {
         overflow: hidden; /* Prevent scrollbars */
 }
 
+#P {
+        min-height: 100vh;
+        overflow-y: auto; /* allow vertical scroll */
+}
+
     h1 {
         font-size: 2rem;
         margin-bottom: 1rem;
