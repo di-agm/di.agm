@@ -20,6 +20,8 @@ function updateTranslations() {
     document.querySelectorAll(".Skills").forEach(el => el.textContent = translations.Skills);
     document.querySelectorAll(".Tools").forEach(el => el.textContent = translations.Tools);
     document.querySelectorAll(".J2911").forEach(el => el.textContent = translations.J2911);
+    document.querySelectorAll(".layout").forEach(el => el.textContent = translations.layout);
+    document.querySelectorAll(".tt").forEach(el => el.textContent = translations.tt);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
