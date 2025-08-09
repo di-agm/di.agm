@@ -23,6 +23,7 @@ html, body {
 }
 
  #home, #menu, #AM {
+        margin-top: 5%;
         margin-left: 10%;
         margin-right: 10%;
         height: 100vh; /* Full viewport height */
