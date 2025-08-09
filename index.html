@@ -110,73 +110,146 @@
 
 <div id="Tools" align="justify">
   <h2 class="Tools"></h2>
-    <div id="app" class="links">
-      <div class="blabel">
-        <label for="pageSize">Page Size:</label>
-        <select id="pageSize">
-          <option value="a4">A4 (210×297 mm)</option>
-          <option value="letter">Letter (8.5×11 in)</option>
-          <option value="legal">Legal (8.5×14 in)</option>
-          <option value="custom">Custom...</option>
-        </select>
+    <div class="hamburger-menu" style="left: 20px;" id="leftMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <!-- Right hamburger button -->  
+  <div class="hamburger-menu" style="right: 20px;" id="rightMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <!-- Left sidebar -->  
+  <div class="sidebar left-sidebar" id="leftSidebar">
+    <div class="sidebar-section">
+      <h3>Page Setup</h3>
+      <select id="sizeSelector" aria-label="Select paper size">
+        <option value="a4">A4 (210 × 297 mm)</option>
+        <option value="letter">Letter (8.5 × 11 in)</option>
+        <option value="tabloid">Tabloid (11 × 17 in)</option>
+      </select>
+      <div style="margin-top: 10px;"></div>
+      <button class="sidebar-btn full-width" id="orientationBtn">↺ Rotate</button>
+    </div>
     
-        <div id="customSizeInputs" style="display: none; margin-top: 1rem;">
-          <label>Width (mm or in): <input type="number" id="customWidth" /></label>
-          <label>Height (mm or in): <input type="number" id="customHeight" /></label>
-          <label>Name (optional): <input type="text" id="customName" /></label>
-          <button id="saveCustomSize">Save Custom Size</button>
-        </div>
-    
-        <label for="pageCount">Number of Pages:</label>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <button type="button" id="decreasePage">–</button>
-          <input type="number" id="pageCount" value="1" min="1" style="width: 4rem;" />
-          <button type="button" id="increasePage">+</button>
-        </div>
-    
-      <label>Title</label>
-        <input type="text" id="docTitle" />
-    
-        <label>Subtitle</label>
-        <input type="text" id="docSubtitle" />
-    
-        <label>Content</label>
-        <textarea id="docContent"></textarea>
-    
-        <label>Font</label>
-        <select id="fontFamily">
-          <option value="Inter">Inter</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Courier New">Courier New</option>
-        </select>
-    
-        <label>Font size</label>
-        <select id="fontSize">
-          <option value="14px">Small</option>
-          <option value="16px" selected>Medium</option>
-          <option value="20px">Large</option>
-        </select>
-    
-        <label>Text color</label>
-        <input type="color" id="textColor" value="#333333" />
-    
-        <label>Background color</label>
-        <input type="color" id="bgColor" value="#ffffff" />
-    
-        <label>Margins (mm)</label>
-        <input type="number" id="marginValue" value="10" min="0" max="50" />
-    
-        <button onclick="generatePreview()">Preview</button>
-      </div>
-      <div id="page container">
-          <div class="page"></div>
+    <div class="sidebar-section">
+      <h3>Elements</h3>
+      <div class="sidebar-buttons">
+        <button class="sidebar-btn" id="addTitleBtn">Title</button>
+        <button class="sidebar-btn" id="addSubtitleBtn">Subtitle</button>
+        <button class="sidebar-btn" id="addParagraphBtn">Paragraph</button>
+        <button class="sidebar-btn" id="addImageBtn">Image</button>
       </div>
     </div>
-</div>
+    
+    <div class="sidebar-section">
+      <h3>Element Style</h3>
+      <div id="elementEditor" style="display: none;">
+        <h4>Text Color</h4>
+        <div class="color-picker-container">
+          <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+          <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+          <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+          <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+          <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+          <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+          <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+          <div class="color-option" style="background-color: #00ffff;" data-color="#00ffff"></div>
+        </div>
+        
+        <h4>Font Size</h4>
+        <div class="font-size-options">
+          <button class="size-btn" data-size="12">S</button>
+          <button class="size-btn" data-size="16">M</button>
+          <button class="size-btn" data-size="20">L</button>
+          <button class="size-btn" data-size="24">XL</button>
+          <button class="size-btn" data-size="32">XXL</button>
+        </div>
+        
+        <h4>Font Family</h4>
+        <select class="font-family-select" id="fontFamilySelect">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Impact, sans-serif">Impact</option>
+        </select>
+        
+        <div style="margin-top: 15px;"></div>
+        <button class="sidebar-btn full-width" id="deleteElementBtn">🗑️ Delete Element</button>
+      </div>
+      <div id="noElementSelected" style="opacity: 0.7; text-align: center; padding: 10px;">
+        Select an element to edit
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Pages</h3>
+      <div class="sidebar-buttons">
+        <button class="sidebar-btn" id="prevPageBtn">← Previous</button>
+        <button class="sidebar-btn" id="nextPageBtn">Next →</button>
+        <button class="sidebar-btn full-width" id="addPageBtn">+ Add Page</button>
+        <button class="sidebar-btn" id="removePageBtn">− Remove</button>
+        <button class="sidebar-btn" id="duplicatePageBtn">⎘ Duplicate</button>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Export</h3>
+      <div class="sidebar-buttons">
+        <button class="sidebar-btn" id="exportPngBtn">PNG</button>
+        <button class="sidebar-btn" id="exportJpgBtn">JPG</button>
+        <button class="sidebar-btn" id="exportPdfBtn">PDF</button>
+        <button class="sidebar-btn full-width" id="saveLayoutBtn">💾 Save Layout</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right sidebar -->  
+  <div class="sidebar right-sidebar" id="rightSidebar">
+    <div class="sidebar-section">
+      <h3>Saved Layouts</h3>
+      <div id="savedLayouts" class="saved-layouts">
+        <div class="layout-item" style="opacity: 0.6; font-style: italic;">
+          No saved layouts
+        </div>
+      </div>
+      <div style="margin-top: 15px;"></div>
+      <button class="sidebar-btn full-width" id="importLayoutBtn">📂 Import Layout</button>
+    </div>
+  </div>
+  
+  <!-- Save layout modal -->
+  <div class="modal" id="saveLayoutModal">
+    <div class="modal-content">
+      <h3>Save Layout</h3>
+      <input type="text" id="layoutNameInput" placeholder="Layout name">
+      <div class="modal-buttons">
+        <button class="sidebar-btn" id="cancelSaveBtn">Cancel</button>
+        <button class="sidebar-btn" id="confirmSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-container">
+    <!-- Page will be inserted here by JS -->
+  </div>
+
+  <div id="pageNumber">Page 1</div>
 
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
     <script src="js/translations.js" defer></script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="js/layout.js" defer></script>
 </body>
 </html>
