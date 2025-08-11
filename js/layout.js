@@ -229,21 +229,28 @@
       element.onmousedown = dragStart;
       
       function dragStart(e) {
-        // Select the element when clicked
-        selectElement(element);
+          selectElement(element);
         
-        // Only allow dragging when not editing text
-        if (document.activeElement === element) {
-          return;
+          // If editing text, don't drag
+          if (document.activeElement === element) return;
+        
+          // Detect clicks inside the bottom-right "resize corner"
+          const rect = element.getBoundingClientRect();
+          const cornerSize = 12; // pixels — tweak if needed
+          const isInResizeCorner = (e.clientX >= rect.right - cornerSize) &&
+                                   (e.clientY >= rect.bottom - cornerSize);
+          if (isInResizeCorner) {
+            // allow the browser to perform the native resize — do NOT call preventDefault()
+            return;
+          }
+        
+          // Otherwise start moving the element
+          e.preventDefault();
+          offsetX = e.clientX - rect.left;
+          offsetY = e.clientY - rect.top;
+          document.onmousemove = dragMove;
+          document.onmouseup = dragEnd;
         }
-        
-        e.preventDefault();
-        offsetX = e.clientX - element.getBoundingClientRect().left;
-        offsetY = e.clientY - element.getBoundingClientRect().top;
-        
-        document.onmousemove = dragMove;
-        document.onmouseup = dragEnd;
-      }
       
       function dragMove(e) {
         e.preventDefault();
