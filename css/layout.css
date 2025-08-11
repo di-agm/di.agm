@@ -109,15 +109,29 @@ button:hover {
   border-radius: 4px;
   cursor: move;
   color: black;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 5;
   transition: border 0.2s;
-  resize: both;       /* allow resizing */
-  overflow: auto;
+}
+
+.text-element .resizer {
+  width: 12px;
+  height: 12px;
+  background: #2563eb;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: se-resize;
+  border-top-left-radius: 3px;
 }
 
 .text-element.selected {
   border: 2px solid #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+}
+
+.text-element:focus {
+  cursor: text;  /* change cursor to text when editing */
 }
 
 /* Hamburger menu styles */
@@ -154,6 +168,7 @@ button:hover {
   border-radius: 2px;
   opacity: 1;
   left: 0;
+  background: #2563eb;
   transform: rotate(0deg);
   transition: .25s ease-in-out;
 }
