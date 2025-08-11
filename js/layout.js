@@ -241,7 +241,9 @@
       if (isInResizeCorner) return;
     
       // Allow text edit when clicking directly on text
-      if (e.target !== element && e.target.isContentEditable) {
+      if (e.target === element) {
+        // Focus element so typing works
+        element.focus();
         return;
       }
     
