@@ -241,10 +241,12 @@
       // Don't drag if clicking resize handle
       if (isInResizeCorner) return;
     
-      if (e.target !== element) {
-          element.focus();
-          return;
-    }
+      // Allow text edit when clicking directly on text
+      if (e.target === element) {
+        // Focus element so typing works
+        element.focus();
+        return;
+      }
     
       // Start dragging
       e.preventDefault();
