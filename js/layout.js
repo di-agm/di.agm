@@ -184,6 +184,7 @@
       const element = document.createElement('div');
       element.className = 'text-element';
       element.contentEditable = true;
+    element.setAttribute('tabindex', '0');
       
       // Position in the center of the page
       element.style.top = '50px';
