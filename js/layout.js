@@ -228,29 +228,28 @@
       
       element.onmousedown = dragStart;
       
-      function dragStart(e) {
-          selectElement(element);
-        
-          // If editing text, don't drag
-          if (document.activeElement === element) return;
-        
-          // Detect clicks inside the bottom-right "resize corner"
-          const rect = element.getBoundingClientRect();
-          const cornerSize = 12; // pixels — tweak if needed
-          const isInResizeCorner = (e.clientX >= rect.right - cornerSize) &&
-                                   (e.clientY >= rect.bottom - cornerSize);
-          if (isInResizeCorner) {
-            // allow the browser to perform the native resize — do NOT call preventDefault()
-            return;
-          }
-        
-          // Otherwise start moving the element
-          e.preventDefault();
-          offsetX = e.clientX - rect.left;
-          offsetY = e.clientY - rect.top;
-          document.onmousemove = dragMove;
-          document.onmouseup = dragEnd;
-        }
+    function dragStart(e) {
+      selectElement(element);
+    
+      // If clicked inside the element to type (not on edges for resize), allow focus
+      const rect = element.getBoundingClientRect();
+      const cornerSize = 12; // pixels
+      const isInResizeCorner =
+        e.clientX >= rect.right - cornerSize &&
+        e.clientY >= rect.bottom - cornerSize;
+    
+      // If this click is for text editing or resize, do nothing
+      if (isInResizeCorner || e.target.isContentEditable) {
+        return; // let the browser handle typing or resizing
+      }
+    
+      // Otherwise, start dragging
+      e.preventDefault(); // stop text selection
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      document.onmousemove = dragMove;
+      document.onmouseup = dragEnd;
+    }
       
       function dragMove(e) {
         e.preventDefault();
