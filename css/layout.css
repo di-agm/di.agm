@@ -168,7 +168,7 @@ button:hover {
   border-radius: 2px;
   opacity: 1;
   left: 0;
-  background: #2563eb;
+  background: inherit;
   transform: rotate(0deg);
   transition: .25s ease-in-out;
 }
