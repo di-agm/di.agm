@@ -303,6 +303,59 @@
         document.getElementById('noElementSelected').style.display = 'block';
       }
     }
+
+function addControlCircles(element) {
+  removeControlCircles(); // Remove old controls first
+  const controls = document.createElement('div');
+  controls.className = 'control-circles';
+
+  const moveCircle = document.createElement('div');
+  moveCircle.className = 'circle move';
+  moveCircle.title = 'Move';
+  moveCircle.innerHTML = '⤧'; // cross arrows symbol
+  moveCircle.onmousedown = (e) => startMove(e, element);
+
+  const scaleCircle = document.createElement('div');
+  scaleCircle.className = 'circle scale';
+  scaleCircle.title = 'Scale';
+  scaleCircle.innerHTML = '⤢'; // diagonal arrow symbol
+  scaleCircle.onmousedown = (e) => startScale(e, element);
+
+  const editCircle = document.createElement('div');
+  editCircle.className = 'circle edit';
+  editCircle.title = 'Edit';
+  editCircle.innerHTML = '✎'; // pencil symbol
+  editCircle.onclick = () => element.focus();
+
+  controls.appendChild(moveCircle);
+  controls.appendChild(scaleCircle);
+  controls.appendChild(editCircle);
+
+  element.appendChild(controls);
+}
+
+function removeControlCircles() {
+  document.querySelectorAll('.control-circles').forEach(c => c.remove());
+}
+
+// Example event hookup to add these when selecting an element
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('text-element')) {
+    addControlCircles(e.target);
+  } else if (!e.target.closest('.control-circles')) {
+    removeControlCircles();
+  }
+});
+
+function startMove(e, element) {
+  e.stopPropagation();
+  // Implement your drag logic here
+}
+
+function startScale(e, element) {
+  e.stopPropagation();
+  // Implement your scaling logic here
+}
     
     // Toggle sidebar functions
     function toggleLeftSidebar() {
