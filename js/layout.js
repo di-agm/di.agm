@@ -56,9 +56,9 @@
         option.value = name.toLowerCase();
         option.textContent = name;
         selector.appendChild(option);
+    }
 
     addCustomPaperSize('Custom', 500, 700, 'px');        
-    }
 
     console.log(paperSizes);
 
