@@ -46,15 +46,20 @@
     };
 
     function addCustomPaperSize(name, width, height, unit = 'px') {
-      paperSizes[name.toLowerCase()] = unit === 'mm'
-        ? { widthMM: width, heightMM: height }
-        : unit === 'in'
-          ? { widthIN: width, heightIN: height }
-          : { widthPX: width, heightPX: height };
+        paperSizes[name.toLowerCase()] = unit === 'mm'
+            ? { widthMM: width, heightMM: height }
+            : unit === 'in'
+              ? { widthIN: width, heightIN: height }
+              : { widthPX: width, heightPX: height };
+
+        const option = document.createElement('option');
+        option.value = name.toLowerCase();
+        option.textContent = name;
+        selector.appendChild(option);
     }
     
     // Example usage:
-    addCustomPaperSize('MyPoster', 500, 700, 'px');
+    addCustomPaperSize('Custom', 500, 700, 'px');
     console.log(paperSizes);
 
     function mmToPx(mm) { return mm * 3.78; }
