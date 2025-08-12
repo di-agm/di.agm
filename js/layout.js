@@ -56,10 +56,10 @@
         option.value = name.toLowerCase();
         option.textContent = name;
         selector.appendChild(option);
+
+    addCustomPaperSize('Custom', 500, 700, 'px');        
     }
-    
-    // Example usage:
-    addCustomPaperSize('Custom', 500, 700, 'px');
+
     console.log(paperSizes);
 
     function mmToPx(mm) { return mm * 3.78; }
