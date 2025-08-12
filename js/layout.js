@@ -40,68 +40,25 @@
     const pageNumberDisplay = document.getElementById('pageNumber');
 
     const paperSizes = {
-  a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthIN: 8.5, heightIN: 11 },
-  tabloid: { widthIN: 11, heightIN: 17 }
-};
+      a4: { widthMM: 210, heightMM: 297 },
+      letter: { widthIN: 8.5, heightIN: 11 },
+      tabloid: { widthIN: 11, heightIN: 17 }
+    };
 
-function addCustomPaperSize(name, width, height, unit = 'px') {
-  paperSizes[name.toLowerCase()] = unit === 'mm'
-    ? { widthMM: width, heightMM: height }
-    : unit === 'in'
-      ? { widthIN: width, heightIN: height }
-      : { widthPX: width, heightPX: height };
-}
-
-function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }
-
-window.addEventListener('DOMContentLoaded', () => {
-  const sizeSelector = document.getElementById('sizeSelector');
-
-  const savedCustomSizes = JSON.parse(localStorage.getItem('customSizes')) || [];
-  savedCustomSizes.forEach(size => {
-    const option = document.createElement('option');
-    option.value = `custom-${size.name}`;
-    option.textContent = `${size.name} (${size.width} × ${size.height} ${size.unit})`;
-    sizeSelector.insertBefore(option, sizeSelector.querySelector('option[value="custom"]'));
-    addCustomPaperSize(size.name, size.width, size.height, size.unit);
-  });
-
-  sizeSelector.addEventListener('change', () => {
-    const customInputs = document.getElementById('customSizeInputs');
-    customInputs.style.display = (sizeSelector.value === 'custom') ? 'block' : 'none';
-  });
-
-  document.getElementById('saveCustomBtn').addEventListener('click', () => {
-    const name = document.getElementById('customName').value.trim();
-    const width = parseFloat(document.getElementById('customWidth').value);
-    const height = parseFloat(document.getElementById('customHeight').value);
-    const unit = document.getElementById('customUnit') ? document.getElementById('customUnit').value : 'mm';
-
-    if (!name || !width || !height) {
-      alert('Please fill all fields.');
-      return;
+    function addCustomPaperSize(name, width, height, unit = 'px') {
+      paperSizes[name.toLowerCase()] = unit === 'mm'
+        ? { widthMM: width, heightMM: height }
+        : unit === 'in'
+          ? { widthIN: width, heightIN: height }
+          : { widthPX: width, heightPX: height };
     }
+    
+    // Example usage:
+    addCustomPaperSize('MyPoster', 500, 700, 'px');
+    console.log(paperSizes);
 
-    const customSizes = JSON.parse(localStorage.getItem('customSizes')) || [];
-    customSizes.push({ name, width, height, unit });
-    localStorage.setItem('customSizes', JSON.stringify(customSizes));
-
-    addCustomPaperSize(name, width, height, unit);
-
-    const option = document.createElement('option');
-    option.value = `custom-${name}`;
-    option.textContent = `${name} (${width} × ${height} ${unit})`;
-    sizeSelector.insertBefore(option, sizeSelector.querySelector('option[value="custom"]'));
-    sizeSelector.value = option.value;
-
-    document.getElementById('customSizeInputs').style.display = 'none';
-    document.getElementById('customName').value = '';
-    document.getElementById('customWidth').value = '';
-    document.getElementById('customHeight').value = '';
-  });
-});
+    function mmToPx(mm) { return mm * 3.78; }
+    function inToPx(inches) { return inches * 96; }
 
     const maxWidthPx = 360;
 
