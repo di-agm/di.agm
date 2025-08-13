@@ -508,7 +508,62 @@ function startScale(e, element) {
         toggleRightSidebar();
       }
     }
+
+    const hRuler = document.querySelector('.horizontal-ruler');
+    const vRuler = document.querySelector('.vertical-ruler');
+    const unitSelect = document.getElementById('units');
     
+    let unit = unitSelect.value;
+    
+    // conversion factors from px
+    const pxPerUnit = {
+      px: 1,
+      pt: 0.75,
+      '%': 1 / window.innerWidth * 100,
+      mm: 3.7795275591,
+      cm: 37.795275591,
+      in: 96
+    };
+    
+    function drawRulers() {
+      hRuler.innerHTML = '';
+      vRuler.innerHTML = '';
+    
+      const hStep = 50; // step in px
+      const vStep = 50;
+    
+      const hTicks = Math.ceil(window.innerWidth / hStep);
+      const vTicks = Math.ceil(window.innerHeight / vStep);
+    
+      for (let i = 0; i <= hTicks; i++) {
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        tick.style.left = `${i * hStep}px`;
+        const value = Math.round((i * hStep) / pxPerUnit[unit]);
+        tick.textContent = value;
+        hRuler.appendChild(tick);
+      }
+    
+      for (let i = 0; i <= vTicks; i++) {
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        tick.style.top = `${i * vStep}px`;
+        const value = Math.round((i * vStep) / pxPerUnit[unit]);
+        tick.textContent = value;
+        vRuler.appendChild(tick);
+      }
+    }
+
+    unitSelect.addEventListener('change', (e) => {
+      unit = e.target.value;
+      drawRulers();
+    });
+    
+    window.addEventListener('resize', drawRulers);
+    
+    // initial draw
+    drawRulers();
+
     function updateSavedLayoutsList() {
       const container = document.getElementById('savedLayouts');
       container.innerHTML = '';
