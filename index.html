@@ -1,273 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Linktree</title>
-    <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/layout.css" />
-</head>
+<header class="topbar">
+    <div class="hamburger btn" id="hamburger" title="Menu"><div></div></div>
+    <div class="brand">Layout Template Builder</div>
+    <button class="btn" id="addCover"><span class="icon">📕</span>Cover</button>
+    <button class="btn" id="addBack"><span class="icon">📘</span>Back</button>
+    <div class="spacer"></div>
+    <button class="btn" id="exportBtn" title="Export template JSON"><span class="icon">⬇️</span>Export</button>
+    <label class="btn" for="importFile" title="Import template JSON"><span class="icon">⬆️</span>Import</label>
+    <input id="importFile" type="file" accept="application/json" hidden />
+  </header>
 
-<body>
-<div id="home">
-  <h1 align="center" id="hello">Hello</h1>
-
-    <div class="ring-container">
-        <!-- Value ring behind all others -->
-        <div class="value-ring" id="valueRing">
-            <div class="ring-knob" id="valueKnob"></div>
-        </div>
-
-        <!-- Hue ring on top -->
-        <div class="color-ring" id="colorRing">
-            <div class="ring-knob" id="ringKnob"></div>
-        </div>
-
-        <div class="color-ring-inner">
-            <div id="logoWrapper" onclick="event.stopPropagation(); window.location.hash = '#menu';" style="cursor: pointer;">
-                <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
-            </div>
-        </div>
-        </div>
-    </div>
-</div>
-<div id="menu" style="display:none;">
-    <h1 align="center">Menu</h1>
-        <h2><a href="#AM" class="AM">About me</a></h2>
-        <h2><a href="#P" class="Portfolio">Portfolio</a></h2>
-        <h2><a href="#Tools" class="Tools">Tools</a></h2>
-        <h2><a href="#CV" class="CV">CV</a></h2>
-        <h2><a href="#links" class="follow">Follow me on social media</a></h2>
-        <h2><a href="#stores" class="stores">Store</a></h2>
-    <h1cg class="J2911" align="center" translate="yes">J29:11</h1cg>
-</div>
-<div id="links" class="links" style="display:none;">
-    <h1 align="center" class="follow">Follow me on social media</h1>
-    <div class="link-icon">
-      <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
-        <span class="label">Instagram</span>
-      </a>
-    </div>
-    <br/>
-    <div class="link-icon">
-      <a href="https://www.tumblr.com/dicreative?source=share" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Tumblr.png?raw=true" alt="Tumblr" />
-        <span class="label">Tumblr</span>
-      </a>
-    </div>
-    <br/>
-    <div class="link-icon">
-      <a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="Reddit" />
-        <span class="label">Reddit</span>
-      </a>
-    </div>
-    <br/>
-    <div class="link-icon">
-      <a href="https://pin.it/4kXf9Bu18" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" />
-        <span class="label">Pinterest</span>
-      </a>
-    </div>
-</div>
-<div id="stores" class="links" style="display:none;">
-    <h1 align="center" class="stores">Store</h1>
-    <div class="link-icon">
-      <a href="https://ko-fi.com/dicreative" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
-        <span class="label">KoFi</span>
-      </a>
-    </div>
-    <br/>
-    <div class="link-icon">
-      <a href="https://coff.ee/dicreative" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/BmaC.png?raw=true" alt="Buy me a coffee" />
-        <span class="label">Buy me a coffee</span>
-      </a>
-    </div>
-    <br/>
-    <div class="link-icon">
-      <a href="https://dicreativemag.myshopify.com/" target="_blank">
-        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Shopify.png?raw=true" alt="Shopify" />
-        <span class="label">Shopify</span>
-      </a>
-    </div>
-</div>
-<div id="AM" align="justify">
-  <h2 class="AM"></h2>
-  <p>¡Hola! Esto es <strong>di.agm</strong>, apasionada diseñadora industrial.</p>
-  <p>Me especializo en diseño asistido por computadora: CAD, y amo el diseño universal. Soy autista, aunque no tengo un diagnostigo oficial porque no puedo pagarlo por el momento, o soy autista o tengo otros 50 diagnósticos diferentes, además no hay un examen oficial 100% confiable. Esto significa que hay cosas que realmente me apasionan, aunque siempre me gusta experimentar cosas nuevas mientras esten en mi zona segura.</p>
-  <p>También me encanta la ilustración, leer y escribir, o experimentar con programación.</p>
-  <p>Quiero emprender y trabajar con los Objetivos de Desarrollo Sostenible utilizando el diseño industrial. Mi sueño es trabajar con y ayudar a personas en situación de discapacidad.</p>
-</div>
-
-<div id="P" align="justify">
-  <h2 class="Portfolio"></h2>
-</div>
-
-<div id="Tools" align="center">
-    <h1 class="Tools" align="center">Tools</h1>
-        <h2><a href="#layout" class="layout">Layout</a></h2>
-        <h2><a href="#LS">LS</a></h2>
-        <h2><a href="#tt" class="tt">Time table</a></h2>
-</div>
-
-<div id="layout" style="display:none;">
-    <div class="hamburger-menu" style="left: 20px;" id="leftMenuBtn">
-    <div class="hamburger-icon">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </div>
-  
-  <!-- Right hamburger button -->  
-  <div class="hamburger-menu" style="right: 20px;" id="rightMenuBtn">
-    <div class="hamburger-icon">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </div>
-  
-  <!-- Left sidebar -->  
-  <div class="sidebar left-sidebar" id="leftSidebar">
-    <div class="sidebar-section">
-      <h3>Page Setup</h3>
-      <select id="sizeSelector" aria-label="Select paper size">
-        <option value="a4">A4 (210 × 297 mm)</option>
-        <option value="letter">Letter (8.5 × 11 in)</option>
-        <option value="tabloid">Tabloid (11 × 17 in)</option>
-        <option value="Custom">Custom</option> 
-      </select>
-      <div style="margin-top: 10px;"></div>
-      <button class="sidebar-btn full-width" id="orientationBtn">↺ Rotate</button>
-    </div>
-    
-    <div class="sidebar-section">
-      <h3>Elements</h3>
-      <div class="sidebar-buttons">
-        <button class="sidebar-btn" id="addTitleBtn">Title</button>
-        <button class="sidebar-btn" id="addSubtitleBtn">Subtitle</button>
-        <button class="sidebar-btn" id="addParagraphBtn">Paragraph</button>
-        <button class="sidebar-btn" id="addImageBtn">Image</button>
-      </div>
-    </div>
-    
-    <div class="sidebar-section">
-      <h3>Element Style</h3>
-      <div id="elementEditor" style="display: none;">
-        <h4>Text Color</h4>
-        <div class="color-picker-container">
-          <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
-          <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
-          <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
-          <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
-          <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
-          <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
-          <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
-          <div class="color-option" style="background-color: #00ffff;" data-color="#00ffff"></div>
-        </div>
-        
-        <h4>Font Size</h4>
-        <div class="font-size-options">
-          <button class="size-btn" data-size="12">S</button>
-          <button class="size-btn" data-size="16">M</button>
-          <button class="size-btn" data-size="20">L</button>
-          <button class="size-btn" data-size="24">XL</button>
-          <button class="size-btn" data-size="32">XXL</button>
-        </div>
-        
-        <h4>Font Family</h4>
-        <select class="font-family-select" id="fontFamilySelect">
-          <option value="Arial, sans-serif">Arial</option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-          <option value="'Courier New', monospace">Courier New</option>
-          <option value="Georgia, serif">Georgia</option>
-          <option value="Verdana, sans-serif">Verdana</option>
-          <option value="Impact, sans-serif">Impact</option>
+  <aside class="drawer" id="drawer">
+    <!-- Units & Size -->
+    <div class="section">
+      <h3>Units & Page Size</h3>
+      <div class="row">
+        <label>Units</label>
+        <select id="units">
+          <option value="in">in</option>
+          <option value="cm" selected>cm</option>
+          <option value="mm">mm</option>
         </select>
-        
-        <div style="margin-top: 15px;"></div>
-        <button class="sidebar-btn full-width" id="deleteElementBtn">🗑️ Delete Element</button>
+        <span class="chip" id="toggleRulers">Rulers</span>
       </div>
-      <div id="noElementSelected" style="opacity: 0.7; text-align: center; padding: 10px;">
-        Select an element to edit
+      <div class="row">
+        <label>Preset</label>
+        <select id="presetSize"></select>
+      </div>
+      <div class="row">
+        <label>W</label><input class="small" id="pageW" type="number" step="0.1" min="0.1" />
+        <label>H</label><input class="small" id="pageH" type="number" step="0.1" min="0.1" />
+        <button class="btn" id="applySize">Apply</button>
+      </div>
+      <div class="row">
+        <input id="customName" placeholder="Save custom size name" />
+        <button class="btn" id="saveCustomSize">Save Size</button>
       </div>
     </div>
-    
-    <div class="sidebar-section">
+
+    <!-- Margins -->
+    <div class="section">
+      <h3>Margins</h3>
+      <div class="row">
+        <label>Top</label><input class="small" id="mTop" type="number" step="0.1" />
+        <label>Right</label><input class="small" id="mRight" type="number" step="0.1" />
+        <label>Bottom</label><input class="small" id="mBottom" type="number" step="0.1" />
+        <label>Left</label><input class="small" id="mLeft" type="number" step="0.1" />
+      </div>
+      <div class="row">
+        <span class="chip" id="applyMargins">Apply Margins</span>
+        <span class="chip" id="toggleSnap">Snap to guides</span>
+      </div>
+    </div>
+
+    <!-- Pages & View -->
+    <div class="section">
       <h3>Pages</h3>
-      <div class="sidebar-buttons">
-        <button class="sidebar-btn" id="prevPageBtn">← Previous</button>
-        <button class="sidebar-btn" id="nextPageBtn">Next →</button>
-        <button class="sidebar-btn full-width" id="addPageBtn">+ Add Page</button>
-        <button class="sidebar-btn" id="removePageBtn">− Remove</button>
-        <button class="sidebar-btn" id="duplicatePageBtn">⎘ Duplicate</button>
+      <div class="row">
+        <button class="btn" id="addPage">Add Page</button>
+        <button class="btn" id="prevPage">Prev</button>
+        <button class="btn" id="nextPage">Next</button>
+      </div>
+      <div class="row">
+        <label>Pages shown</label>
+        <select id="pagesShown">
+          <option>1</option>
+          <option selected>2</option>
+          <option>3</option>
+        </select>
       </div>
     </div>
-    
-    <div class="sidebar-section">
-      <h3>Export</h3>
-      <div class="sidebar-buttons">
-        <button class="sidebar-btn" id="exportPngBtn">PNG</button>
-        <button class="sidebar-btn" id="exportJpgBtn">JPG</button>
-        <button class="sidebar-btn" id="exportPdfBtn">PDF</button>
-        <button class="sidebar-btn full-width" id="saveLayoutBtn">💾 Save Layout</button>
+
+    <!-- Insert -->
+    <div class="section">
+      <h3>Insert</h3>
+      <div class="row">
+        <button class="btn" id="addTitle">+ Title</button>
+        <button class="btn" id="addSubtitle">+ Subtitle</button>
+        <button class="btn" id="addParagraph">+ Paragraph</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="addImage">+ Image placeholder</button>
+        <label class="btn" for="fontFile">Import Font</label>
+        <input id="fontFile" type="file" accept=".ttf,.otf,.woff,.woff2" hidden />
+      </div>
+      <div class="row">
+        <select id="shapeType">
+          <option value="rect">Rectangle</option>
+          <option value="square">Square</option>
+          <option value="ellipse">Ellipse</option>
+          <option value="circle">Circle</option>
+          <option value="polygon">Polygon…</option>
+          <option value="star">Star…</option>
+        </select>
+        <select id="shapeUse">
+          <option value="element">Element</option>
+          <option value="textbox">Text box</option>
+          <option value="image">Image placeholder</option>
+        </select>
+        <button class="btn" id="addShape">+ Shape</button>
+      </div>
+      <div class="row" id="polyInputs" style="display:none">
+        <label>Sides</label><input id="polySides" type="number" min="3" value="5" class="small" />
+      </div>
+      <div class="row" id="starInputs" style="display:none">
+        <label>Peaks</label><input id="starPeaks" type="number" min="3" value="5" class="small" />
+        <label>Inner %</label><input id="starInner" type="number" min="5" max="95" value="50" class="small" />
       </div>
     </div>
-  </div>
-  
-  <!-- Right sidebar -->  
-  <div class="sidebar right-sidebar" id="rightSidebar">
-    <div class="sidebar-section">
-      <h3>Saved Layouts</h3>
-      <div id="savedLayouts" class="saved-layouts">
-        <div class="layout-item" style="opacity: 0.6; font-style: italic;">
-          No saved layouts
-        </div>
+
+    <!-- Element Properties -->
+    <div class="section">
+      <h3>Element Properties</h3>
+      <div class="row">
+        <label>Font</label><select id="fontSelect"><option value="system-ui">System</option></select>
       </div>
-      <div style="margin-top: 15px;"></div>
-      <button class="sidebar-btn full-width" id="importLayoutBtn">📂 Import Layout</button>
-    </div>
-  </div>
-  
-  <!-- Save layout modal -->
-  <div class="modal" id="saveLayoutModal">
-    <div class="modal-content">
-      <h3>Save Layout</h3>
-      <input type="text" id="layoutNameInput" placeholder="Layout name">
-      <div class="modal-buttons">
-        <button class="sidebar-btn" id="cancelSaveBtn">Cancel</button>
-        <button class="sidebar-btn" id="confirmSaveBtn">Save</button>
+      <div class="row">
+        <label>Fill</label><input id="fillColor1" type="color" value="#ffffff" />
+        <label>→</label><input id="fillColor2" type="color" value="#ffffff" />
+        <label>Angle</label><input id="gradAngle" type="number" class="small" value="0" />
+      </div>
+      <div class="row">
+        <label>Stroke</label><input id="strokeColor" type="color" value="#000000" />
+        <label>W</label><input id="strokeW" type="number" class="small" value="0" />
+      </div>
+      <div class="row">
+        <button class="btn" id="applyStyle">Apply Style</button>
+        <button class="btn" id="layerUp">Layer ↑</button>
+        <button class="btn" id="layerDown">Layer ↓</button>
       </div>
     </div>
-  </div>
 
-  <div class="center-container">
-    <!-- Page will be inserted here by JS -->
-  </div>
-
-  <div id="pageNumber">Page 1</div>
-</div>
-
-<div class="tt" style="display:none;">
-    <h1>Horario Planner</h1>
-    <div>
-      <label>Días (expresión): <input type="text" id="daysExpr"></label><br>
-      <label>Hora inicio-fin (HH:MM - HH:MM): <input type="text" id="timeRange"></label><br>
-      <button onclick="generateSchedule()">Generar Horario</button>
+    <!-- Layers -->
+    <div class="section">
+      <h3>Layers (current page)</h3>
+      <div id="layers" class="layers"></div>
     </div>
-    <div id="output"></div>
-</div>
+  </aside>
 
-    <script src="js/windows.js" defer></script>
-    <script src="js/color.js" defer></script>
-    <script src="js/translations.js" defer></script>
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="js/layout.js" defer></script>
-</body>
-</html>
+  <main class="stage-wrap">
+    <div class="stage">
+      <div class="rulers" id="rulersX"></div>
+      <div class="pages-view" id="pagesView"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="thumbs" id="thumbs"></div>
+    <div class="spacer"></div>
+    <div id="status" style="font-size:12px;color:var(--muted)">Ready.</div>
+  </footer>
+
+  <!-- Simple modal for text editing -->
+  <dialog id="textEditDlg">
+    <form method="dialog">
+      <h3>Edit Text</h3>
+      <textarea id="textEditArea" rows="6"></textarea>
+      <menu style="display:flex; gap:8px; justify-content:flex-end;">
+        <button value="cancel">Cancel</button>
+        <button id="textEditOk" value="ok">OK</button>
+      </menu>
+    </form>
+  </dialog>
