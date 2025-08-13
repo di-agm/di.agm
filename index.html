@@ -212,6 +212,18 @@
     <div class="sidebar-section">
       <h3>Pages</h3>
       <div class="sidebar-buttons">
+          <!-- Unit selector -->
+        <div id="unitSelector">
+          <label for="units">Units:</label>
+          <select id="units">
+            <option value="px">px</option>
+            <option value="pt">pt</option>
+            <option value="%">%</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="in">in</option>
+          </select>
+        </div>
         <button class="sidebar-btn" id="prevPageBtn">← Previous</button>
         <button class="sidebar-btn" id="nextPageBtn">Next →</button>
         <button class="sidebar-btn full-width" id="addPageBtn">+ Add Page</button>
@@ -244,19 +256,6 @@
       <button class="sidebar-btn full-width" id="importLayoutBtn">📂 Import Layout</button>
     </div>
   </div>
-
-        <!-- Unit selector -->
-<div id="unitSelector">
-  <label for="units">Units:</label>
-  <select id="units">
-    <option value="px">px</option>
-    <option value="pt">pt</option>
-    <option value="%">%</option>
-    <option value="mm">mm</option>
-    <option value="cm">cm</option>
-    <option value="in">in</option>
-  </select>
-</div>
 
 <!-- Horizontal & vertical rulers -->
 <div class="ruler horizontal-ruler"></div>
