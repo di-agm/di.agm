@@ -7,11 +7,6 @@
   <style>
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body {
-      margin: 5; background: var(--bg); color: var(--ink); font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden;
-    }
-
     /* Top bar */
     .topbar {
       height: 56px; display: flex; align-items: center; gap: 12px;
@@ -29,7 +24,7 @@
     .icon { width: 18px; height: 18px; display: inline-grid; place-items: center; }
 
     /* Hamburger + Side drawer */
-    .hamburger { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background:#1b2039; border:1px solid #30365a;}
+    .hamburger { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background:#1b2039; border:1px solid #30365a;}
     .hamburger div { width: 18px; height: 2px; background: var(--ink); position: relative; }
     .hamburger div::before, .hamburger div::after { content:""; position:absolute; left:0; right:0; height:2px; background:var(--ink);} 
     .hamburger div::before { top:-6px } .hamburger div::after { top:6px }
