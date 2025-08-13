@@ -664,7 +664,23 @@ function startScale(e, element) {
     // Initialize with first page and load saved layouts
     addPage();
     loadSavedLayouts();
-    
+
+document.getElementById('applyMarginsBtn').addEventListener('click', () => {
+  const top = document.getElementById('marginTop').value + 'px';
+  const bottom = document.getElementById('marginBottom').value + 'px';
+  const left = document.getElementById('marginLeft').value + 'px';
+  const right = document.getElementById('marginRight').value + 'px';
+  
+  const page = pages[currentPageIndex];
+  if (!page) return;
+  
+  const content = page.querySelector('.page-content');
+  content.style.paddingTop = top;
+  content.style.paddingBottom = bottom;
+  content.style.paddingLeft = left;
+  content.style.paddingRight = right;
+});
+
     // Add html2canvas library for image export
     const html2canvasScript = document.createElement('script');
     html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
