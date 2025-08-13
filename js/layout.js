@@ -681,6 +681,25 @@ document.getElementById('applyMarginsBtn').addEventListener('click', () => {
   content.style.paddingRight = right;
 });
 
+function showMarginGuides(page) {
+  const content = page.querySelector('.page-content');
+  let guide = page.querySelector('.margin-guide');
+  if (!guide) {
+    guide = document.createElement('div');
+    guide.className = 'margin-guide';
+    guide.style.position = 'absolute';
+    guide.style.pointerEvents = 'none';
+    guide.style.border = '1px dashed red';
+    page.appendChild(guide);
+  }
+  
+  const styles = window.getComputedStyle(content);
+  guide.style.top = styles.paddingTop;
+  guide.style.left = styles.paddingLeft;
+  guide.style.width = `calc(${page.style.width} - ${styles.paddingLeft} - ${styles.paddingRight})`;
+  guide.style.height = `calc(${page.style.height} - ${styles.paddingTop} - ${styles.paddingBottom})`;
+}
+
     // Add html2canvas library for image export
     const html2canvasScript = document.createElement('script');
     html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
