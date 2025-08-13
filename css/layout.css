@@ -1,3 +1,23 @@
+:root {
+  --page-margin: 20px; /* Change this to adjust margins */
+  --content-max-width: 1200px;
+}
+
+body {
+  margin: var(--page-margin);
+}
+
+.container {
+  max-width: var(--content-max-width);
+  margin: 0 auto; /* center horizontally */
+  padding: var(--page-margin);
+  box-sizing: border-box;
+}
+
+/* Optional: Add rules for spacing between sections */
+section {
+  margin-bottom: var(--page-margin);
+}
 
 /* Fixed selector on left side vertically centered */
 #sizeSelector {
