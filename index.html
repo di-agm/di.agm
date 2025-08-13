@@ -125,6 +125,145 @@
     <div id="output"></div>
 </div>
 
+    <div id="layout" style="display:none;">
+    <div class="hamburger-menu" style="left: 20px;" id="leftMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <!-- Right hamburger button -->  
+  <div class="hamburger-menu" style="right: 20px;" id="rightMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <!-- Left sidebar -->  
+  <div class="sidebar left-sidebar" id="leftSidebar">
+    <div class="sidebar-section">
+      <h3>Page Setup</h3>
+      <select id="sizeSelector" aria-label="Select paper size">
+        <option value="a4">A4 (210 × 297 mm)</option>
+        <option value="letter">Letter (8.5 × 11 in)</option>
+        <option value="tabloid">Tabloid (11 × 17 in)</option>
+        <option value="Custom">Custom</option> 
+      </select>
+      <div style="margin-top: 10px;"></div>
+      <button class="sidebar-btn full-width" id="orientationBtn">↺ Rotate</button>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Elements</h3>
+      <div class="sidebar-buttons">
+        <button class="sidebar-btn" id="addTitleBtn">Title</button>
+        <button class="sidebar-btn" id="addSubtitleBtn">Subtitle</button>
+        <button class="sidebar-btn" id="addParagraphBtn">Paragraph</button>
+        <button class="sidebar-btn" id="addImageBtn">Image</button>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Element Style</h3>
+      <div id="elementEditor" style="display: none;">
+        <h4>Text Color</h4>
+        <div class="color-picker-container">
+          <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+          <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+          <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+          <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+          <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+          <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+          <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+          <div class="color-option" style="background-color: #00ffff;" data-color="#00ffff"></div>
+        </div>
+        
+        <h4>Font Size</h4>
+        <div class="font-size-options">
+          <button class="size-btn" data-size="12">S</button>
+          <button class="size-btn" data-size="16">M</button>
+          <button class="size-btn" data-size="20">L</button>
+          <button class="size-btn" data-size="24">XL</button>
+          <button class="size-btn" data-size="32">XXL</button>
+        </div>
+        
+        <h4>Font Family</h4>
+        <select class="font-family-select" id="fontFamilySelect">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Impact, sans-serif">Impact</option>
+        </select>
+        
+        <div style="margin-top: 15px;"></div>
+        <button class="sidebar-btn full-width" id="deleteElementBtn">🗑️ Delete Element</button>
+      </div>
+      <div id="noElementSelected" style="opacity: 0.7; text-align: center; padding: 10px;">
+        Select an element to edit
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Pages</h3>
+      <div class="sidebar-buttons">
+        <button class="sidebar-btn" id="prevPageBtn">← Previous</button>
+        <button class="sidebar-btn" id="nextPageBtn">Next →</button>
+        <button class="sidebar-btn full-width" id="addPageBtn">+ Add Page</button>
+        <button class="sidebar-btn" id="removePageBtn">− Remove</button>
+        <button class="sidebar-btn" id="duplicatePageBtn">⎘ Duplicate</button>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Export</h3>
+      <div class="sidebar-buttons">
+        <button class="sidebar-btn" id="exportPngBtn">PNG</button>
+        <button class="sidebar-btn" id="exportJpgBtn">JPG</button>
+        <button class="sidebar-btn" id="exportPdfBtn">PDF</button>
+        <button class="sidebar-btn full-width" id="saveLayoutBtn">💾 Save Layout</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right sidebar -->  
+  <div class="sidebar right-sidebar" id="rightSidebar">
+    <div class="sidebar-section">
+      <h3>Saved Layouts</h3>
+      <div id="savedLayouts" class="saved-layouts">
+        <div class="layout-item" style="opacity: 0.6; font-style: italic;">
+          No saved layouts
+        </div>
+      </div>
+      <div style="margin-top: 15px;"></div>
+      <button class="sidebar-btn full-width" id="importLayoutBtn">📂 Import Layout</button>
+    </div>
+  </div>
+  
+  <!-- Save layout modal -->
+  <div class="modal" id="saveLayoutModal">
+    <div class="modal-content">
+      <h3>Save Layout</h3>
+      <input type="text" id="layoutNameInput" placeholder="Layout name">
+      <div class="modal-buttons">
+        <button class="sidebar-btn" id="cancelSaveBtn">Cancel</button>
+        <button class="sidebar-btn" id="confirmSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-container">
+    <!-- Page will be inserted here by JS -->
+  </div>
+
+  <div id="pageNumber">Page 1</div>
+</div>
+
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
     <script src="js/translations.js" defer></script>
