@@ -35,7 +35,7 @@
     }
 
     const rectContainer = document.querySelector('.center-container');
-    const selector = document.getElementById('sizeSelector');
+    const selector = document.getElementById('your-select-id');
     const orientationBtn = document.getElementById('orientationBtn');
     const pageNumberDisplay = document.getElementById('pageNumber');
 
@@ -71,19 +71,25 @@
       if (!pages[currentPageIndex]) return;
       
       let widthPx, heightPx;
-      if (key === 'a4') {
-        widthPx = mmToPx(paperSizes.a4.widthMM);
-        heightPx = mmToPx(paperSizes.a4.heightMM);
-      } else if (key === 'letter') {
-        widthPx = inToPx(paperSizes.letter.widthIN);
-        heightPx = inToPx(paperSizes.letter.heightIN);
-      } else if (key === 'tabloid') {
-        widthPx = inToPx(paperSizes.tabloid.widthIN);
-        heightPx = inToPx(paperSizes.tabloid.heightIN);
-      } else {
-        widthPx = mmToPx(paperSizes.a4.widthMM);
-        heightPx = mmToPx(paperSizes.a4.heightMM);
-      }
+        if (key === 'a4') {
+            widthPx = mmToPx(paperSizes.a4.widthMM);
+            heightPx = mmToPx(paperSizes.a4.heightMM);
+        } else if (key === 'letter') {
+            widthPx = inToPx(paperSizes.letter.widthIN);
+            heightPx = inToPx(paperSizes.letter.heightIN);
+        } else if (key === 'tabloid') {
+            widthPx = inToPx(paperSizes.tabloid.widthIN);
+            heightPx = inToPx(paperSizes.tabloid.heightIN);
+        } else if (paperSizes[key].widthPX) {
+            widthPx = paperSizes[key].widthPX;
+            heightPx = paperSizes[key].heightPX;
+        } else if (paperSizes[key].widthMM) {
+            widthPx = mmToPx(paperSizes[key].widthMM);
+            heightPx = mmToPx(paperSizes[key].heightMM);
+        } else if (paperSizes[key].widthIN) {
+            widthPx = inToPx(paperSizes[key].widthIN);
+            heightPx = inToPx(paperSizes[key].heightIN);
+        }
 
       if (widthPx > maxWidthPx) {
         const scale = maxWidthPx / widthPx;
