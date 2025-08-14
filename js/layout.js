@@ -132,6 +132,63 @@
       deselectElement();
     }
 
+  const page = document.getElementById('page');
+  const vRuler = document.getElementById('vRuler');
+  const hRuler = document.getElementById('hRuler');
+
+  const tickSpacing = 20; // px between ticks
+
+  function drawVerticalRuler() {
+    vRuler.innerHTML = '';
+    const height = page.offsetHeight;
+    for (let i = 0; i <= height; i += tickSpacing) {
+      const tick = document.createElement('div');
+      tick.className = 'tick';
+      tick.style.top = i + 'px';
+      tick.style.height = (i % 100 === 0 ? '10px' : '5px'); // major vs minor tick
+      vRuler.appendChild(tick);
+
+      if (i % 100 === 0) { // number every 100px
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.style.top = i + 'px';
+        label.textContent = i;
+        vRuler.appendChild(label);
+      }
+    }
+  }
+
+  function drawHorizontalRuler() {
+    hRuler.innerHTML = '';
+    const width = page.offsetWidth;
+    for (let i = 0; i <= width; i += tickSpacing) {
+      const tick = document.createElement('div');
+      tick.className = 'tick';
+      tick.style.left = i + 'px';
+      tick.style.width = (i % 100 === 0 ? '10px' : '5px'); // major vs minor tick
+      hRuler.appendChild(tick);
+
+      if (i % 100 === 0) { // number every 100px
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.style.left = i + 'px';
+        label.textContent = i;
+        hRuler.appendChild(label);
+      }
+    }
+  }
+
+  function drawRulers() {
+    drawVerticalRuler();
+    drawHorizontalRuler();
+  }
+
+  // Initial draw
+  drawRulers();
+
+  // Optional: redraw on window resize
+  window.addEventListener('resize', drawRulers);
+
     function updatePageNumbers() {
       pages.forEach((page, i) => {
         const pageNumberLabel = page.querySelector('div:last-child');
