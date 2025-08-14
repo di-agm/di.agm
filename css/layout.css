@@ -17,8 +17,6 @@
 
 /* Center container that fills viewport minus left space */
 .center-container {
-  width: 100vw;
-  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,22 +112,22 @@ button:hover {
 
 .ruler-horizontal {
   position: absolute;
-  top: var(--page-top);
-  left: var(--page-left);
-  width: var(--page-width);
+  top: 0;
+  left: 20px;
+  width: 800px;
   height: 20px;
   background: #ccc;
-  z-index: 500;
+  z-index: 1500;
 }
 
 .ruler-vertical {
   position: absolute;
-  top: var(--page-top);
-  left: var(--page-left);
-  height: var(--page-height);
+  top: 20px;
+  left: 0;
+  height: 1000px;
   width: 20px;
   background: #ccc;
-  z-index: 500;
+  z-index: 1500;
 }
 
 #textElementSelector {
@@ -199,7 +197,7 @@ button:hover {
   width: 40px;
   height: 40px;
   background-color: var(--menu-bg);
-  color: #FFFFFF
+  color: #FFFFFF;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
