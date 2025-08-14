@@ -230,7 +230,7 @@ button:hover {
   position: absolute;
   height: 2px;
   width: 100%;
-  background: var(--menu-text);
+  background: white;
   border-radius: 2px;
   opacity: 1;
   left: 0;
