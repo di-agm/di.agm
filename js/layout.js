@@ -1,4 +1,4 @@
-let pages = [];
+    let pages = [];
     let currentPageIndex = 0;
     let isPortrait = true;
     let selectedElement = null;
