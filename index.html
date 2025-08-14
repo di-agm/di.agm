@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -115,17 +116,7 @@
         <h2><a href="#tt" class="tt">Time table</a></h2>
 </div>
 
-<div class="tt" style="display:none;">
-    <h1>Horario Planner</h1>
-    <div>
-      <label>Días (expresión): <input type="text" id="daysExpr"></label><br>
-      <label>Hora inicio-fin (HH:MM - HH:MM): <input type="text" id="timeRange"></label><br>
-      <button onclick="generateSchedule()">Generar Horario</button>
-    </div>
-    <div id="output"></div>
-</div>
-
-    <div id="layout" style="display:none;">
+<div id="layout" style="display:none;">
     <div class="hamburger-menu" style="left: 20px;" id="leftMenuBtn">
     <div class="hamburger-icon">
       <span></span>
@@ -212,18 +203,6 @@
     <div class="sidebar-section">
       <h3>Pages</h3>
       <div class="sidebar-buttons">
-          <!-- Unit selector -->
-        <div id="unitSelector">
-          <label for="units">Units:</label>
-          <select id="units">
-            <option value="px">px</option>
-            <option value="pt">pt</option>
-            <option value="%">%</option>
-            <option value="mm">mm</option>
-            <option value="cm">cm</option>
-            <option value="in">in</option>
-          </select>
-        </div>
         <button class="sidebar-btn" id="prevPageBtn">← Previous</button>
         <button class="sidebar-btn" id="nextPageBtn">Next →</button>
         <button class="sidebar-btn full-width" id="addPageBtn">+ Add Page</button>
@@ -256,16 +235,7 @@
       <button class="sidebar-btn full-width" id="importLayoutBtn">📂 Import Layout</button>
     </div>
   </div>
-
-<div class="center-container">
-  <div class="page-wrapper">
-    <!-- Horizontal & vertical rulers -->
-    <div class="ruler ruler-horizontal"></div>
-    <div class="ruler ruler-vertical"></div>
-
-    <!-- Your page content -->
-    <div class="page-content">
-
+  
   <!-- Save layout modal -->
   <div class="modal" id="saveLayoutModal">
     <div class="modal-content">
@@ -284,8 +254,15 @@
 
   <div id="pageNumber">Page 1</div>
 </div>
-</div>
-  </div>
+
+<div class="tt" style="display:none;">
+    <h1>Horario Planner</h1>
+    <div>
+      <label>Días (expresión): <input type="text" id="daysExpr"></label><br>
+      <label>Hora inicio-fin (HH:MM - HH:MM): <input type="text" id="timeRange"></label><br>
+      <button onclick="generateSchedule()">Generar Horario</button>
+    </div>
+    <div id="output"></div>
 </div>
 
     <script src="js/windows.js" defer></script>
