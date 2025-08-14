@@ -277,7 +277,39 @@ let pages = [];
         document.onmouseup = null;
       }
     }
-    
+
+const pageWrapper = document.querySelector('.page-wrapper');
+
+function drawRulers() {
+  const w = pageWrapper.clientWidth;
+  const h = pageWrapper.clientHeight;
+
+  hRuler.innerHTML = '';
+  vRuler.innerHTML = '';
+
+  const hStep = 50; // in px
+  const vStep = 50;
+
+  const hTicks = Math.ceil(w / hStep);
+  const vTicks = Math.ceil(h / vStep);
+
+  for (let i = 0; i <= hTicks; i++) {
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    tick.style.left = `${i * hStep}px`;
+    tick.textContent = Math.round(i * hStep / pxPerUnit[unit]);
+    hRuler.appendChild(tick);
+  }
+
+  for (let i = 0; i <= vTicks; i++) {
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    tick.style.top = `${i * vStep}px`;
+    tick.textContent = Math.round(i * vStep / pxPerUnit[unit]);
+    vRuler.appendChild(tick);
+  }
+}
+
     function selectElement(element) {
       // Deselect previously selected element
       if (selectedElement) {
