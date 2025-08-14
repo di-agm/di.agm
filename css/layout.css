@@ -17,7 +17,7 @@
 
 /* Center container that fills viewport minus left space */
 .center-container {
-  width: 100vw;   /* full viewport width */
+  width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -75,10 +75,10 @@ button:hover {
 }
 
 #unitSelector {
-  position: fixed;
-  top: 40px;
-  left: 50px;
-  z-index: 2000;
+  position: absolute;
+  top: -40px; /* above the page */
+  left: 0;
+  z-index: 1500;
   background: #333;
   color: white;
   padding: 5px 10px;
@@ -104,12 +104,23 @@ button:hover {
   user-select: none;
 }
 
+.page-wrapper {
+  position: relative;
+  background: white;
+  width: 800px;   /* example page width */
+  height: 1000px; /* example page height */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 .horizontal-ruler {
+  position: absolute;
   top: 0;
-  left: 30px; /* space for vertical ruler */
+  left: 0;
+  width: 100%;
   height: 30px;
-  width: calc(100% - 30px);
+  background: #f0f0f0;
   border-bottom: 1px solid #ccc;
+  z-index: 1000;
 }
 
 .horizontal-ruler .tick {
@@ -123,11 +134,14 @@ button:hover {
 }
 
 .vertical-ruler {
+  position: absolute;
+  top: 0;
   left: 0;
-  top: 30px; /* space for horizontal ruler */
   width: 30px;
-  height: calc(100% - 30px);
+  height: 100%;
+  background: #f0f0f0;
   border-right: 1px solid #ccc;
+  z-index: 1000;
 }
 
 .vertical-ruler .tick {
