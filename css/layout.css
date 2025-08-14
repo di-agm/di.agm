@@ -112,45 +112,24 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.horizontal-ruler {
+.ruler-horizontal {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 30px;
-  background: #f0f0f0;
-  border-bottom: 1px solid #ccc;
-  z-index: 1000;
+  top: var(--page-top);
+  left: var(--page-left);
+  width: var(--page-width);
+  height: 20px;
+  background: #ccc;
+  z-index: 500;
 }
 
-.horizontal-ruler .tick {
+.ruler-vertical {
   position: absolute;
-  top: 0;
-  width: 1px;
-  height: 100%;
-  border-left: 1px solid #999;
-  text-align: left;
-  transform: translateX(-50%);
-}
-
-.vertical-ruler {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 30px;
-  height: 100%;
-  background: #f0f0f0;
-  border-right: 1px solid #ccc;
-  z-index: 1000;
-}
-
-.vertical-ruler .tick {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  border-top: 1px solid #999;
-  transform: translateY(-50%);
+  top: var(--page-top);
+  left: var(--page-left);
+  height: var(--page-height);
+  width: 20px;
+  background: #ccc;
+  z-index: 500;
 }
 
 #textElementSelector {
