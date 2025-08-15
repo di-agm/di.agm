@@ -276,7 +276,34 @@
         }
       });
     });
-    
+
+document.addEventListener('click', (e) => {
+  const toolbar = document.getElementById('elementToolbar');
+  if (!toolbar) {
+    console.error('Toolbar element not found');
+    return;
+  }
+
+  if (e.target.closest('.text-element')) {
+    // Show the toolbar when a text-element is clicked
+    toolbar.style.display = 'flex'; // use flex if it contains multiple icons
+    // Position the toolbar under the clicked element
+    const rect = e.target.getBoundingClientRect();
+    toolbar.style.position = 'absolute';
+    toolbar.style.top = window.scrollY + rect.bottom + 'px';
+    toolbar.style.left = window.scrollX + rect.left + 'px';
+  } 
+  else if (!e.target.closest('#elementEditor') &&
+           !e.target.closest('#elementToolbar') &&
+           !e.target.closest('.sidebar-btn')) {
+    // Hide the toolbar when clicking outside
+    toolbar.style.display = 'none';
+    if (typeof deselectElement === 'function') {
+      deselectElement();
+    }
+  }
+});
+
     // Toggle sidebar functions
     function toggleLeftSidebar() {
       const sidebar = document.getElementById('leftSidebar');
