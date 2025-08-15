@@ -218,23 +218,29 @@
       }
       
       pageContent.appendChild(element);
-      makeElementDraggable(element);
       
       // Select the newly added element
       selectElement(element);
     }
     
     function selectElement(element) {
-      // Deselect previously selected element
       if (selectedElement) {
         selectedElement.classList.remove('selected');
       }
       
-      // Select new element
       selectedElement = element;
       selectedElement.classList.add('selected');
+    
+      // Show the toolbar
+      const toolbar = document.getElementById('elementToolbar');
+      const rect = element.getBoundingClientRect();
+      const containerRect = document.body.getBoundingClientRect();
+    
+      // Position the toolbar just under the element
+      toolbar.style.left = `${rect.left - containerRect.left + rect.width/2 - 55}px`;
+      toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+      toolbar.style.display = 'flex';
       
-      // Show editor
       document.getElementById('elementEditor').style.display = 'block';
       document.getElementById('noElementSelected').style.display = 'none';
     }
@@ -243,12 +249,33 @@
       if (selectedElement) {
         selectedElement.classList.remove('selected');
         selectedElement = null;
-        
-        // Hide editor
         document.getElementById('elementEditor').style.display = 'none';
         document.getElementById('noElementSelected').style.display = 'block';
       }
+      
+      document.getElementById('elementToolbar').style.display = 'none';
     }
+
+    document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent click from deselecting element
+        if (!selectedElement) return;
+        
+        const action = btn.dataset.action;
+        if (action === 'move') {
+          // Could trigger your drag logic directly
+          alert('Move mode - drag the element');
+        }
+        else if (action === 'scale') {
+          selectedElement.style.transform = 'scale(1.2)'; // example
+          // You could instead enable resize handles
+        }
+        else if (action === 'delete') {
+          selectedElement.remove();
+          deselectElement();
+        }
+      });
+    });
     
     // Toggle sidebar functions
     function toggleLeftSidebar() {
