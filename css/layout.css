@@ -373,22 +373,7 @@ button:hover {
   margin-top: 15px;
 }
 
-document.addEventListener('click', (e) => {
-  const toolbar = document.getElementById('elementToolbar');
-
-  if (e.target.closest('.text-element')) {
-    // Show the toolbar when a text-element is clicked
-    toolbar.style.display = 'block';
-    // Position the toolbar under the clicked element
-    const rect = e.target.getBoundingClientRect();
-    toolbar.style.top = rect.bottom + 'px';
-    toolbar.style.left = rect.left + 'px';
-  } 
-  else if (!e.target.closest('#elementEditor') &&
-           !e.target.closest('#elementToolbar') &&
-           !e.target.closest('.sidebar-btn')) {
-    // Hide the toolbar when clicking outside
-    toolbar.style.display = 'none';
-    deselectElement();
-  }
-});
+#elementToolbar {
+  position: absolute;
+  display: none; /* hidden until clicked */
+}
