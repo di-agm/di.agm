@@ -224,55 +224,6 @@
       selectElement(element);
     }
     
-    function makeElementDraggable(element) {
-      let offsetX = 0, offsetY = 0;
-      
-      element.onmousedown = dragStart;
-      
-    function dragStart(e) {
-      selectElement(element);
-    
-      const rect = element.getBoundingClientRect();
-      const cornerSize = 12;
-      const isInResizeCorner =
-        e.clientX >= rect.right - cornerSize &&
-        e.clientY >= rect.bottom - cornerSize;
-    
-      // Don't drag if clicking resize handle
-      if (isInResizeCorner) return;
-    
-      // Allow text edit when clicking directly on text
-      if (e.target === element) {
-        // Focus element so typing works
-        element.focus();
-        return;
-      }
-    
-      // Start dragging
-      e.preventDefault();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-      document.onmousemove = dragMove;
-      document.onmouseup = dragEnd;
-    }
-      
-      function dragMove(e) {
-        e.preventDefault();
-        
-        const pageRect = element.parentElement.getBoundingClientRect();
-        const x = e.clientX - pageRect.left - offsetX;
-        const y = e.clientY - pageRect.top - offsetY;
-        
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-      }
-      
-      function dragEnd() {
-        document.onmousemove = null;
-        document.onmouseup = null;
-      }
-    }
-    
     function selectElement(element) {
       // Deselect previously selected element
       if (selectedElement) {
