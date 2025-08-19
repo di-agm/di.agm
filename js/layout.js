@@ -503,10 +503,38 @@ document.addEventListener('click', (e) => {
     
     // Handle click outside elements to deselect
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.text-element') && 
-          !e.target.closest('#elementEditor') && 
-          !e.target.closest('.sidebar-btn')) {
-        deselectElement();
+      const toolbar = document.getElementById('elementToolbar');
+    
+      if (e.target.closest('.text-element')) {
+        selectedElement = e.target.closest('.text-element');
+        toolbar.style.display = 'flex';
+        const rect = selectedElement.getBoundingClientRect();
+        toolbar.style.top = rect.bottom + 'px';
+        toolbar.style.left = rect.left + 'px';
+      }
+      else if (!e.target.closest('#elementToolbar')) {
+        toolbar.style.display = 'none';
+        selectedElement = null;
+      }
+    });
+    
+    // Button actions
+    document.getElementById('btnMove').addEventListener('click', () => {
+      if (selectedElement) {
+        selectedElement.style.transform = 'translateX(50px)';
+      }
+    });
+    
+    document.getElementById('btnScale').addEventListener('click', () => {
+      if (selectedElement) {
+        selectedElement.style.transform = 'scale(1.5)';
+      }
+    });
+    
+    document.getElementById('btnDelete').addEventListener('click', () => {
+      if (selectedElement) {
+        selectedElement.remove();
+        document.getElementById('elementToolbar').style.display = 'none';
       }
     });
     
