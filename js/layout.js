@@ -629,12 +629,15 @@ document.addEventListener('click', (e) => {
     });
     
     // Font size handlers
-    document.querySelectorAll('.size-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (selectedElement) {
-          selectedElement.style.fontSize = `${btn.dataset.size}px`;
+    const fontSizeInput = document.getElementById('fontSizeInput');
+
+    fontSizeInput.addEventListener('input', () => {
+      if (selectedElement) {
+        let size = parseInt(fontSizeInput.value, 10);
+        if (!isNaN(size) && size >= 1 && size <= 100) {
+          selectedElement.style.fontSize = size + 'px';
         }
-      });
+      }
     });
     
     // Font family handler
