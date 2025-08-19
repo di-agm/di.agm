@@ -260,11 +260,12 @@
       position: absolute;
       display: none;
       gap: 8px;
+      align: center;
       z-index: 1000;
     ">
-      <div class="toolbar-btn" data-action="move" title="Move" style="width:30px;height:30px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;cursor:pointer;">⇕</div>
-      <div class="toolbar-btn" data-action="scale" title="Scale" style="width:30px;height:30px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;cursor:pointer;">⤢</div>
-      <div class="toolbar-btn" data-action="delete" title="Delete" style="width:30px;height:30px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</div>
+      <div class="toolbar-button" id="btnMove">↔</div>
+      <div class="toolbar-button" id="btnScale">⤢</div>
+      <div class="toolbar-button" id="btnDelete">✖</div>
     </div>
 
 <div class="tt" style="display:none;">
