@@ -174,13 +174,16 @@
         
         <h4>Font Size</h4>
         <div class="font-size-options">
-          <button class="size-btn" data-size="12">S</button>
-          <button class="size-btn" data-size="16">M</button>
-          <button class="size-btn" data-size="20">L</button>
-          <button class="size-btn" data-size="24">XL</button>
-          <button class="size-btn" data-size="32">XXL</button>
+          <label for="fontSizeInput">Font size:</label>
+          <input 
+            id="fontSizeInput" 
+            type="number" 
+            min="1" 
+            max="100" 
+            value="16"
+          >
         </div>
-        
+
         <h4>Font Family</h4>
         <select class="font-family-select" id="fontFamilySelect">
           <option value="Arial, sans-serif">Arial</option>
