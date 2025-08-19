@@ -517,18 +517,31 @@ document.addEventListener('click', (e) => {
         selectedElement = null;
       }
     });
-    
-    // Button actions
+
+    // Move mode
     document.getElementById('btnMove').addEventListener('click', () => {
-      if (selectedElement) {
-        selectedElement.style.transform = 'translateX(50px)';
+      if (!selectedElement) return;
+      selectedElement.style.position = 'absolute'; // needed for dragging
+    
+      function onMouseMove(e) {
+        selectedElement.style.left = e.pageX - selectedElement.offsetWidth / 2 + 'px';
+        selectedElement.style.top = e.pageY - selectedElement.offsetHeight / 2 + 'px';
       }
+    
+      function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+    
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
     });
     
+    // Scale mode (simple browser resize)
     document.getElementById('btnScale').addEventListener('click', () => {
-      if (selectedElement) {
-        selectedElement.style.transform = 'scale(1.5)';
-      }
+      if (!selectedElement) return;
+      selectedElement.style.resize = 'both';
+      selectedElement.style.overflow = 'auto';
     });
     
     document.getElementById('btnDelete').addEventListener('click', () => {
