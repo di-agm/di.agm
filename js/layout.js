@@ -229,6 +229,7 @@
       }
       
       selectedElement = element;
+      document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
       selectedElement.classList.add('selected');
     
       // Show the toolbar
