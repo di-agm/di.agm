@@ -527,24 +527,27 @@ document.addEventListener('click', (e) => {
       }
     });
 
-    // Move mode
-    document.getElementById('btnMove').addEventListener('click', () => {
-      if (!selectedElement) return;
-      selectedElement.style.position = 'absolute'; // needed for dragging
-    
-      function onMouseMove(e) {
-        selectedElement.style.left = e.pageX - selectedElement.offsetWidth / 2 + 'px';
-        selectedElement.style.top = e.pageY - selectedElement.offsetHeight / 2 + 'px';
-      }
-    
-      function onMouseUp() {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      }
-    
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
+    // --- Move logic ---
+    function enableMove() {
+        if (!selectedElement) return;
+        selectedElement.style.position = 'absolute';
+        
+        function onMouseMove(e) {
+            const parent = selectedElement.parentElement;
+            const parentRect = parent.getBoundingClientRect();
+            // Align cursor center with element center
+            selectedElement.style.left = (e.clientX - parentRect.left - selectedElement.offsetWidth / 2) + 'px';
+            selectedElement.style.top = (e.clientY - parentRect.top - selectedElement.offsetHeight / 2) + 'px';
+        }
+        
+        function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
     
     // Scale mode (simple browser resize)
     document.getElementById('btnScale').addEventListener('click', () => {
