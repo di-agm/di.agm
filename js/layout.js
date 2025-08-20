@@ -620,12 +620,12 @@ document.addEventListener('click', (e) => {
     });
     
     // Color picker handlers
-    document.querySelectorAll('.color-option').forEach(option => {
-      option.addEventListener('click', () => {
-        if (selectedElement) {
-          selectedElement.style.color = option.dataset.color;
-        }
-      });
+    const fontColorInput = document.getElementById('fontColorInput');
+
+    fontColorInput.addEventListener('input', () => {
+      if (selectedElement) {
+        selectedElement.style.color = fontColorInput.value;
+      }
     });
     
     // Font size handlers
