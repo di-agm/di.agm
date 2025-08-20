@@ -243,10 +243,18 @@
       document.getElementById('elementEditor').style.display = 'block';
       document.getElementById('noElementSelected').style.display = 'none';
     
-      // Reapply move and resize behaviors
+      // Update toolbar UI to reflect selected element's styles
+      const fontSizeInput = document.getElementById('fontSizeInput'); // new numeric input
+      if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+    
+      const fontFamilySelect = document.getElementById('fontFamilySelect');
+      if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+    
+      const colorInput = document.getElementById('colorPickerInput');
+      if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+    
+      // Reapply drag/resize behavior
       makeElementDraggable(selectedElement);
-      // Optionally: reset contentEditable focus
-      selectedElement.focus();
     }
 
     function deselectElement() {
