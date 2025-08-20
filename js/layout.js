@@ -227,7 +227,7 @@
       if (selectedElement) {
         selectedElement.classList.remove('selected');
       }
-      
+    
       selectedElement = element;
       document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
       selectedElement.classList.add('selected');
@@ -236,16 +236,19 @@
       const toolbar = document.getElementById('elementToolbar');
       const rect = element.getBoundingClientRect();
       const containerRect = document.body.getBoundingClientRect();
-    
-      // Position the toolbar just under the element
       toolbar.style.left = `${rect.left - containerRect.left + rect.width/2 - 55}px`;
       toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       toolbar.style.display = 'flex';
-      
+    
       document.getElementById('elementEditor').style.display = 'block';
       document.getElementById('noElementSelected').style.display = 'none';
-    }
     
+      // Reapply move and resize behaviors
+      makeElementDraggable(selectedElement);
+      // Optionally: reset contentEditable focus
+      selectedElement.focus();
+    }
+
     function deselectElement() {
       if (selectedElement) {
         selectedElement.classList.remove('selected');
