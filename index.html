@@ -162,14 +162,8 @@
       <div id="elementEditor" style="display: none;">
         <h4>Text Color</h4>
         <div class="color-picker-container">
-          <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
-          <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
-          <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
-          <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
-          <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
-          <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
-          <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
-          <div class="color-option" style="background-color: #00ffff;" data-color="#00ffff"></div>
+          <label for="fontColorInput">Font color:</label>
+          <input type="color" id="fontColorInput" value="#000000">
         </div>
         
         <h4>Font Size</h4>
@@ -197,7 +191,6 @@
         </select>
         
         <div style="margin-top: 15px;"></div>
-        <button class="sidebar-btn full-width" id="deleteElementBtn">🗑️ Delete Element</button>
       </div>
       <div id="noElementSelected" style="opacity: 0.7; text-align: center; padding: 10px;">
         Select an element to edit
