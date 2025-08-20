@@ -627,6 +627,14 @@ document.addEventListener('click', (e) => {
         }
       });
     });
+
+    const fontColorInput = document.getElementById('fontColorInput');
+    
+    fontColorInput.addEventListener('input', () => {
+      if (selectedElement) {
+        selectedElement.style.color = fontColorInput.value;
+      }
+    });
     
     // Font size handlers
     const fontSizeInput = document.getElementById('fontSizeInput');
