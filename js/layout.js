@@ -481,6 +481,15 @@ document.addEventListener('click', (e) => {
         loadBtn.innerHTML = '⏏';
         loadBtn.title = 'Load layout';
         loadBtn.onclick = () => loadLayout(index);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '×';
+        deleteBtn.title = 'Delete layout';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          savedLayouts.splice(index, 1);
+          localStorage.setItem('paperSizeSelectorLayouts', JSON.stringify(savedLayouts));
+          updateSavedLayoutsList();
         };
         
         const buttonContainer = document.createElement('div');
