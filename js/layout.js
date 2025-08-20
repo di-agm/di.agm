@@ -627,14 +627,6 @@ document.addEventListener('click', (e) => {
         }
       });
     });
-
-    const fontColorInput = document.getElementById('fontColorInput');
-    
-    fontColorInput.addEventListener('input', () => {
-      if (selectedElement) {
-        selectedElement.style.color = fontColorInput.value;
-      }
-    });
     
     // Font size handlers
     const fontSizeInput = document.getElementById('fontSizeInput');
@@ -654,7 +646,23 @@ document.addEventListener('click', (e) => {
         selectedElement.style.fontFamily = e.target.value;
       }
     });
+
+    function loadCustomFont(file) {
+      const url = URL.createObjectURL(file);
+      const font = new FontFace("CustomFont", `url(${url})`);
+      font.load().then((loadedFont) => {
+        document.fonts.add(loadedFont);
+        if (selectedElement) {
+          selectedElement.style.fontFamily = "CustomFont";
+        }
+      });
+    }
     
+    document.getElementById('fontFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) loadCustomFont(file);
+    });
+
     // Export handlers
     document.getElementById('exportPngBtn').addEventListener('click', () => exportAsImage('png'));
     document.getElementById('exportJpgBtn').addEventListener('click', () => exportAsImage('jpg'));
