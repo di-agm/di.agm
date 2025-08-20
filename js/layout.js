@@ -313,6 +313,36 @@ document.addEventListener('click', (e) => {
   }
 });
 
+function makeElementDraggable(el) {
+let offsetX = 0, offsetY = 0, isDragging = false;
+
+el.addEventListener('mousedown', (e) => {
+// Only drag if not resizing or editing text
+if (e.target.classList.contains('resizer') || el.isContentEditable) return;
+
+isDragging = true;
+offsetX = e.clientX - el.offsetLeft;
+offsetY = e.clientY - el.offsetTop;
+
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+});
+
+function onMouseMove(e) {
+if (!isDragging) return;
+el.style.left = (e.clientX - offsetX) + 'px';
+el.style.top = (e.clientY - offsetY) + 'px';
+}
+
+function onMouseUp() {
+isDragging = false;
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+}
+}
+
+makeElementDraggable(selectedElement);
+
     // Toggle sidebar functions
     function toggleLeftSidebar() {
       const sidebar = document.getElementById('leftSidebar');
@@ -450,36 +480,6 @@ document.addEventListener('click', (e) => {
           
           pageContent.appendChild(element);
         });
-
-          function makeElementDraggable(el) {
-          let offsetX = 0, offsetY = 0, isDragging = false;
-        
-          el.addEventListener('mousedown', (e) => {
-            // Only drag if not resizing or editing text
-            if (e.target.classList.contains('resizer') || el.isContentEditable) return;
-        
-            isDragging = true;
-            offsetX = e.clientX - el.offsetLeft;
-            offsetY = e.clientY - el.offsetTop;
-        
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-          });
-        
-          function onMouseMove(e) {
-            if (!isDragging) return;
-            el.style.left = (e.clientX - offsetX) + 'px';
-            el.style.top = (e.clientY - offsetY) + 'px';
-          }
-        
-          function onMouseUp() {
-            isDragging = false;
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-          }
-        }
-        
-        makeElementDraggable(selectedElement);
         
         pages.push(newPage);
       });
