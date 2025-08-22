@@ -1,151 +1,65 @@
-const daysOfWeek = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+// Guardar tareas
+let tasks = [];
 
-function convertirHoraAMinutos(hora) {
-  let [h,m] = hora.split(":").map(Number);
-  return h*60+m;
-}
+function addTask() {
+    const taskName = document.getElementById("task").value;
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
 
-function calcularMCD(a,b) {
-  while(b!==0){ let t=b; b=a%b; a=t;}
-  return a;
-}
-
-function calcularMCDVector(nums) {
-  if(nums.length===0) return 1;
-  let mcd=nums[0];
-  for(let i=1;i<nums.length;i++) mcd=calcularMCD(mcd,nums[i]);
-  return mcd;
-}
-
-let actividadesArr=[], bloquesArr=[], matrix=[];
-
-function agregarActividad(){
-  let div=document.getElementById("actividades");
-  let idx=div.children.length;
-  div.insertAdjacentHTML("beforeend",`
-    <div>
-      <input placeholder="Nombre" id="actNombre${idx}">
-      <input placeholder="Dur total" id="actDurTotal${idx}">
-      <input placeholder="Dur diaria" id="actDurDia${idx}">
-      <select id="actTipo${idx}">
-        <option value="1">Inicio libre</option>
-        <option value="2">Después de anterior</option>
-      </select>
-    </div>`);
-}
-
-function agregarBloque(){
-  let div=document.getElementById("bloques");
-  let idx=div.children.length;
-  div.insertAdjacentHTML("beforeend",`
-    <div>
-      <select id="bloqueDia${idx}">
-        ${daysOfWeek.map((d,i)=>`<option value="${i}">${d}</option>`).join("")}
-      </select>
-      <input type="time" id="bloqueIni${idx}">
-      <input type="time" id="bloqueFin${idx}">
-    </div>`);
-}
-
-function generarHorario(){
-  let cols=parseInt(document.getElementById("dias").value)+2;
-  let startTime=convertirHoraAMinutos(document.getElementById("horaInicio").value);
-  let endTime=convertirHoraAMinutos(document.getElementById("horaFin").value);
-  let totalMinutes=endTime-startTime;
-  let diaInicio=parseInt(document.getElementById("diaInicio").value);
-
-  actividadesArr=[];
-  let actDiv=document.getElementById("actividades").children;
-  for(let i=0;i<actDiv.length;i++){
-    actividadesArr.push({
-      nombre: document.getElementById(`actNombre${i}`).value,
-      duracion: parseInt(document.getElementById(`actDurTotal${i}`).value),
-      duracionDiaria: parseInt(document.getElementById(`actDurDia${i}`).value),
-      tipoInicio: parseInt(document.getElementById(`actTipo${i}`).value)
-    });
-  }
-
-  bloquesArr=[];
-  let bloqDiv=document.getElementById("bloques").children;
-  for(let i=0;i<bloqDiv.length;i++){
-    bloquesArr.push({
-      dia: parseInt(document.getElementById(`bloqueDia${i}`).value),
-      inicio: convertirHoraAMinutos(document.getElementById(`bloqueIni${i}`).value),
-      fin: convertirHoraAMinutos(document.getElementById(`bloqueFin${i}`).value)
-    });
-  }
-
-  let todasDuraciones=[...actividadesArr.map(a=>a.duracionDiaria),...bloquesArr.map(b=>b.fin-b.inicio)];
-  let intervalMinutes=calcularMCDVector(todasDuraciones);
-  if(intervalMinutes<=0) intervalMinutes=30;
-
-  let numRows=Math.floor((totalMinutes+intervalMinutes-1)/intervalMinutes)+1;
-  matrix=Array.from({length:numRows},()=>Array(cols).fill(" "));
-
-  matrix[0][0]="Inicio";
-  matrix[0][1]="Final";
-  for(let j=2;j<cols;j++) matrix[0][j]=daysOfWeek[(diaInicio+j-2)%7];
-
-  let curH=Math.floor(startTime/60), curM=startTime%60;
-  for(let i=1;i<numRows;i++){
-    let s=`${String(curH).padStart(2,"0")}:${String(curM).padStart(2,"0")}`;
-    let endMin=curM+intervalMinutes, endH=curH;
-    if(endMin>=60){ endMin-=60; endH++; }
-    let e=`${String(endH%24).padStart(2,"0")}:${String(endMin).padStart(2,"0")}`;
-    matrix[i][0]=s; matrix[i][1]=e;
-    curH=endH%24; curM=endMin;
-    if(endH*60+endMin>=endTime) break;
-  }
-
-  for(let i=1;i<numRows;i++){
-    for(let j=2;j<cols;j++){
-      let dia=(j-2+diaInicio)%7;
-      let currentTime=startTime+(i-1)*intervalMinutes;
-      for(let b of bloquesArr){
-        if(b.dia===dia && currentTime>=b.inicio && currentTime<b.fin){
-          matrix[i][j]="N/A";
-        }
-      }
+    if (!taskName || !start || !end) {
+        alert("Por favor completa todos los campos");
+        return;
     }
-  }
 
-  let ultimaCol=2;
-  for(let act of actividadesArr){
-    let rest=act.duracion;
-    let startCol=act.tipoInicio===2?ultimaCol+1:2;
-    for(let col=startCol;col<cols && rest>0;col++){
-      let dia=(col-2+diaInicio)%7;
-      let minutosHoy=0;
-      for(let row=1;row<numRows && minutosHoy<act.duracionDiaria && rest>0;row++){
-        if(matrix[row][col]===" "){
-          let currentTime=startTime+(row-1)*intervalMinutes;
-          let block=bloquesArr.some(b=>b.dia===dia && currentTime>=b.inicio && currentTime<b.fin);
-          if(!block){
-            matrix[row][col]=act.nombre;
-            minutosHoy+=intervalMinutes;
-            rest-=intervalMinutes;
-          }
-        }
-      }
-      if(minutosHoy>0) ultimaCol=col;
-    }
-  }
-
-  // Mostrar
-  let html="<table><tr>"+matrix[0].map(h=>`<th>${h}</th>`).join("")+"</tr>";
-  for(let i=1;i<matrix.length;i++){
-    html+="<tr>"+matrix[i].map(c=>`<td>${c}</td>`).join("")+"</tr>";
-  }
-  html+="</table>";
-  document.getElementById("resultado").innerHTML=html;
+    tasks.push({ taskName, start, end });
+    renderTable();
 }
 
-function exportarCSV(){
-  if(matrix.length===0){ alert("Primero genera el horario"); return;}
-  let csv=matrix.map(r=>r.join(",")).join("\n");
-  let blob=new Blob([csv],{type:"text/csv"});
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="horario.csv";
-  a.click();
+function renderTable() {
+    const tbody = document.querySelector("#scheduleTable tbody");
+    tbody.innerHTML = "";
+    tasks.forEach(t => {
+        const row = `<tr>
+            <td>${t.taskName}</td>
+            <td>${t.start}</td>
+            <td>${t.end}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+}
+
+function downloadCSV() {
+    let csv = "Tarea,Fecha Inicio,Fecha Fin\n";
+    tasks.forEach(t => {
+        csv += `${t.taskName},${t.start},${t.end}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "cronograma.csv";
+    link.click();
+}
+
+// Descargar PDF usando jsPDF
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    doc.text("Cronograma", 14, 15);
+
+    let y = 25;
+    doc.text("Tarea", 14, y);
+    doc.text("Fecha Inicio", 70, y);
+    doc.text("Fecha Fin", 140, y);
+    y += 7;
+
+    tasks.forEach(t => {
+        doc.text(t.taskName, 14, y);
+        doc.text(t.start, 70, y);
+        doc.text(t.end, 140, y);
+        y += 7;
+    });
+
+    doc.save("cronograma.pdf");
 }
