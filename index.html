@@ -260,33 +260,38 @@
     </div>
 
 <div class="tt" style="display:none;">
-    <h1>Generador de Horarios (equivalente al programa en C++)</h1>
-    <section class="card">
-        <div class="content grid">
-            <div class="section-title">Parámetros generales</div>
-            <div class="grid cols-3">
-                <div class="row"><label>Número de días (expresión)</label><input id="diasExpr" type="text" placeholder="p.ej. 5 o 2+3" /></div>
-                <div class="row"><label>Día de inicio (1=Lunes…7=Domingo)</label>
-                <select id="diaInicio">
-                    <option value="1">1 - Lunes</option>
-                    <option value="2">2 - Martes</option>
-                    <option value="3">3 - Miércoles</option>
-                    <option value="4">4 - Jueves</option>
-                    <option value="5">5 - Viernes</option>
-                    <option value="6">6 - Sábado</option>
-                    <option value="7">7 - Domingo</option>
-                </select>
-                </div>
-                <div class="row"><label>Rango horario (HH:MM - HH:MM)</label><input id="rango" type="text" placeholder="08:00 - 18:00" /></div>
-            </div>
-        </div>
-    </section>
-    <section class="card" id="actividadesSec">
-        <div class="content">
-        <div class="section-title">Actividades</div>
-        <div class="btns" style="margin-bottom:.5rem"></div>
-    </section>
-    
+  <h1>Generador de Horarios</h1>
+
+  <label>Días: <input type="text" id="dias" value="5"></label><br>
+  <label>Hora inicio: <input type="time" id="horaInicio" value="08:00"></label>
+  <label>Hora fin: <input type="time" id="horaFin" value="18:00"></label><br>
+
+  <h3>Actividades</h3>
+  <div id="actividades"></div>
+  <button onclick="agregarActividad()">Añadir Actividad</button>
+
+  <h3>Bloques no accesibles</h3>
+  <div id="bloques"></div>
+  <button onclick="agregarBloque()">Añadir Bloque</button><br>
+
+  <label>Día inicio: 
+    <select id="diaInicio">
+      <option value="0">Lunes</option>
+      <option value="1">Martes</option>
+      <option value="2">Miércoles</option>
+      <option value="3">Jueves</option>
+      <option value="4">Viernes</option>
+      <option value="5">Sábado</option>
+      <option value="6">Domingo</option>
+    </select>
+  </label><br><br>
+
+  <button onclick="generarHorario()">Generar Horario</button>
+  <button onclick="exportarCSV()">Exportar CSV</button>
+
+  <div id="resultado"></div>
+</div>
+ 
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
     <script src="js/translations.js" defer></script>
