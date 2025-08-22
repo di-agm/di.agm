@@ -1,67 +1,42 @@
 // Utilidades
-}
-}
+const daysOfWeek = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]; // sin tildes para seguir el C++
+const CELL_WIDTH_CH = 16; // ancho aproximado
 
 
-// Render tabla
-renderTable(matrix);
-byId('resultadoSec').classList.remove('hidden');
-byId('exportar').disabled = false;
-byId('status').innerHTML = `<span class="pill ok">✓ Generado</span> Intervalo: <strong>${intervalMinutes}</strong> min · Filas: ${numRows} · Columnas: ${cols}`;
+const byId = id => document.getElementById(id);
+const trim = s => (s ?? "").trim();
 
 
-// Exportar CSV
-byId('exportar').onclick = ()=> downloadCSV(matrix, 'horarios.csv');
-
-
-} catch (err){
-byId('status').innerHTML = `<span class="pill err">✗ Error</span> ${err.message}`;
-console.error(err);
-}
-};
-
-
-function renderTable(matrix){
-const table = byId('tabla');
-table.innerHTML = '';
-const thead = document.createElement('thead');
-const trh = document.createElement('tr');
-matrix[0].forEach((h,idx)=>{
-const th = document.createElement('th');
-th.textContent = h || '';
-th.style.minWidth = idx<2? '120px' : `${CELL_WIDTH_CH}ch`;
-trh.appendChild(th);
-});
-thead.appendChild(trh);
-table.appendChild(thead);
-
-
-const tbody = document.createElement('tbody');
-for (let r=1;r<matrix.length;r++){
-const tr = document.createElement('tr');
-for (let c=0;c<matrix[r].length;c++){
-const td = document.createElement('td');
-const val = matrix[r][c];
-td.textContent = val;
-if (c>=2){
-if (val === 'N/A') td.className = 'na';
-else if (val === ' ') td.className = 'cell-empty';
-else td.className = 'activity';
-}
-tr.appendChild(td);
-}
-tbody.appendChild(tr);
-}
-table.appendChild(tbody);
+function parseHm(s) {
+const m = /^\s*(\d{1,2})\s*:\s*(\d{2})\s*$/.exec(s);
+if (!m) throw new Error("Formato de hora inválido: " + s);
+const h = parseInt(m[1],10), min = parseInt(m[2],10);
+if (h<0||h>23||min<0||min>59) throw new Error("Hora fuera de rango: "+s);
+return h*60+min;
 }
 
 
-function downloadCSV(matrix, filename){
-const escape = (s)=>('"'+String(s).replaceAll('"','""')+'"');
-const csv = matrix.map(row=>row.map(escape).join(',')).join('\n');
-const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url; a.download = filename; a.click();
-setTimeout(()=>URL.revokeObjectURL(url), 2000);
+function parseRange(s) {
+const parts = s.split("-");
+if (parts.length !== 2) throw new Error("Formato de rango debe ser 'HH:MM - HH:MM'");
+const start = parseHm(parts[0]);
+const end = parseHm(parts[1]);
+if (end <= start) throw new Error("La hora de fin debe ser después de la de inicio");
+return {start, end};
+}
+
+
+// Evaluador de expresiones entero (+,-,*,/) estilo C++
+function evalExpr(expr) {
+const s = trim(expr);
+if (!/^[-+*/()\d\s]+$/.test(s)) throw new Error("Expresión inválida: solo 0-9 y + - * / ( )");
+// Shunting-yard
+const output = [], ops = [];
+const prec = c => (c==="+"||c==="-")?1:(c==="*"||c==="/")?2:0;
+const tokens = s.match(/\d+|[()+\-*/]/g) || [];
+for (const t of tokens) {
+if (/^\d+$/.test(t)) output.push(parseInt(t,10));
+else if (t === "(") ops.push(t);
+else if (t === ")") {
+while (ops.length && ops[ops.length-1] !== "(") applyOp();
 }
