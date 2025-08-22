@@ -260,37 +260,28 @@
     </div>
 
 <div class="tt" style="display:none;">
-  <h1>Generador de Horarios</h1>
-
-  <label>Días: <input type="text" id="dias" value="5"></label><br>
-  <label>Hora inicio: <input type="time" id="horaInicio" value="08:00"></label>
-  <label>Hora fin: <input type="time" id="horaFin" value="18:00"></label><br>
-
-  <h3>Actividades</h3>
-  <div id="actividades"></div>
-  <button onclick="agregarActividad()">Añadir Actividad</button>
-
-  <h3>Bloques no accesibles</h3>
-  <div id="bloques"></div>
-  <button onclick="agregarBloque()">Añadir Bloque</button><br>
-
-  <label>Día inicio: 
-    <select id="diaInicio">
-      <option value="0">Lunes</option>
-      <option value="1">Martes</option>
-      <option value="2">Miércoles</option>
-      <option value="3">Jueves</option>
-      <option value="4">Viernes</option>
-      <option value="5">Sábado</option>
-      <option value="6">Domingo</option>
-    </select>
-  </label><br><br>
-
-  <button onclick="generarHorario()">Generar Horario</button>
-  <button onclick="exportarCSV()">Exportar CSV</button>
-
-  <div id="resultado"></div>
-</div>
+  <h1>Generador de Cronogramas</h1>
+    <div>
+        <input type="text" id="task" placeholder="Tarea">
+        <input type="date" id="startDate">
+        <input type="date" id="endDate">
+        <button onclick="addTask()">Agregar Tarea</button>
+    </div>
+    
+    <table id="scheduleTable">
+        <thead>
+            <tr>
+                <th>Tarea</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    
+    <button onclick="downloadCSV()">Descargar CSV</button>
+    <button onclick="downloadPDF()">Descargar PDF</button>
  
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
