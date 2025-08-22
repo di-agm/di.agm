@@ -1,238 +1,151 @@
-// schedule.js
-const fs = require("fs");
-const readline = require("readline");
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-// Helpers
-function evaluateExpression(expr) {
-  // WARNING: eval can be dangerous. For safety, you might replace with a parser
-  return Function(`"use strict"; return (${expr})`)();
-}
+const daysOfWeek = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 
 function convertirHoraAMinutos(hora) {
-  const [h, m] = hora.split(":").map(Number);
-  return h * 60 + m;
+  let [h,m] = hora.split(":").map(Number);
+  return h*60+m;
 }
 
-function trim(str) {
-  return str.trim();
-}
-
-function calcularMCD(a, b) {
-  while (b !== 0) {
-    let temp = b;
-    b = a % b;
-    a = temp;
-  }
+function calcularMCD(a,b) {
+  while(b!==0){ let t=b; b=a%b; a=t;}
   return a;
 }
 
 function calcularMCDVector(nums) {
-  if (nums.length === 0) return 1;
-  let mcd = nums[0];
-  for (let i = 1; i < nums.length; i++) {
-    mcd = calcularMCD(mcd, nums[i]);
-  }
+  if(nums.length===0) return 1;
+  let mcd=nums[0];
+  for(let i=1;i<nums.length;i++) mcd=calcularMCD(mcd,nums[i]);
   return mcd;
 }
 
-function esHoraNoAccesible(minutos, bloque) {
-  return minutos >= bloque.inicio && minutos < bloque.fin;
+let actividadesArr=[], bloquesArr=[], matrix=[];
+
+function agregarActividad(){
+  let div=document.getElementById("actividades");
+  let idx=div.children.length;
+  div.insertAdjacentHTML("beforeend",`
+    <div>
+      <input placeholder="Nombre" id="actNombre${idx}">
+      <input placeholder="Dur total" id="actDurTotal${idx}">
+      <input placeholder="Dur diaria" id="actDurDia${idx}">
+      <select id="actTipo${idx}">
+        <option value="1">Inicio libre</option>
+        <option value="2">Después de anterior</option>
+      </select>
+    </div>`);
 }
 
-const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
-
-async function ask(question) {
-  return new Promise(resolve => rl.question(question, ans => resolve(ans)));
+function agregarBloque(){
+  let div=document.getElementById("bloques");
+  let idx=div.children.length;
+  div.insertAdjacentHTML("beforeend",`
+    <div>
+      <select id="bloqueDia${idx}">
+        ${daysOfWeek.map((d,i)=>`<option value="${i}">${d}</option>`).join("")}
+      </select>
+      <input type="time" id="bloqueIni${idx}">
+      <input type="time" id="bloqueFin${idx}">
+    </div>`);
 }
 
-async function main() {
-  const CELL_WIDTH = 15;
+function generarHorario(){
+  let cols=parseInt(document.getElementById("dias").value)+2;
+  let startTime=convertirHoraAMinutos(document.getElementById("horaInicio").value);
+  let endTime=convertirHoraAMinutos(document.getElementById("horaFin").value);
+  let totalMinutes=endTime-startTime;
+  let diaInicio=parseInt(document.getElementById("diaInicio").value);
 
-  // Numero de dias
-  let colsExpression = await ask("Ingrese el numero de dias: ");
-  let cols = evaluateExpression(colsExpression) + 2;
-
-  // Rango de tiempo
-  let startEndTime;
-  let startTime, endTime;
-  while (true) {
-    startEndTime = await ask("Ingrese la hora de inicio y fin (HH:MM - HH:MM): ");
-    if (!startEndTime.includes("-")) {
-      console.log("Formato incorrecto. Debe ser HH:MM - HH:MM.");
-      continue;
-    }
-    let [startStr, endStr] = startEndTime.split("-").map(trim);
-    startTime = convertirHoraAMinutos(startStr);
-    endTime = convertirHoraAMinutos(endStr);
-    if (endTime <= startTime) {
-      console.log("La hora de fin debe ser después de la hora de inicio.");
-    } else break;
-  }
-  let totalMinutes = endTime - startTime;
-
-  // Actividades
-  let numActividades = parseInt(await ask("Ingrese el numero de actividades: "));
-  let actividades = [];
-  let duracionesDiarias = [];
-
-  for (let i = 0; i < numActividades; i++) {
-    let nombre = await ask(`Ingrese el nombre de la actividad ${i + 1}: `);
-    let durTotalExp = await ask("Ingrese la duracion total: ");
-    let durTotal = evaluateExpression(durTotalExp);
-
-    let durDiaExp = await ask("Ingrese la duracion diaria: ");
-    let durDia = evaluateExpression(durDiaExp);
-
-    let tipoInicio = parseInt(
-      await ask("Inicio: 1. Desde el primer horario disponible, 2. Después de la anterior: ")
-    );
-
-    actividades.push({ nombre, duracion: durTotal, duracionDiaria: durDia, tipoInicio });
-    duracionesDiarias.push(durDia);
+  actividadesArr=[];
+  let actDiv=document.getElementById("actividades").children;
+  for(let i=0;i<actDiv.length;i++){
+    actividadesArr.push({
+      nombre: document.getElementById(`actNombre${i}`).value,
+      duracion: parseInt(document.getElementById(`actDurTotal${i}`).value),
+      duracionDiaria: parseInt(document.getElementById(`actDurDia${i}`).value),
+      tipoInicio: parseInt(document.getElementById(`actTipo${i}`).value)
+    });
   }
 
-  // Bloques no accesibles
-  let numBloques = parseInt(await ask("Ingrese el numero de bloques no accesibles: "));
-  let bloques = [];
-  for (let i = 0; i < numBloques; i++) {
-    let dia = parseInt(await ask(`Ingrese el dia (1=Lunes, 7=Domingo): `)) - 1;
-
-    let bloqueTiempo;
-    while (true) {
-      bloqueTiempo = await ask(`Ingrese la hora inicio-fin del bloque ${i + 1} (HH:MM - HH:MM): `);
-      if (!bloqueTiempo.includes("-")) {
-        console.log("Formato incorrecto. Intente de nuevo.");
-        continue;
-      }
-      let [startStr, endStr] = bloqueTiempo.split("-").map(trim);
-      let inicio = convertirHoraAMinutos(startStr);
-      let fin = convertirHoraAMinutos(endStr);
-      if (fin <= inicio) {
-        console.log("Fin debe ser después del inicio.");
-      } else {
-        bloques.push({ dia, inicio, fin });
-        break;
-      }
-    }
+  bloquesArr=[];
+  let bloqDiv=document.getElementById("bloques").children;
+  for(let i=0;i<bloqDiv.length;i++){
+    bloquesArr.push({
+      dia: parseInt(document.getElementById(`bloqueDia${i}`).value),
+      inicio: convertirHoraAMinutos(document.getElementById(`bloqueIni${i}`).value),
+      fin: convertirHoraAMinutos(document.getElementById(`bloqueFin${i}`).value)
+    });
   }
 
-  // Calcular intervalo
-  let todasDuraciones = [...duracionesDiarias, ...bloques.map(b => b.fin - b.inicio)];
-  let intervalMinutes = calcularMCDVector(todasDuraciones);
+  let todasDuraciones=[...actividadesArr.map(a=>a.duracionDiaria),...bloquesArr.map(b=>b.fin-b.inicio)];
+  let intervalMinutes=calcularMCDVector(todasDuraciones);
+  if(intervalMinutes<=0) intervalMinutes=30;
 
-  // Numero de filas
-  let numRows = Math.floor((totalMinutes + intervalMinutes - 1) / intervalMinutes) + 1;
+  let numRows=Math.floor((totalMinutes+intervalMinutes-1)/intervalMinutes)+1;
+  matrix=Array.from({length:numRows},()=>Array(cols).fill(" "));
 
-  // Dia inicio
-  let diaInicio = parseInt(await ask("Ingrese el dia de inicio (1=Lunes,7=Domingo): ")) - 1;
+  matrix[0][0]="Inicio";
+  matrix[0][1]="Final";
+  for(let j=2;j<cols;j++) matrix[0][j]=daysOfWeek[(diaInicio+j-2)%7];
 
-  // Matriz
-  let matrix = Array.from({ length: numRows }, () => Array(cols).fill(""));
-
-  matrix[0][0] = "Inicio";
-  matrix[0][1] = "Final";
-  for (let j = 2; j < cols; j++) {
-    matrix[0][j] = daysOfWeek[(diaInicio + (j - 2)) % daysOfWeek.length];
+  let curH=Math.floor(startTime/60), curM=startTime%60;
+  for(let i=1;i<numRows;i++){
+    let s=`${String(curH).padStart(2,"0")}:${String(curM).padStart(2,"0")}`;
+    let endMin=curM+intervalMinutes, endH=curH;
+    if(endMin>=60){ endMin-=60; endH++; }
+    let e=`${String(endH%24).padStart(2,"0")}:${String(endMin).padStart(2,"0")}`;
+    matrix[i][0]=s; matrix[i][1]=e;
+    curH=endH%24; curM=endMin;
+    if(endH*60+endMin>=endTime) break;
   }
 
-  // Fill horas
-  let curH = Math.floor(startTime / 60);
-  let curM = startTime % 60;
-  for (let i = 1; i < numRows; i++) {
-    let startStr = `${String(curH).padStart(2, "0")}:${String(curM).padStart(2, "0")}`;
-    let endMin = curM + intervalMinutes;
-    let endH = curH;
-    if (endMin >= 60) {
-      endMin -= 60;
-      endH++;
-    }
-    let endStr = `${String(endH % 24).padStart(2, "0")}:${String(endMin).padStart(2, "0")}`;
-    matrix[i][0] = startStr;
-    matrix[i][1] = endStr;
-
-    curH = endH % 24;
-    curM = endMin;
-    if (endH * 60 + endMin >= endTime) break;
-  }
-
-  // Rellenar N/A en bloques
-  for (let i = 1; i < numRows; i++) {
-    for (let j = 2; j < cols; j++) {
-      let dia = (j - 2 + diaInicio) % 7;
-      let currentTime = startTime + (i - 1) * intervalMinutes;
-      for (let b of bloques) {
-        if (b.dia === dia && esHoraNoAccesible(currentTime, b)) {
-          matrix[i][j] = "N/A";
+  for(let i=1;i<numRows;i++){
+    for(let j=2;j<cols;j++){
+      let dia=(j-2+diaInicio)%7;
+      let currentTime=startTime+(i-1)*intervalMinutes;
+      for(let b of bloquesArr){
+        if(b.dia===dia && currentTime>=b.inicio && currentTime<b.fin){
+          matrix[i][j]="N/A";
         }
       }
     }
   }
 
-  // Rellenar espacios vacíos
-  for (let i = 1; i < numRows; i++) {
-    for (let j = 2; j < cols; j++) {
-      if (matrix[i][j] === "") matrix[i][j] = " ";
-    }
-  }
-
-  // Asignar actividades
-  let ultimaColumnaOcupada = 2;
-  for (let act of actividades) {
-    let duracionRestante = act.duracion;
-    let diasContados = 0;
-    let startCol = act.tipoInicio === 2 ? ultimaColumnaOcupada + 1 : 2;
-
-    for (let col = startCol; col < cols && diasContados < cols - 2; col++) {
-      let dia = (col - 2 + diaInicio) % 7;
-      let minutosHoy = 0;
-      let asignada = false;
-
-      for (let row = 1; row < numRows && minutosHoy < act.duracionDiaria; row++) {
-        if (matrix[row][col] === " " && duracionRestante > 0) {
-          let currentTime = startTime + (row - 1) * intervalMinutes;
-          let noAccesible = bloques.some(b => b.dia === dia && esHoraNoAccesible(currentTime, b));
-          if (!noAccesible) {
-            let minutosDisponibles = Math.min(act.duracionDiaria - minutosHoy, intervalMinutes);
-            matrix[row][col] = act.nombre;
-            minutosHoy += minutosDisponibles;
-            duracionRestante -= minutosDisponibles;
-            asignada = true;
-            if (duracionRestante <= 0) break;
+  let ultimaCol=2;
+  for(let act of actividadesArr){
+    let rest=act.duracion;
+    let startCol=act.tipoInicio===2?ultimaCol+1:2;
+    for(let col=startCol;col<cols && rest>0;col++){
+      let dia=(col-2+diaInicio)%7;
+      let minutosHoy=0;
+      for(let row=1;row<numRows && minutosHoy<act.duracionDiaria && rest>0;row++){
+        if(matrix[row][col]===" "){
+          let currentTime=startTime+(row-1)*intervalMinutes;
+          let block=bloquesArr.some(b=>b.dia===dia && currentTime>=b.inicio && currentTime<b.fin);
+          if(!block){
+            matrix[row][col]=act.nombre;
+            minutosHoy+=intervalMinutes;
+            rest-=intervalMinutes;
           }
         }
       }
-      if (asignada) {
-        diasContados++;
-        ultimaColumnaOcupada = col;
-      }
-      if (duracionRestante <= 0) break;
-    }
-
-    if (duracionRestante > 0) {
-      console.log(`No se pudo completar la actividad: ${act.nombre}`);
+      if(minutosHoy>0) ultimaCol=col;
     }
   }
 
-  // Imprimir matriz
-  console.log("Matriz resultante:");
-  for (let row of matrix) {
-    console.log(row.map(x => x.padEnd(CELL_WIDTH)).join(""));
+  // Mostrar
+  let html="<table><tr>"+matrix[0].map(h=>`<th>${h}</th>`).join("")+"</tr>";
+  for(let i=1;i<matrix.length;i++){
+    html+="<tr>"+matrix[i].map(c=>`<td>${c}</td>`).join("")+"</tr>";
   }
-
-  // Exportar CSV
-  let exportar = (await ask("Desea exportar a CSV? (S/N): ")).toLowerCase();
-  if (exportar === "s") {
-    let csv = matrix.map(r => r.join(",")).join("\n");
-    fs.writeFileSync("horarios.csv", csv);
-    console.log("Matriz exportada exitosamente a horarios.csv");
-  }
-
-  rl.close();
+  html+="</table>";
+  document.getElementById("resultado").innerHTML=html;
 }
 
-main();
+function exportarCSV(){
+  if(matrix.length===0){ alert("Primero genera el horario"); return;}
+  let csv=matrix.map(r=>r.join(",")).join("\n");
+  let blob=new Blob([csv],{type:"text/csv"});
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="horario.csv";
+  a.click();
+}
