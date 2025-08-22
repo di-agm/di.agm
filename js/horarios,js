@@ -1,42 +1,238 @@
-// Utilidades
-const daysOfWeek = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]; // sin tildes para seguir el C++
-const CELL_WIDTH_CH = 16; // ancho aproximado
+// schedule.js
+const fs = require("fs");
+const readline = require("readline");
 
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-const byId = id => document.getElementById(id);
-const trim = s => (s ?? "").trim();
-
-
-function parseHm(s) {
-const m = /^\s*(\d{1,2})\s*:\s*(\d{2})\s*$/.exec(s);
-if (!m) throw new Error("Formato de hora inválido: " + s);
-const h = parseInt(m[1],10), min = parseInt(m[2],10);
-if (h<0||h>23||min<0||min>59) throw new Error("Hora fuera de rango: "+s);
-return h*60+min;
+// Helpers
+function evaluateExpression(expr) {
+  // WARNING: eval can be dangerous. For safety, you might replace with a parser
+  return Function(`"use strict"; return (${expr})`)();
 }
 
-
-function parseRange(s) {
-const parts = s.split("-");
-if (parts.length !== 2) throw new Error("Formato de rango debe ser 'HH:MM - HH:MM'");
-const start = parseHm(parts[0]);
-const end = parseHm(parts[1]);
-if (end <= start) throw new Error("La hora de fin debe ser después de la de inicio");
-return {start, end};
+function convertirHoraAMinutos(hora) {
+  const [h, m] = hora.split(":").map(Number);
+  return h * 60 + m;
 }
 
-
-// Evaluador de expresiones entero (+,-,*,/) estilo C++
-function evalExpr(expr) {
-const s = trim(expr);
-if (!/^[-+*/()\d\s]+$/.test(s)) throw new Error("Expresión inválida: solo 0-9 y + - * / ( )");
-// Shunting-yard
-const output = [], ops = [];
-const prec = c => (c==="+"||c==="-")?1:(c==="*"||c==="/")?2:0;
-const tokens = s.match(/\d+|[()+\-*/]/g) || [];
-for (const t of tokens) {
-if (/^\d+$/.test(t)) output.push(parseInt(t,10));
-else if (t === "(") ops.push(t);
-else if (t === ")") {
-while (ops.length && ops[ops.length-1] !== "(") applyOp();
+function trim(str) {
+  return str.trim();
 }
+
+function calcularMCD(a, b) {
+  while (b !== 0) {
+    let temp = b;
+    b = a % b;
+    a = temp;
+  }
+  return a;
+}
+
+function calcularMCDVector(nums) {
+  if (nums.length === 0) return 1;
+  let mcd = nums[0];
+  for (let i = 1; i < nums.length; i++) {
+    mcd = calcularMCD(mcd, nums[i]);
+  }
+  return mcd;
+}
+
+function esHoraNoAccesible(minutos, bloque) {
+  return minutos >= bloque.inicio && minutos < bloque.fin;
+}
+
+const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
+
+async function ask(question) {
+  return new Promise(resolve => rl.question(question, ans => resolve(ans)));
+}
+
+async function main() {
+  const CELL_WIDTH = 15;
+
+  // Numero de dias
+  let colsExpression = await ask("Ingrese el numero de dias: ");
+  let cols = evaluateExpression(colsExpression) + 2;
+
+  // Rango de tiempo
+  let startEndTime;
+  let startTime, endTime;
+  while (true) {
+    startEndTime = await ask("Ingrese la hora de inicio y fin (HH:MM - HH:MM): ");
+    if (!startEndTime.includes("-")) {
+      console.log("Formato incorrecto. Debe ser HH:MM - HH:MM.");
+      continue;
+    }
+    let [startStr, endStr] = startEndTime.split("-").map(trim);
+    startTime = convertirHoraAMinutos(startStr);
+    endTime = convertirHoraAMinutos(endStr);
+    if (endTime <= startTime) {
+      console.log("La hora de fin debe ser después de la hora de inicio.");
+    } else break;
+  }
+  let totalMinutes = endTime - startTime;
+
+  // Actividades
+  let numActividades = parseInt(await ask("Ingrese el numero de actividades: "));
+  let actividades = [];
+  let duracionesDiarias = [];
+
+  for (let i = 0; i < numActividades; i++) {
+    let nombre = await ask(`Ingrese el nombre de la actividad ${i + 1}: `);
+    let durTotalExp = await ask("Ingrese la duracion total: ");
+    let durTotal = evaluateExpression(durTotalExp);
+
+    let durDiaExp = await ask("Ingrese la duracion diaria: ");
+    let durDia = evaluateExpression(durDiaExp);
+
+    let tipoInicio = parseInt(
+      await ask("Inicio: 1. Desde el primer horario disponible, 2. Después de la anterior: ")
+    );
+
+    actividades.push({ nombre, duracion: durTotal, duracionDiaria: durDia, tipoInicio });
+    duracionesDiarias.push(durDia);
+  }
+
+  // Bloques no accesibles
+  let numBloques = parseInt(await ask("Ingrese el numero de bloques no accesibles: "));
+  let bloques = [];
+  for (let i = 0; i < numBloques; i++) {
+    let dia = parseInt(await ask(`Ingrese el dia (1=Lunes, 7=Domingo): `)) - 1;
+
+    let bloqueTiempo;
+    while (true) {
+      bloqueTiempo = await ask(`Ingrese la hora inicio-fin del bloque ${i + 1} (HH:MM - HH:MM): `);
+      if (!bloqueTiempo.includes("-")) {
+        console.log("Formato incorrecto. Intente de nuevo.");
+        continue;
+      }
+      let [startStr, endStr] = bloqueTiempo.split("-").map(trim);
+      let inicio = convertirHoraAMinutos(startStr);
+      let fin = convertirHoraAMinutos(endStr);
+      if (fin <= inicio) {
+        console.log("Fin debe ser después del inicio.");
+      } else {
+        bloques.push({ dia, inicio, fin });
+        break;
+      }
+    }
+  }
+
+  // Calcular intervalo
+  let todasDuraciones = [...duracionesDiarias, ...bloques.map(b => b.fin - b.inicio)];
+  let intervalMinutes = calcularMCDVector(todasDuraciones);
+
+  // Numero de filas
+  let numRows = Math.floor((totalMinutes + intervalMinutes - 1) / intervalMinutes) + 1;
+
+  // Dia inicio
+  let diaInicio = parseInt(await ask("Ingrese el dia de inicio (1=Lunes,7=Domingo): ")) - 1;
+
+  // Matriz
+  let matrix = Array.from({ length: numRows }, () => Array(cols).fill(""));
+
+  matrix[0][0] = "Inicio";
+  matrix[0][1] = "Final";
+  for (let j = 2; j < cols; j++) {
+    matrix[0][j] = daysOfWeek[(diaInicio + (j - 2)) % daysOfWeek.length];
+  }
+
+  // Fill horas
+  let curH = Math.floor(startTime / 60);
+  let curM = startTime % 60;
+  for (let i = 1; i < numRows; i++) {
+    let startStr = `${String(curH).padStart(2, "0")}:${String(curM).padStart(2, "0")}`;
+    let endMin = curM + intervalMinutes;
+    let endH = curH;
+    if (endMin >= 60) {
+      endMin -= 60;
+      endH++;
+    }
+    let endStr = `${String(endH % 24).padStart(2, "0")}:${String(endMin).padStart(2, "0")}`;
+    matrix[i][0] = startStr;
+    matrix[i][1] = endStr;
+
+    curH = endH % 24;
+    curM = endMin;
+    if (endH * 60 + endMin >= endTime) break;
+  }
+
+  // Rellenar N/A en bloques
+  for (let i = 1; i < numRows; i++) {
+    for (let j = 2; j < cols; j++) {
+      let dia = (j - 2 + diaInicio) % 7;
+      let currentTime = startTime + (i - 1) * intervalMinutes;
+      for (let b of bloques) {
+        if (b.dia === dia && esHoraNoAccesible(currentTime, b)) {
+          matrix[i][j] = "N/A";
+        }
+      }
+    }
+  }
+
+  // Rellenar espacios vacíos
+  for (let i = 1; i < numRows; i++) {
+    for (let j = 2; j < cols; j++) {
+      if (matrix[i][j] === "") matrix[i][j] = " ";
+    }
+  }
+
+  // Asignar actividades
+  let ultimaColumnaOcupada = 2;
+  for (let act of actividades) {
+    let duracionRestante = act.duracion;
+    let diasContados = 0;
+    let startCol = act.tipoInicio === 2 ? ultimaColumnaOcupada + 1 : 2;
+
+    for (let col = startCol; col < cols && diasContados < cols - 2; col++) {
+      let dia = (col - 2 + diaInicio) % 7;
+      let minutosHoy = 0;
+      let asignada = false;
+
+      for (let row = 1; row < numRows && minutosHoy < act.duracionDiaria; row++) {
+        if (matrix[row][col] === " " && duracionRestante > 0) {
+          let currentTime = startTime + (row - 1) * intervalMinutes;
+          let noAccesible = bloques.some(b => b.dia === dia && esHoraNoAccesible(currentTime, b));
+          if (!noAccesible) {
+            let minutosDisponibles = Math.min(act.duracionDiaria - minutosHoy, intervalMinutes);
+            matrix[row][col] = act.nombre;
+            minutosHoy += minutosDisponibles;
+            duracionRestante -= minutosDisponibles;
+            asignada = true;
+            if (duracionRestante <= 0) break;
+          }
+        }
+      }
+      if (asignada) {
+        diasContados++;
+        ultimaColumnaOcupada = col;
+      }
+      if (duracionRestante <= 0) break;
+    }
+
+    if (duracionRestante > 0) {
+      console.log(`No se pudo completar la actividad: ${act.nombre}`);
+    }
+  }
+
+  // Imprimir matriz
+  console.log("Matriz resultante:");
+  for (let row of matrix) {
+    console.log(row.map(x => x.padEnd(CELL_WIDTH)).join(""));
+  }
+
+  // Exportar CSV
+  let exportar = (await ask("Desea exportar a CSV? (S/N): ")).toLowerCase();
+  if (exportar === "s") {
+    let csv = matrix.map(r => r.join(",")).join("\n");
+    fs.writeFileSync("horarios.csv", csv);
+    console.log("Matriz exportada exitosamente a horarios.csv");
+  }
+
+  rl.close();
+}
+
+main();
