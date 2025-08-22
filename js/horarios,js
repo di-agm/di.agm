@@ -1,48 +1,67 @@
-function trim(str) { return str.trim(); }
-function convertirHoraAMinutos(hora) {
-  const [h, m] = hora.split(":").map(Number);
-  return h * 60 + m;
+// Utilidades
 }
-function evaluateExpression(expr) {
-  try { return Function('return ' + expr)(); } catch { return 0; }
 }
-function calcularMCD(a, b) { return b ? calcularMCD(b, a % b) : a; }
-function calcularMCDArr(arr) {
-  return arr.reduce((acc, val) => calcularMCD(acc, val), arr[0] || 1);
+
+
+// Render tabla
+renderTable(matrix);
+byId('resultadoSec').classList.remove('hidden');
+byId('exportar').disabled = false;
+byId('status').innerHTML = `<span class="pill ok">✓ Generado</span> Intervalo: <strong>${intervalMinutes}</strong> min · Filas: ${numRows} · Columnas: ${cols}`;
+
+
+// Exportar CSV
+byId('exportar').onclick = ()=> downloadCSV(matrix, 'horarios.csv');
+
+
+} catch (err){
+byId('status').innerHTML = `<span class="pill err">✗ Error</span> ${err.message}`;
+console.error(err);
 }
-function generateSchedule() {
-  const daysCount = 7;
-  const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
-  const cols = evaluateExpression(document.getElementById('daysExpr').value) + 2;
-  const [startStr, endStr] = document.getElementById('timeRange').value.split('-').map(trim);
-  const startTime = convertirHoraAMinutos(startStr);
-  const endTime = convertirHoraAMinutos(endStr);
-  const totalMinutes = endTime - startTime;
-  const intervalMinutes = 60; // Simplified example
-  const numRows = Math.ceil(totalMinutes / intervalMinutes) + 1;
-  let matrix = Array.from({length: numRows}, () => Array(cols).fill(" "));
-  matrix[0][0] = "Inicio";
-  matrix[0][1] = "Final";
-  for (let j = 2; j < cols; j++) matrix[0][j] = daysOfWeek[(j - 2) % daysCount];
-  let currentTime = startTime;
-  for (let i = 1; i < numRows; i++) {
-    let nextTime = currentTime + intervalMinutes;
-    matrix[i][0] = toHHMM(currentTime);
-    matrix[i][1] = toHHMM(nextTime);
-    currentTime = nextTime;
-  }
-  renderTable(matrix);
+};
+
+
+function renderTable(matrix){
+const table = byId('tabla');
+table.innerHTML = '';
+const thead = document.createElement('thead');
+const trh = document.createElement('tr');
+matrix[0].forEach((h,idx)=>{
+const th = document.createElement('th');
+th.textContent = h || '';
+th.style.minWidth = idx<2? '120px' : `${CELL_WIDTH_CH}ch`;
+trh.appendChild(th);
+});
+thead.appendChild(trh);
+table.appendChild(thead);
+
+
+const tbody = document.createElement('tbody');
+for (let r=1;r<matrix.length;r++){
+const tr = document.createElement('tr');
+for (let c=0;c<matrix[r].length;c++){
+const td = document.createElement('td');
+const val = matrix[r][c];
+td.textContent = val;
+if (c>=2){
+if (val === 'N/A') td.className = 'na';
+else if (val === ' ') td.className = 'cell-empty';
+else td.className = 'activity';
 }
-function toHHMM(minutes) {
-  let h = Math.floor(minutes / 60) % 24;
-  let m = minutes % 60;
-  return String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0');
+tr.appendChild(td);
 }
-function renderTable(matrix) {
-  let html = '<table>';
-  matrix.forEach(row => {
-    html += '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
-  });
-  html += '</table>';
-  document.getElementById('output').innerHTML = html;
+tbody.appendChild(tr);
+}
+table.appendChild(tbody);
+}
+
+
+function downloadCSV(matrix, filename){
+const escape = (s)=>('"'+String(s).replaceAll('"','""')+'"');
+const csv = matrix.map(row=>row.map(escape).join(',')).join('\n');
+const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url; a.download = filename; a.click();
+setTimeout(()=>URL.revokeObjectURL(url), 2000);
 }
