@@ -263,27 +263,27 @@
 
 <div class="tt" style="display:none;">
   <h1>Generador de Cronogramas</h1>
-    <div>
-        <input type="text" id="task" placeholder="Tarea">
-        <input type="date" id="startDate">
-        <input type="date" id="endDate">
-        <button onclick="addTask()">Agregar Tarea</button>
-    </div>
-    
-    <table id="scheduleTable">
-        <thead>
-            <tr>
-                <th>Tarea</th>
-                <th>Fecha Inicio</th>
-                <th>Fecha Fin</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    
-    <button onclick="downloadCSV()">Descargar CSV</button>
-    <button onclick="downloadPDF()">Descargar PDF</button>
+
+  <div>
+      <input type="text" id="task" placeholder="Tarea">
+      <input type="date" id="startDate">
+      <input type="date" id="endDate">
+      <button onclick="addTask()">Agregar Tarea</button>
+  </div>
+
+  <table id="scheduleTable">
+      <thead>
+          <tr>
+              <th>Tarea</th>
+              <th>Fecha Inicio</th>
+              <th>Fecha Fin</th>
+          </tr>
+      </thead>
+      <tbody></tbody>
+  </table>
+
+  <button onclick="downloadCSV()">Descargar CSV</button>
+  <button onclick="downloadPDF()">Descargar PDF</button>
  
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
