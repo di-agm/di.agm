@@ -1,4 +1,3 @@
-// Guardar tareas
 let tasks = [];
 
 function addTask() {
@@ -41,7 +40,6 @@ function downloadCSV() {
     link.click();
 }
 
-// Descargar PDF usando jsPDF
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
