@@ -184,7 +184,7 @@
       const element = document.createElement('div');
       element.className = 'text-element';
       element.contentEditable = true;
-    element.setAttribute('tabindex', '0');
+      element.setAttribute('tabindex', '0');
       
       // Position in the center of the page
       element.style.top = '50px';
@@ -216,7 +216,10 @@
           element.contentEditable = false;
           break;
       }
-      
+        
+      element.style.resize = 'both';
+      element.style.overflow = 'auto';
+
       pageContent.appendChild(element);
       
       // Select the newly added element
@@ -304,10 +307,9 @@
           // Could trigger your drag logic directly
           alert('Move mode - drag the element');
         }
-        else if (action === 'scale') {
-          selectedElement.style.transform = 'scale(1.2)'; // example
-          // You could instead enable resize handles
-        }
+        //else if (action === 'scale') {
+          //selectedElement.style.transform = 'scale(1.2)'; // example
+          // You could instead enable resize handles}
         else if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
@@ -585,12 +587,7 @@ document.addEventListener('click', (e) => {
         document.addEventListener('mouseup', onMouseUp);
     }
     
-    // Scale mode (simple browser resize)
-    document.getElementById('btnScale').addEventListener('click', () => {
-      if (!selectedElement) return;
-      selectedElement.style.resize = 'both';
-      selectedElement.style.overflow = 'auto';
-    });
+    // Scale mode (simple browser resize) document.getElementById('btnScale').addEventListener('click', () => {if (!selectedElement) return;selectedElement.style.resize = 'both';selectedElement.style.overflow = 'auto';});
     
     document.getElementById('btnDelete').addEventListener('click', () => {
       if (selectedElement) {
