@@ -257,39 +257,34 @@
       if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
 
     function makeElementDraggable(el) {
-      let offsetX = 0, offsetY = 0, isDragging = false;
-    
-      el.addEventListener('mousedown', (e) => {
-        // Don’t drag if clicking on resizer handles or editing text
+        let offsetX = 0, offsetY = 0, isDragging = false;
+        
+        el.addEventListener('mousedown', (e) => {
+        // Only drag if not resizing or editing text
         if (e.target.classList.contains('resizer') || el.isContentEditable) return;
-    
+        
         isDragging = true;
-        // Calculate cursor position relative to element’s top-left corner
         offsetX = e.clientX - el.offsetLeft;
         offsetY = e.clientY - el.offsetTop;
-    
-        // Attach mousemove & mouseup to the document
+        
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
-      });
-    
-      function onMouseMove(e) {
+        });
+        
+        function onMouseMove(e) {
         if (!isDragging) return;
-        el.style.position = 'absolute'; // ensure it can move freely
         el.style.left = (e.clientX - offsetX) + 'px';
         el.style.top = (e.clientY - offsetY) + 'px';
-      }
-    
-      function onMouseUp() {
+        }
+        
+        function onMouseUp() {
         isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-      }
+        }
+        }
+        makeElementDraggable(selectedElement);
     }
-
-    clonedElements.forEach(element => {
-      makeElementDraggable(element);
-    });
 
     function deselectElement() {
       if (selectedElement) {
