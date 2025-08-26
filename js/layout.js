@@ -303,13 +303,28 @@
         if (!selectedElement) return;
         
         const action = btn.dataset.action;
+        //if (action === 'move') {alert('Move mode - drag the element');}
         if (action === 'move') {
-          // Could trigger your drag logic directly
-          alert('Move mode - drag the element');
+        let offsetX, offsetY;
+        
+        const onMouseMove = (e) => {
+            selectedElement.style.position = 'absolute';
+            selectedElement.style.left = `${e.clientX - offsetX}px`;
+            selectedElement.style.top = `${e.clientY - offsetY}px`;
+        };
+        
+        const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+        
+          offsetX = event.clientX - selectedElement.getBoundingClientRect().left;
+          offsetY = event.clientY - selectedElement.getBoundingClientRect().top;
+        
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
         }
-        //else if (action === 'scale') {
-          //selectedElement.style.transform = 'scale(1.2)'; // example
-          // You could instead enable resize handles}
+
         else if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
