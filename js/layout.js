@@ -189,7 +189,8 @@
       // Position in the center of the page
       element.style.top = '50px';
       element.style.left = '50px';
-      
+      element.style.position = 'absolute';
+
       switch(type) {
         case 'title':
           element.style.fontSize = '24px';
@@ -239,7 +240,7 @@
       const toolbar = document.getElementById('elementToolbar');
       const rect = element.getBoundingClientRect();
       const containerRect = document.body.getBoundingClientRect();
-      toolbar.style.left = `${rect.left - containerRect.left + rect.width/2 - 55}px`;
+      toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
       toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       toolbar.style.display = 'flex';
     
@@ -260,9 +261,9 @@
         let offsetX = 0, offsetY = 0, isDragging = false;
         
         el.addEventListener('mousedown', (e) => {
-        // Only drag if not resizing or editing text
-        if (e.target.classList.contains('resizer') || el.isContentEditable) return;
-        
+        // if (e.target.classList.contains('resizer') || el.isContentEditable) return;
+        if (e.target !== el) return;
+
         isDragging = true;
         offsetX = e.clientX - el.offsetLeft;
         offsetY = e.clientY - el.offsetTop;
