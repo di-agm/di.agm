@@ -645,13 +645,21 @@ document.addEventListener('click', (e) => {
     document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
     
     // Element editing handlers
-    document.getElementById('deleteElementBtn').addEventListener('click', () => {
-      if (selectedElement && selectedElement.parentNode) {
-        selectedElement.parentNode.removeChild(selectedElement);
-        deselectElement();
-      }
-    });
-    
+    //document.getElementById('deleteElementBtn').addEventListener('click', () => {
+      //if (selectedElement && selectedElement.parentNode) {
+        //selectedElement.parentNode.removeChild(selectedElement);
+        //deselectElement();}});
+
+    const deleteBtn = document.getElementById('deleteElementBtn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => {
+        if (selectedElement && selectedElement.parentNode) {
+          selectedElement.parentNode.removeChild(selectedElement);
+          deselectElement();
+        }
+      });
+    }
+
     // Color picker handlers
     const fontColorInput = document.getElementById('fontColorInput');
 
