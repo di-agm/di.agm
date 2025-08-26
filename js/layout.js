@@ -254,7 +254,7 @@
       if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
     
       const colorInput = document.getElementById('colorPickerInput');
-      if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+      if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
     function makeElementDraggable(el) {
         let offsetX = 0, offsetY = 0, isDragging = false;
@@ -282,9 +282,8 @@
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
         }
-        }
-        makeElementDraggable(selectedElement);
     }
+        //makeElementDraggable(selectedElement);
 
     function deselectElement() {
       if (selectedElement) {
@@ -495,6 +494,7 @@ document.addEventListener('click', (e) => {
           });
           
           pageContent.appendChild(element);
+            makeElementDraggable(element);
         });
         
         pages.push(newPage);
