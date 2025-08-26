@@ -4,6 +4,7 @@
     let selectedElement = null;
     let savedLayouts = [];
     let moveModeEnabled = false;
+    let offsetX = 0, offsetY = 0;
 
     function createPage(pageNumber) {
       const page = document.createElement('div');
@@ -298,7 +299,7 @@
       document.getElementById('elementToolbar').style.display = 'none';
     }
 
-    document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+    /*document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation(); // prevent click from deselecting element
         if (!selectedElement) return;
@@ -333,17 +334,51 @@
           }
         }
 
-          offsetX = e.clientX - selectedElement.getBoundingClientRect().left;
-          offsetY = e.clientY - selectedElement.getBoundingClientRect().top;
-        
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-
         else if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
         }
       });
+    });*/
+
+    document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+      btn.addEventListener('click', (toolbarEvent) => {
+        toolbarEvent.stopPropagation();
+        if (!selectedElement) return;
+    
+        const action = btn.dataset.action;
+    
+        if (action === 'move') {
+          moveModeEnabled = !moveModeEnabled;
+          btn.classList.toggle('active', moveModeEnabled);
+        } 
+        else if (action === 'delete') {
+          selectedElement.remove();
+          deselectElement();
+        }
+      });
+    });
+    
+    // Single global drag handler (doesn’t stack)
+    document.addEventListener('mousedown', (mouseEvent) => {
+      if (!moveModeEnabled || !selectedElement) return;
+    
+      offsetX = mouseEvent.clientX - selectedElement.getBoundingClientRect().left;
+      offsetY = mouseEvent.clientY - selectedElement.getBoundingClientRect().top;
+    
+      const onMouseMove = (moveEvent) => {
+        selectedElement.style.position = 'absolute';
+        selectedElement.style.left = `${moveEvent.clientX - offsetX}px`;
+        selectedElement.style.top = `${moveEvent.clientY - offsetY}px`;
+      };
+    
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+    
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
     });
 
 document.addEventListener('click', (e) => {
