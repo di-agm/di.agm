@@ -3,9 +3,7 @@
     let isPortrait = true;
     let selectedElement = null;
     let savedLayouts = [];
-    let moveModeEnabled = false;
-    let offsetX = 0, offsetY = 0;
-
+    
     function createPage(pageNumber) {
       const page = document.createElement('div');
       page.className = 'rect';
@@ -262,28 +260,28 @@
         let offsetX = 0, offsetY = 0, isDragging = false;
         
         el.addEventListener('mousedown', (e) => {
-            if (!moveModeEnabled) return; // Only drag if move mode is on
-            if (e.target.classList.contains('resizer')/* || el.isContentEditable)*/ return;
-            
-            isDragging = true;
-            offsetX = e.clientX - el.offsetLeft;
-            offsetY = e.clientY - el.offsetTop;
-            
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
+        // Only drag if not resizing or editing text
+        if (e.target.classList.contains('resizer') || el.isContentEditable) return;
+        
+        isDragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
         });
         
         function onMouseMove(e) {
-            if (!isDragging) return;
-            el.style.position = 'absolute';
-            el.style.left = (e.clientX - offsetX) + 'px';
-            el.style.top = (e.clientY - offsetY) + 'px';
+        if (!isDragging) return;
+        el.style.left = (e.clientX - offsetX) + 'px';
+        el.style.top = (e.clientY - offsetY) + 'px';
         }
-    
+        
         function onMouseUp() {
-            isDragging = false;
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        }
         }
         makeElementDraggable(selectedElement);
     }
@@ -299,39 +297,32 @@
       document.getElementById('elementToolbar').style.display = 'none';
     }
 
-    /*document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+    document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation(); // prevent click from deselecting element
         if (!selectedElement) return;
         
         const action = btn.dataset.action;
+        //if (action === 'move') {alert('Move mode - drag the element');}
         if (action === 'move') {
-          moveModeEnabled = !moveModeEnabled;
-          btn.classList.toggle('active', moveModeEnabled);
+        let offsetX, offsetY;
         
-          if (moveModeEnabled) {
-            let offsetX = 0, offsetY = 0;
+        const onMouseMove = (e) => {
+            selectedElement.style.position = 'absolute';
+            selectedElement.style.left = `${e.clientX - offsetX}px`;
+            selectedElement.style.top = `${e.clientY - offsetY}px`;
+        };
         
-            const onMouseMove = (e) => {
-              selectedElement.style.position = 'absolute';
-              selectedElement.style.left = `${e.clientX - offsetX}px`;
-              selectedElement.style.top = `${e.clientY - offsetY}px`;
-            };
+        const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
         
-            const onMouseUp = () => {
-              document.removeEventListener('mousemove', onMouseMove);
-              document.removeEventListener('mouseup', onMouseUp);
-            };
+          offsetX = event.clientX - selectedElement.getBoundingClientRect().left;
+          offsetY = event.clientY - selectedElement.getBoundingClientRect().top;
         
-            document.addEventListener('mousedown', (e) => {
-              if (!moveModeEnabled || !selectedElement) return;
-              offsetX = e.clientX - selectedElement.getBoundingClientRect().left;
-              offsetY = e.clientY - selectedElement.getBoundingClientRect().top;
-        
-              document.addEventListener('mousemove', onMouseMove);
-              document.addEventListener('mouseup', onMouseUp);
-            });
-          }
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
         }
 
         else if (action === 'delete') {
@@ -339,46 +330,6 @@
           deselectElement();
         }
       });
-    });*/
-
-    document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
-      btn.addEventListener('click', (toolbarEvent) => {
-        toolbarEvent.stopPropagation();
-        if (!selectedElement) return;
-    
-        const action = btn.dataset.action;
-    
-        if (action === 'move') {
-          moveModeEnabled = !moveModeEnabled;
-          btn.classList.toggle('active', moveModeEnabled);
-        } 
-        else if (action === 'delete') {
-          selectedElement.remove();
-          deselectElement();
-        }
-      });
-    });
-    
-    // Single global drag handler (doesn’t stack)
-    document.addEventListener('mousedown', (mouseEvent) => {
-      if (!moveModeEnabled || !selectedElement) return;
-    
-      offsetX = mouseEvent.clientX - selectedElement.getBoundingClientRect().left;
-      offsetY = mouseEvent.clientY - selectedElement.getBoundingClientRect().top;
-    
-      const onMouseMove = (moveEvent) => {
-        selectedElement.style.position = 'absolute';
-        selectedElement.style.left = `${moveEvent.clientX - offsetX}px`;
-        selectedElement.style.top = `${moveEvent.clientY - offsetY}px`;
-      };
-    
-      const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      };
-    
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
     });
 
 document.addEventListener('click', (e) => {
