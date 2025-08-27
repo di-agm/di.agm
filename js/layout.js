@@ -331,15 +331,7 @@
         
         const action = btn.dataset.action;
         if (action === 'move') {
-          moveMode = !moveMode;
-          /*if (moveMode) {
-            selectedElement.contentEditable = false;
-            makeElementDraggable(selectedElement);
-            btn.classList.add("active");
-          } else {
-            selectedElement.contentEditable = true;
-            btn.classList.remove("active");
-          }*/
+          moveMode = !moveMode
          if (moveMode) {
             selectedElement.contentEditable = false;
             selectedElement.style.cursor = "move";   // visual feedback
