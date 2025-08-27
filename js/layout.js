@@ -262,8 +262,10 @@
       let offsetX = 0, offsetY = 0, isDragging = false;
     
       el.addEventListener('mousedown', (e) => {
-        if (!moveMode) return; // only drag in move mode
+        // only drag in move mode + only if clicked on the element box (not children text nodes)
+        if (!moveMode || e.target !== el) return;
     
+        e.preventDefault(); // prevent text selection
         isDragging = true;
     
         const rect = el.getBoundingClientRect();
@@ -280,9 +282,16 @@
         const container = el.parentElement; // the .page-content
         const containerRect = container.getBoundingClientRect();
     
-        // ✅ cursor position adjusted to container coordinates
-        el.style.left = (e.clientX - containerRect.left - offsetX) + 'px';
-        el.style.top = (e.clientY - containerRect.top - offsetY) + 'px';
+        // keep element inside container boundaries
+        let newLeft = e.clientX - containerRect.left - offsetX;
+        let newTop = e.clientY - containerRect.top - offsetY;
+    
+        // clamp
+        newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
+    
+        el.style.left = newLeft + 'px';
+        el.style.top = newTop + 'px';
       }
     
       function onMouseUp() {
