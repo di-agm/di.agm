@@ -3,7 +3,8 @@
     let isPortrait = true;
     let selectedElement = null;
     let savedLayouts = [];
-    
+    let moveMode = false;
+
     function createPage(pageNumber) {
       const page = document.createElement('div');
       page.className = 'rect';
@@ -257,7 +258,7 @@
       const colorInput = document.getElementById('colorPickerInput');
       if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
- function makeElementDraggable(el) {
+ /*function makeElementDraggable(el) {
         let offsetX = 0, offsetY = 0, isDragging = false;
         
         el.addEventListener('mousedown', (e) => {
@@ -283,6 +284,33 @@
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
         }
+    }*/
+
+    function makeElementDraggable(el) {
+      let offsetX = 0, offsetY = 0, isDragging = false;
+    
+      el.addEventListener('mousedown', (e) => {
+        if (!moveMode) return; // only drag in move mode
+    
+        isDragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+    
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+    
+      function onMouseMove(e) {
+        if (!isDragging) return;
+        el.style.left = (e.clientX - offsetX) + 'px';
+        el.style.top = (e.clientY - offsetY) + 'px';
+      }
+    
+      function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
     }
 
     function deselectElement() {
@@ -302,27 +330,19 @@
         if (!selectedElement) return;
         
         const action = btn.dataset.action;
-        //if (action === 'move') {alert('Move mode - drag the element');}
         if (action === 'move') {
-        let offsetX, offsetY;
+          moveMode = !moveMode; // toggle state
         
-        const onMouseMove = (e) => {
-            selectedElement.style.position = 'absolute';
-            selectedElement.style.left = `${e.clientX - offsetX}px`;
-            selectedElement.style.top = `${e.clientY - offsetY}px`;
-        };
-        
-        const onMouseUp = () => {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        };
-        
-          offsetX = event.clientX - selectedElement.getBoundingClientRect().left;
-          offsetY = event.clientY - selectedElement.getBoundingClientRect().top;
-        
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-        }
+          if (moveMode) {
+            // disable typing, enable dragging
+            selectedElement.contentEditable = false;
+            makeElementDraggable(selectedElement);
+            btn.classList.add("active"); // optional visual highlight
+          } else {
+            // back to typing mode
+            selectedElement.contentEditable = true;
+            btn.classList.remove("active");
+          }
 
         else if (action === 'delete') {
           selectedElement.remove();
