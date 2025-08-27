@@ -259,27 +259,49 @@
 
 <div class="tt" style="display:none;">
   <h1>Generador de Cronogramas</h1>
-
-  <div>
-      <input type="text" id="task" placeholder="Tarea">
-      <input type="date" id="startDate">
-      <input type="date" id="endDate">
-      <button onclick="addTask()">Agregar Tarea</button>
-  </div>
-
-  <table id="scheduleTable">
-      <thead>
-          <tr>
-              <th>Tarea</th>
-              <th>Fecha Inicio</th>
-              <th>Fecha Fin</th>
-          </tr>
-      </thead>
-      <tbody></tbody>
-  </table>
-
-  <button onclick="downloadCSV()">Descargar CSV</button>
-  <button onclick="downloadPDF()">Descargar PDF</button>
+        <div class="form-group">
+            <label for="numDays">Número de días:</label>
+            <input type="text" id="numDays" placeholder="Ej: 7 o 5+2">
+        </div>
+        
+        <div class="form-group">
+            <label for="timeRange">Hora de inicio y fin (HH:MM - HH:MM):</label>
+            <input type="text" id="timeRange" placeholder="Ej: 08:00 - 18:00">
+        </div>
+        
+        <div class="form-group">
+            <label for="startDay">Día de inicio (1=Lunes, 7=Domingo):</label>
+            <select id="startDay">
+                <option value="1">Lunes</option>
+                <option value="2">Martes</option>
+                <option value="3">Miércoles</option>
+                <option value="4">Jueves</option>
+                <option value="5">Viernes</option>
+                <option value="6">Sábado</option>
+                <option value="7">Domingo</option>
+            </select>
+        </div>
+        
+        <!-- Actividades -->
+        <h3>Actividades</h3>
+        <div id="activitiesContainer"></div>
+        <button type="button" class="add-btn" onclick="addActivity()">Agregar Actividad</button>
+        
+        <!-- Bloques no accesibles -->
+        <h3>Bloques No Accesibles</h3>
+        <div id="blocksContainer"></div>
+        <button type="button" class="add-btn" onclick="addBlock()">Agregar Bloque</button>
+        
+        <!-- Botón generar -->
+        <button type="button" onclick="generateSchedule()">Generar Horario</button>
+    </div>
+    
+    <!-- Resultado -->
+    <div class="container" id="scheduleResult">
+        <h2>Horario Generado</h2>
+        <div id="scheduleTable"></div>
+        <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
+    </div>
  
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
