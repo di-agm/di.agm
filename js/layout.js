@@ -678,13 +678,7 @@ document.addEventListener('click', (e) => {
     document.getElementById('addSubtitleBtn').addEventListener('click', () => addTextElement('subtitle'));
     document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
     document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
-    
-    // Element editing handlers
-    //document.getElementById('deleteElementBtn').addEventListener('click', () => {
-      //if (selectedElement && selectedElement.parentNode) {
-        //selectedElement.parentNode.removeChild(selectedElement);
-        //deselectElement();}});
-
+   
     const deleteBtn = document.getElementById('deleteElementBtn');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {
