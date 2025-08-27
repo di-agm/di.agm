@@ -223,7 +223,7 @@
       element.style.overflow = 'auto';
 
       pageContent.appendChild(element);
-      
+      makeElementDraggable(element);
       // Select the newly added element
       selectElement(element);
     }
@@ -331,24 +331,22 @@
         
         const action = btn.dataset.action;
         if (action === 'move') {
-          moveMode = !moveMode; // toggle state
+          moveMode = !moveMode;
         
           if (moveMode) {
-            // disable typing, enable dragging
             selectedElement.contentEditable = false;
             makeElementDraggable(selectedElement);
-            btn.classList.add("active"); // optional visual highlight
+            btn.classList.add("active");
           } else {
-            // back to typing mode
             selectedElement.contentEditable = true;
             btn.classList.remove("active");
           }
-
-        else if (action === 'delete') {
+        
+        } else if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
         }
-      });
+     });
     });
 
 document.addEventListener('click', (e) => {
@@ -600,30 +598,6 @@ document.addEventListener('click', (e) => {
       }
     });
 
-    // --- Move logic ---
-    function enableMove() {
-        if (!selectedElement) return;
-        selectedElement.style.position = 'absolute';
-        
-        function onMouseMove(e) {
-            const parent = selectedElement.parentElement;
-            const parentRect = parent.getBoundingClientRect();
-            // Align cursor center with element center
-            selectedElement.style.left = (e.clientX - parentRect.left - selectedElement.offsetWidth / 2) + 'px';
-            selectedElement.style.top = (e.clientY - parentRect.top - selectedElement.offsetHeight / 2) + 'px';
-        }
-        
-        function onMouseUp() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-        
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    }
-    
-    // Scale mode (simple browser resize) document.getElementById('btnScale').addEventListener('click', () => {if (!selectedElement) return;selectedElement.style.resize = 'both';selectedElement.style.overflow = 'auto';});
-    
     document.getElementById('btnDelete').addEventListener('click', () => {
       if (selectedElement) {
         selectedElement.remove();
