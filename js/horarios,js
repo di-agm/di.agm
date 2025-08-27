@@ -48,13 +48,14 @@ function trim(str) {
     return str.trim();
 }
 
-// Funciones para agregar actividades y bloques
 function addActivity() {
     const container = document.getElementById('activitiesContainer');
     const activityIndex = activities.length;
     
     const activityDiv = document.createElement('div');
     activityDiv.className = 'activity-item';
+    activityDiv.id = `activity-${activityIndex}`;  // <--- unique id
+    
     activityDiv.innerHTML = `
         <div class="inline-group">
             <div>
@@ -88,7 +89,8 @@ function addActivity() {
 
 function removeActivity(index) {
     activities = activities.filter(activity => activity.index !== index);
-    document.querySelector(`#activitiesContainer .activity-item:nth-child(${index + 1})`).remove();
+    const elem = document.getElementById(`activity-${index}`);
+    if (elem) elem.remove();
 }
 
 function addBlock() {
