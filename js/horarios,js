@@ -400,3 +400,8 @@ document.addEventListener('DOMContentLoaded', function() {
     addActivity();
     addBlock();
 });
+
+window.addActivity = addActivity;
+window.addBlock = addBlock;
+window.generateSchedule = generateSchedule;
+window.exportToCSV = exportToCSV;
