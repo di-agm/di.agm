@@ -265,8 +265,10 @@
         if (!moveMode) return; // only drag in move mode
     
         isDragging = true;
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
+    
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
     
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
@@ -274,8 +276,13 @@
     
       function onMouseMove(e) {
         if (!isDragging) return;
-        el.style.left = (e.clientX - offsetX) + 'px';
-        el.style.top = (e.clientY - offsetY) + 'px';
+    
+        const container = el.parentElement; // the .page-content
+        const containerRect = container.getBoundingClientRect();
+    
+        // ✅ cursor position adjusted to container coordinates
+        el.style.left = (e.clientX - containerRect.left - offsetX) + 'px';
+        el.style.top = (e.clientY - containerRect.top - offsetY) + 'px';
       }
     
       function onMouseUp() {
