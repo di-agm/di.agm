@@ -6,7 +6,8 @@ function showSectionFromHash() {
         const section = document.getElementById(id);
         if (section) {
             section.style.display = (id === hash) ? "block" : "none";
-        }
+            console.log("Showing section:", hash);
+       }
     });
 
     if (typeof updateTranslations === "function") {
