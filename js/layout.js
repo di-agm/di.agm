@@ -332,16 +332,23 @@
         const action = btn.dataset.action;
         if (action === 'move') {
           moveMode = !moveMode;
-        
-          if (moveMode) {
+          /*if (moveMode) {
             selectedElement.contentEditable = false;
             makeElementDraggable(selectedElement);
             btn.classList.add("active");
           } else {
             selectedElement.contentEditable = true;
             btn.classList.remove("active");
+          }*/
+         if (moveMode) {
+            selectedElement.contentEditable = false;
+            selectedElement.style.cursor = "move";   // visual feedback
+            btn.classList.add("active");
+          } else {
+            selectedElement.contentEditable = true;
+            selectedElement.style.cursor = "text";   // back to typing
+            btn.classList.remove("active");
           }
-        
         } else if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
