@@ -258,32 +258,48 @@
       const colorInput = document.getElementById('colorPickerInput');
       if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
-    function makeDraggable(el) {
+    function makeElementDraggable(el) {
       let offsetX = 0, offsetY = 0, isDragging = false;
-
-      el.addEventListener("mousedown", (e) => {
+    
+      el.addEventListener('mousedown', (e) => {
+        // only drag in move mode + only if clicked on the element box (not children text nodes)
+        if (!moveMode/* || e.target !== el*/) return;
+    
+        e.preventDefault(); // prevent text selection
         isDragging = true;
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
+    
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+    
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
       });
-
+    
       function onMouseMove(e) {
         if (!isDragging) return;
-        el.style.left = (e.clientX - offsetX) + "px";
-        el.style.top = (e.clientY - offsetY) + "px";
+    
+        const container = el.parentElement; // the .page-content
+        const containerRect = container.getBoundingClientRect();
+    
+        // keep element inside container boundaries
+        let newLeft = e.clientX - containerRect.left - offsetX;
+        let newTop = e.clientY - containerRect.top - offsetY;
+    
+        // clamp
+        newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
+    
+        el.style.left = newLeft + 'px';
+        el.style.top = newTop + 'px';
       }
-
+    
       function onMouseUp() {
         isDragging = false;
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
       }
     }
-
-    // make all .draggable elements movable
-    document.querySelectorAll(".draggable").forEach(makeDraggable);
 
     function deselectElement() {
       if (selectedElement) {
