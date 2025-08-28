@@ -263,7 +263,7 @@
     
       el.addEventListener('mousedown', (e) => {
         // only drag in move mode + only if clicked on the element box (not children text nodes)
-        if (!moveMode || e.target !== el) return;
+        if (!moveMode/* || e.target !== el*/) return;
     
         e.preventDefault(); // prevent text selection
         isDragging = true;
