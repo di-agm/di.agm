@@ -327,6 +327,23 @@ button:hover {
   font-size: 16px;
 }
 
+.draggable {
+      width: 150px;
+      height: 100px;
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute; /* required for movement */
+      top: 100px;
+      left: 100px;
+      cursor: move;
+      user-select: none; /* prevents accidental text selection */
+      border-radius: 8px;
+    }
+
 .modal {
   display: none;
   position: fixed;
