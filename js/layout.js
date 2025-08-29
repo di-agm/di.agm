@@ -228,7 +228,7 @@
       selectElement(element);
     }
     
-    /*function selectElement(element) {
+    function selectElement(element) {
       if (selectedElement) {
         //selectedElement.classList.remove('selected');
         return;
@@ -311,50 +311,7 @@
       }
       
       document.getElementById('elementToolbar').style.display = 'none';
-    }*/
-
-    function selectElement(el) {
-      // if the same element is already selected, do nothing
-      if (selectedElement === el) return;
-    
-      selectedElement = el;
-    
-      // show the editor
-      document.getElementById("elementEditor").style.display = "block";
-      document.getElementById("noElementSelected").style.display = "none";
-    
-      // optional: highlight selected element
-      clearSelectionHighlight();
-      el.classList.add("selected-element");
     }
-    
-    function deselectElement() {
-      selectedElement = null;
-    
-      // hide the editor, show the "no element selected" text
-      document.getElementById("elementEditor").style.display = "none";
-      document.getElementById("noElementSelected").style.display = "block";
-    
-      clearSelectionHighlight();
-    }
-    
-    function clearSelectionHighlight() {
-      document.querySelectorAll(".draggable").forEach(el => {
-        el.classList.remove("selected-element");
-      });
-    }
-    
-    // Apply selection when clicking draggable elements
-    document.addEventListener("click", (e) => {
-      const draggable = e.target.closest(".draggable");
-    
-      if (draggable) {
-        selectElement(draggable);
-      } else if (!e.target.closest("#elementEditor")) {
-        // clicked outside element and editor → deselect
-        deselectElement();
-      }
-    });
 
     document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
