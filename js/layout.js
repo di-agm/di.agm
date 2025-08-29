@@ -258,12 +258,12 @@
       const colorInput = document.getElementById('colorPickerInput');
       if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
-    function makeElementDraggable(el, moveModeRef) {
+    function makeElementDraggable(el) {
       let offsetX = 0, offsetY = 0, isDragging = false;
     
-      el.addEventListener("mousedown", (e) => {
-        // require moveMode if a reference/flag is provided
-        if (typeof moveModeRef !== "undefined" && !moveModeRef.value) return;
+      el.addEventListener('mousedown', (e) => {
+        // only drag in move mode + only if clicked on the element box (not children text nodes)
+        if (!moveMode/* || e.target !== el*/) return;
     
         e.preventDefault(); // prevent text selection
         isDragging = true;
@@ -272,48 +272,34 @@
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
     
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
       });
     
       function onMouseMove(e) {
         if (!isDragging) return;
     
-        const container = el.parentElement;
+        const container = el.parentElement; // the .page-content
         const containerRect = container.getBoundingClientRect();
     
-        // calculate new position relative to container
+        // keep element inside container boundaries
         let newLeft = e.clientX - containerRect.left - offsetX;
         let newTop = e.clientY - containerRect.top - offsetY;
     
-        // clamp to container
+        // clamp
         newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
         newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
     
-        el.style.left = newLeft + "px";
-        el.style.top = newTop + "px";
-        el.style.position = "absolute"; // ensure it's positioned
+        el.style.left = newLeft + 'px';
+        el.style.top = newTop + 'px';
       }
     
       function onMouseUp() {
         isDragging = false;
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
       }
     }
-
-    // Example moveMode toggle
-    let moveMode = { value: true }; // wrapped in object so it's pass-by-reference
-    
-    // Attach to all draggable elements
-    document.querySelectorAll(".draggable").forEach(el => {
-      makeElementDraggable(el, moveMode);
-    });
-    
-    // Toggle mode somewhere else in your code
-    document.getElementById("toggleBtn").onclick = () => {
-      moveMode.value = !moveMode.value;
-    };
 
     function deselectElement() {
       if (selectedElement) {
