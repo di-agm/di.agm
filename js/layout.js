@@ -3,7 +3,7 @@
     let isPortrait = true;
     let selectedElement = null;
     let savedLayouts = [];
-    let moveMode = false;
+    let moveMode = { value: false };
 
     function createPage(pageNumber) {
       const page = document.createElement('div');
@@ -262,10 +262,9 @@
       let offsetX = 0, offsetY = 0, isDragging = false;
     
       el.addEventListener("mousedown", (e) => {
-        // require moveMode if a reference/flag is provided
-        if (typeof moveModeRef !== "undefined" && !moveModeRef.value) return;
+        if (!moveModeRef.value) return; // only allow dragging if moveMode is ON
     
-        e.preventDefault(); // prevent text selection
+        e.preventDefault();
         isDragging = true;
     
         const rect = el.getBoundingClientRect();
@@ -282,17 +281,15 @@
         const container = el.parentElement;
         const containerRect = container.getBoundingClientRect();
     
-        // calculate new position relative to container
         let newLeft = e.clientX - containerRect.left - offsetX;
         let newTop = e.clientY - containerRect.top - offsetY;
     
-        // clamp to container
         newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
         newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
     
         el.style.left = newLeft + "px";
         el.style.top = newTop + "px";
-        el.style.position = "absolute"; // ensure it's positioned
+        el.style.position = "absolute";
       }
     
       function onMouseUp() {
@@ -302,8 +299,18 @@
       }
     }
 
-    // Example moveMode toggle
-    let moveMode = { value: true }; // wrapped in object so it's pass-by-reference
+    document.getElementById("btnMove").addEventListener("click", () => {
+      moveMode.value = !moveMode.value;
+    
+      // optional: visual feedback (highlight button when active)
+      document.getElementById("btnMove").classList.toggle("active", moveMode.value);
+      console.log("Move mode:", moveMode.value);
+    });
+    
+    // Example: make all .draggable elements movable
+    document.querySelectorAll(".draggable").forEach(el => {
+      makeElementDraggable(el, moveMode);
+    });
     
     // Attach to all draggable elements
     document.querySelectorAll(".draggable").forEach(el => {
