@@ -545,7 +545,19 @@ document.addEventListener('click', (e) => {
         document.getElementById('elementToolbar').style.display = 'none';
       }
     });
-    
+
+    document.getElementById('btnEdit').addEventListener('click', () => {
+      if (!selectedElement) return;
+      // Toggle edit mode
+      const isEditing = selectedElement.contentEditable === "true";
+      selectedElement.contentEditable = !isEditing;
+      if (!isEditing) {
+        selectedElement.focus(); // go into edit mode
+      } else {
+        selectedElement.blur();  // exit edit mode
+      }
+    });
+
     // Load saved layouts from localStorage
     function loadSavedLayouts() {
       const saved = localStorage.getItem('paperSizeSelectorLayouts');
