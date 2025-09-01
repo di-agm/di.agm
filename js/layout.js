@@ -3,7 +3,6 @@
     let isPortrait = true;
     let selectedElement = null;
     let savedLayouts = [];
-    let moveMode = false;
 
     function createPage(pageNumber) {
       const page = document.createElement('div');
@@ -114,22 +113,11 @@
     }
 
     function showPage(index) {
-      // Remove current page from display
       rectContainer.innerHTML = '';
-      
-      // Update current page index
       currentPageIndex = index;
-      
-      // Add selected page to container
       rectContainer.appendChild(pages[currentPageIndex]);
-      
-      // Update page number display
       pageNumberDisplay.textContent = `Page ${index + 1}`;
-      
-      // Apply current size settings to new page
       updateRectSize(selector.value);
-      
-      // Deselect any element when changing pages
       deselectElement();
     }
 
@@ -149,16 +137,11 @@
     }
 
     function removePage(index) {
-      if (pages.length <= 1) return; // Always keep at least one page
-
-      // Remove from array
+      if (pages.length <= 1) return;
       pages.splice(index, 1);
-
-      // Adjust currentPageIndex if needed
       if (currentPageIndex >= pages.length) {
         currentPageIndex = pages.length - 1;
       }
-
       showPage(currentPageIndex);
       updatePageNumbers();
     }
@@ -166,13 +149,10 @@
     function duplicatePage(index) {
       const originalPage = pages[index];
       const clone = originalPage.cloneNode(true);
-      
-      // Reset event listeners on cloned elements if needed
       const clonedElements = clone.querySelectorAll('.text-element');
       clonedElements.forEach(element => {
         makeElementDraggable(element);
       });
-      
       pages.splice(index + 1, 0, clone);
       showPage(index + 1);
       updatePageNumbers();
@@ -186,8 +166,6 @@
       element.className = 'text-element';
       element.contentEditable = true;
       element.setAttribute('tabindex', '0');
-      
-      // Position in the center of the page
       element.style.top = '50px';
       element.style.left = '50px';
       element.style.position = 'absolute';
@@ -224,7 +202,6 @@
 
       pageContent.appendChild(element);
       makeElementDraggable(element);
-      // Select the newly added element
       selectElement(element);
     }
     
@@ -232,68 +209,46 @@
       if (selectedElement) {
         selectedElement.classList.remove('selected');
       }
-    
       selectedElement = element;
       document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
       selectedElement.classList.add('selected');
-    
-      // Show the toolbar
       const toolbar = document.getElementById('elementToolbar');
       const rect = element.getBoundingClientRect();
       const containerRect = document.body.getBoundingClientRect();
       toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
       toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       toolbar.style.display = 'flex';
-    
       document.getElementById('elementEditor').style.display = 'block';
       document.getElementById('noElementSelected').style.display = 'none';
-    
-      // Update toolbar UI to reflect selected element's styles
-      const fontSizeInput = document.getElementById('fontSizeInput'); // new numeric input
+      const fontSizeInput = document.getElementById('fontSizeInput');
       if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-    
       const fontFamilySelect = document.getElementById('fontFamilySelect');
       if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-    
       const colorInput = document.getElementById('colorPickerInput');
       if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
     function makeElementDraggable(el) {
       let offsetX = 0, offsetY = 0, isDragging = false;
-    
       el.addEventListener('mousedown', (e) => {
-        // only drag in move mode + only if clicked on the element box (not children text nodes)
-        if (!moveMode/* || e.target !== el*/) return;
-    
-        e.preventDefault(); // prevent text selection
+        e.preventDefault();
         isDragging = true;
-    
         const rect = el.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
-    
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
       });
-    
       function onMouseMove(e) {
         if (!isDragging) return;
-    
-        const container = el.parentElement; // the .page-content
+        const container = el.parentElement;
         const containerRect = container.getBoundingClientRect();
-    
-        // keep element inside container boundaries
         let newLeft = e.clientX - containerRect.left - offsetX;
         let newTop = e.clientY - containerRect.top - offsetY;
-    
-        // clamp
         newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
         newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
-    
         el.style.left = newLeft + 'px';
         el.style.top = newTop + 'px';
       }
-    
       function onMouseUp() {
         isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
@@ -308,28 +263,15 @@
         document.getElementById('elementEditor').style.display = 'none';
         document.getElementById('noElementSelected').style.display = 'block';
       }
-      
       document.getElementById('elementToolbar').style.display = 'none';
     }
 
     document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent click from deselecting element
+        e.stopPropagation();
         if (!selectedElement) return;
-        
         const action = btn.dataset.action;
-        if (action === 'move') {
-          moveMode = !moveMode
-         if (moveMode) {
-            selectedElement.contentEditable = false;
-            selectedElement.style.cursor = "move";   // visual feedback
-            btn.classList.add("active");
-          } else {
-            selectedElement.contentEditable = true;
-            selectedElement.style.cursor = "text";   // back to typing
-            btn.classList.remove("active");
-          }
-        } else if (action === 'delete') {
+        if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
         }
