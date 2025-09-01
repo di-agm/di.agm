@@ -558,6 +558,20 @@ document.addEventListener('click', (e) => {
       }
     });
 
+    document.getElementById('btnScale').addEventListener('click', () => {
+      if (!selectedElement) return;
+      const isResizable = selectedElement.style.resize === 'both';
+      if (isResizable) {
+        // Disable scaling
+        selectedElement.style.resize = 'none';
+        selectedElement.style.overflow = 'hidden';
+      } else {
+        // Enable scaling
+        selectedElement.style.resize = 'both';
+        selectedElement.style.overflow = 'auto';
+      }
+    });
+
     // Load saved layouts from localStorage
     function loadSavedLayouts() {
       const saved = localStorage.getItem('paperSizeSelectorLayouts');
