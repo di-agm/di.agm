@@ -228,10 +228,9 @@
       selectElement(element);
     }
     
-    /*function selectElement(element) {
+    function selectElement(element) {
       if (selectedElement) {
-        //selectedElement.classList.remove('selected');
-        return;
+        selectedElement.classList.remove('selected');
       }
     
       selectedElement = element;
@@ -246,8 +245,8 @@
       toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       toolbar.style.display = 'flex';
     
-      document.getElementById('elementEditor').style.display = 'none';
-      document.getElementById('noElementSelected').style.display = 'block';
+      document.getElementById('elementEditor').style.display = 'block';
+      document.getElementById('noElementSelected').style.display = 'none';
     
       // Update toolbar UI to reflect selected element's styles
       const fontSizeInput = document.getElementById('fontSizeInput'); // new numeric input
@@ -264,7 +263,7 @@
     
       el.addEventListener('mousedown', (e) => {
         // only drag in move mode + only if clicked on the element box (not children text nodes)
-        if (!moveMode) return;
+        if (!moveMode/* || e.target !== el*/) return;
     
         e.preventDefault(); // prevent text selection
         isDragging = true;
@@ -311,50 +310,7 @@
       }
       
       document.getElementById('elementToolbar').style.display = 'none';
-    }*/
-
-    function selectElement(el) {
-      // if the same element is already selected, do nothing
-      if (selectedElement === el) return;
-    
-      selectedElement = el;
-    
-      // show the editor
-      document.getElementById("elementEditor").style.display = "block";
-      document.getElementById("noElementSelected").style.display = "none";
-    
-      // optional: highlight selected element
-      clearSelectionHighlight();
-      el.classList.add("selected-element");
     }
-    
-    function deselectElement() {
-      selectedElement = null;
-    
-      // hide the editor, show the "no element selected" text
-      document.getElementById("elementEditor").style.display = "none";
-      document.getElementById("noElementSelected").style.display = "block";
-    
-      clearSelectionHighlight();
-    }
-    
-    function clearSelectionHighlight() {
-      document.querySelectorAll(".draggable").forEach(el => {
-        el.classList.remove("selected-element");
-      });
-    }
-    
-    // Apply selection when clicking draggable elements
-    document.addEventListener("click", (e) => {
-      const draggable = e.target.closest(".draggable");
-    
-      if (draggable) {
-        selectElement(draggable);
-      } else if (!e.target.closest("#elementEditor")) {
-        // clicked outside element and editor → deselect
-        deselectElement();
-      }
-    });
 
     document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
