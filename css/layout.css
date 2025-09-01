@@ -383,7 +383,8 @@ button:hover {
 
 #elementToolbar {
   position: absolute;
-  display: none; /* hidden until clicked */
+  display: flex;            /* Arrange buttons side by side */
+  gap: 6px;                 /* Spacing between buttons */
 }
 
 .toolbar-button {
