@@ -275,6 +275,18 @@
           selectedElement.remove();
           deselectElement();
         }
+        if (action === 'edit') {
+          // Toggle edit mode
+          const isEditing = selectedElement.contentEditable === "true";
+          selectedElement.contentEditable = !isEditing;
+          if (!isEditing) {
+            // Enable editing
+            selectedElement.focus();
+          } else {
+            // Disable editing (back to drag mode)
+            selectedElement.blur();
+          }
+        }
      });
     });
 
