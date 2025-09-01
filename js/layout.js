@@ -3,7 +3,7 @@
     let isPortrait = true;
     let selectedElement = null;
     let savedLayouts = [];
-    
+
     function createPage(pageNumber) {
       const page = document.createElement('div');
       page.className = 'rect';
@@ -113,22 +113,11 @@
     }
 
     function showPage(index) {
-      // Remove current page from display
       rectContainer.innerHTML = '';
-      
-      // Update current page index
       currentPageIndex = index;
-      
-      // Add selected page to container
       rectContainer.appendChild(pages[currentPageIndex]);
-      
-      // Update page number display
       pageNumberDisplay.textContent = `Page ${index + 1}`;
-      
-      // Apply current size settings to new page
       updateRectSize(selector.value);
-      
-      // Deselect any element when changing pages
       deselectElement();
     }
 
@@ -148,16 +137,11 @@
     }
 
     function removePage(index) {
-      if (pages.length <= 1) return; // Always keep at least one page
-
-      // Remove from array
+      if (pages.length <= 1) return;
       pages.splice(index, 1);
-
-      // Adjust currentPageIndex if needed
       if (currentPageIndex >= pages.length) {
         currentPageIndex = pages.length - 1;
       }
-
       showPage(currentPageIndex);
       updatePageNumbers();
     }
@@ -165,13 +149,10 @@
     function duplicatePage(index) {
       const originalPage = pages[index];
       const clone = originalPage.cloneNode(true);
-      
-      // Reset event listeners on cloned elements if needed
       const clonedElements = clone.querySelectorAll('.text-element');
       clonedElements.forEach(element => {
         makeElementDraggable(element);
       });
-      
       pages.splice(index + 1, 0, clone);
       showPage(index + 1);
       updatePageNumbers();
@@ -185,8 +166,6 @@
       element.className = 'text-element';
       element.contentEditable = true;
       element.setAttribute('tabindex', '0');
-      
-      // Position in the center of the page
       element.style.top = '50px';
       element.style.left = '50px';
       element.style.position = 'absolute';
@@ -222,8 +201,7 @@
       element.style.overflow = 'auto';
 
       pageContent.appendChild(element);
-      
-      // Select the newly added element
+      makeElementDraggable(element);
       selectElement(element);
     }
     
@@ -231,58 +209,51 @@
       if (selectedElement) {
         selectedElement.classList.remove('selected');
       }
-    
       selectedElement = element;
       document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
       selectedElement.classList.add('selected');
-    
-      // Show the toolbar
       const toolbar = document.getElementById('elementToolbar');
       const rect = element.getBoundingClientRect();
       const containerRect = document.body.getBoundingClientRect();
       toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
       toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       toolbar.style.display = 'flex';
-    
       document.getElementById('elementEditor').style.display = 'block';
       document.getElementById('noElementSelected').style.display = 'none';
-    
-      // Update toolbar UI to reflect selected element's styles
-      const fontSizeInput = document.getElementById('fontSizeInput'); // new numeric input
+      const fontSizeInput = document.getElementById('fontSizeInput');
       if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-    
       const fontFamilySelect = document.getElementById('fontFamilySelect');
       if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-    
       const colorInput = document.getElementById('colorPickerInput');
       if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
- function makeElementDraggable(el) {
-        let offsetX = 0, offsetY = 0, isDragging = false;
-        
-        el.addEventListener('mousedown', (e) => {
-        // if (e.target.classList.contains('resizer') || el.isContentEditable) return;
-        if (e.target !== el) return;
-
+    function makeElementDraggable(el) {
+      let offsetX = 0, offsetY = 0, isDragging = false;
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
         isDragging = true;
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
-        
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
-        });
-        
-        function onMouseMove(e) {
+      });
+      function onMouseMove(e) {
         if (!isDragging) return;
-        el.style.left = (e.clientX - offsetX) + 'px';
-        el.style.top = (e.clientY - offsetY) + 'px';
-        }
-        
-        function onMouseUp() {
+        const container = el.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        let newLeft = e.clientX - containerRect.left - offsetX;
+        let newTop = e.clientY - containerRect.top - offsetY;
+        newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
+        el.style.left = newLeft + 'px';
+        el.style.top = newTop + 'px';
+      }
+      function onMouseUp() {
         isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        }
+      }
     }
 
     function deselectElement() {
@@ -292,43 +263,31 @@
         document.getElementById('elementEditor').style.display = 'none';
         document.getElementById('noElementSelected').style.display = 'block';
       }
-      
       document.getElementById('elementToolbar').style.display = 'none';
     }
 
     document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent click from deselecting element
+        e.stopPropagation();
         if (!selectedElement) return;
-        
         const action = btn.dataset.action;
-        //if (action === 'move') {alert('Move mode - drag the element');}
-        if (action === 'move') {
-        let offsetX, offsetY;
-        
-        const onMouseMove = (e) => {
-            selectedElement.style.position = 'absolute';
-            selectedElement.style.left = `${e.clientX - offsetX}px`;
-            selectedElement.style.top = `${e.clientY - offsetY}px`;
-        };
-        
-        const onMouseUp = () => {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        };
-        
-          offsetX = event.clientX - selectedElement.getBoundingClientRect().left;
-          offsetY = event.clientY - selectedElement.getBoundingClientRect().top;
-        
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-        }
-
-        else if (action === 'delete') {
+        if (action === 'delete') {
           selectedElement.remove();
           deselectElement();
         }
-      });
+        if (action === 'edit') {
+          // Toggle edit mode
+          const isEditing = selectedElement.contentEditable === "true";
+          selectedElement.contentEditable = !isEditing;
+          if (!isEditing) {
+            // Enable editing
+            selectedElement.focus();
+          } else {
+            // Disable editing (back to drag mode)
+            selectedElement.blur();
+          }
+        }
+     });
     });
 
 document.addEventListener('click', (e) => {
@@ -580,37 +539,39 @@ document.addEventListener('click', (e) => {
       }
     });
 
-    // --- Move logic ---
-    function enableMove() {
-        if (!selectedElement) return;
-        selectedElement.style.position = 'absolute';
-        
-        function onMouseMove(e) {
-            const parent = selectedElement.parentElement;
-            const parentRect = parent.getBoundingClientRect();
-            // Align cursor center with element center
-            selectedElement.style.left = (e.clientX - parentRect.left - selectedElement.offsetWidth / 2) + 'px';
-            selectedElement.style.top = (e.clientY - parentRect.top - selectedElement.offsetHeight / 2) + 'px';
-        }
-        
-        function onMouseUp() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-        
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    }
-    
-    // Scale mode (simple browser resize) document.getElementById('btnScale').addEventListener('click', () => {if (!selectedElement) return;selectedElement.style.resize = 'both';selectedElement.style.overflow = 'auto';});
-    
     document.getElementById('btnDelete').addEventListener('click', () => {
       if (selectedElement) {
         selectedElement.remove();
         document.getElementById('elementToolbar').style.display = 'none';
       }
     });
-    
+
+    document.getElementById('btnEdit').addEventListener('click', () => {
+      if (!selectedElement) return;
+      // Toggle edit mode
+      const isEditing = selectedElement.contentEditable === "true";
+      selectedElement.contentEditable = !isEditing;
+      if (!isEditing) {
+        selectedElement.focus(); // go into edit mode
+      } else {
+        selectedElement.blur();  // exit edit mode
+      }
+    });
+
+    document.getElementById('btnScale').addEventListener('click', () => {
+      if (!selectedElement) return;
+      const isResizable = selectedElement.style.resize === 'both';
+      if (isResizable) {
+        // Disable scaling
+        selectedElement.style.resize = 'none';
+        selectedElement.style.overflow = 'hidden';
+      } else {
+        // Enable scaling
+        selectedElement.style.resize = 'both';
+        selectedElement.style.overflow = 'auto';
+      }
+    });
+
     // Load saved layouts from localStorage
     function loadSavedLayouts() {
       const saved = localStorage.getItem('paperSizeSelectorLayouts');
@@ -658,13 +619,7 @@ document.addEventListener('click', (e) => {
     document.getElementById('addSubtitleBtn').addEventListener('click', () => addTextElement('subtitle'));
     document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
     document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
-    
-    // Element editing handlers
-    //document.getElementById('deleteElementBtn').addEventListener('click', () => {
-      //if (selectedElement && selectedElement.parentNode) {
-        //selectedElement.parentNode.removeChild(selectedElement);
-        //deselectElement();}});
-
+   
     const deleteBtn = document.getElementById('deleteElementBtn');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {
