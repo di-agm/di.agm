@@ -230,14 +230,26 @@
     function makeElementDraggable(el) {
       let offsetX = 0, offsetY = 0, isDragging = false;
       el.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        isDragging = true;
-        const rect = el.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-      });
+          // If the element is resizable and the user clicked on the resize handle, skip dragging
+          if (getComputedStyle(el).resize !== "none") {
+            const rect = el.getBoundingClientRect();
+            const resizeHandleSize = 16; // px size for the corner region
+        
+            // bottom-right corner = resize zone
+            if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
+              return; // let the browser handle resizing
+            }
+          }
+        
+          e.preventDefault();
+          isDragging = true;
+          const rect = el.getBoundingClientRect();
+          offsetX = e.clientX - rect.left;
+          offsetY = e.clientY - rect.top;
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+
       function onMouseMove(e) {
         if (!isDragging) return;
         const container = el.parentElement;
