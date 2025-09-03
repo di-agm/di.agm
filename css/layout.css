@@ -383,26 +383,20 @@ button:hover {
 
 #elementToolbar {
   position: absolute;
-  display: flex;         /* always flex */
-  flex-direction: row;   /* buttons side by side */
-  gap: 5px;
-  visibility: hidden;    /* hidden by default */
-}
-
-#elementToolbar.show {
-  visibility: visible;   /* show when needed */
+  display: none;        /* hidden until clicked */
+  display: flex;        /* enable flexbox layout */
+  flex-direction: row;  /* buttons in a row */
+  gap: 5px;                 /* Spacing between buttons */
 }
 
 .toolbar-button {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: 50%; /* makes it a circle */
   background-color: black;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: white; /* icon or text color */
   cursor: pointer;
-  flex-shrink: 0;  /* prevent squishing */
-  margin: 2px;
 }
