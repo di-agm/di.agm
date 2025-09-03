@@ -383,7 +383,7 @@ button:hover {
 
 #elementToolbar {
   position: absolute;
-  display: none;
+  display: flex;
   flex-direction: row;  /* buttons in a row */
   gap: 5px;                 /* Spacing between buttons */
 }
