@@ -2,399 +2,281 @@
 let scheduleMatrix = [];
 let activities = [];
 let blocks = [];
-let daysOfWeek = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const daysOfWeek = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
-// Funciones de utilidad
+// -------- Utilidades --------
 function evaluateExpression(expression) {
-    try {
-        // Limpiar la expresión y evaluar operaciones básicas
-        const cleanExpression = expression.replace(/[^0-9+\-*/\(\)\s]/g, '');
-        return Function('"use strict"; return (' + cleanExpression + ')')();
-    } catch (e) {
-        return parseInt(expression) || 0;
-    }
+  try {
+    const clean = expression.replace(/[^0-9+\-*/()\s]/g, "");
+    return Function('"use strict";return(' + clean + ")")();
+  } catch {
+    return parseInt(expression) || 0;
+  }
 }
-
 function convertTimeToMinutes(timeStr) {
-    const [hours, minutes] = timeStr.split(':').map(num => parseInt(num));
-    return hours * 60 + minutes;
+  const [h, m] = timeStr.split(":").map(n => parseInt(n));
+  return h * 60 + m;
 }
-
-function convertMinutesToTime(minutes) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+function convertMinutesToTime(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 }
-
 function gcd(a, b) {
-    while (b !== 0) {
-        const temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a;
+  while (b !== 0) [a, b] = [b, a % b];
+  return a;
 }
-
-function calculateGCD(numbers) {
-    if (numbers.length === 0) return 1;
-    let result = numbers[0];
-    for (let i = 1; i < numbers.length; i++) {
-        result = gcd(result, numbers[i]);
-    }
-    return result;
+function calculateGCD(arr) {
+  if (!arr.length) return 1;
+  return arr.reduce((acc, n) => gcd(acc, n));
 }
+const trim = str => str.trim();
 
-function trim(str) {
-    return str.trim();
-}
-
-// Funciones para agregar actividades y bloques
+// -------- Actividades --------
 function addActivity() {
-    const container = document.getElementById('activitiesContainer');
-    const activityIndex = activities.length;
-    
-    const activityDiv = document.createElement('div');
-    activityDiv.className = 'activity-item';
-    activityDiv.innerHTML = `
-        <div class="inline-group">
-            <div>
-                <label>Nombre de la actividad:</label>
-                <input type="text" id="activityName${activityIndex}" placeholder="Nombre de la actividad">
-            </div>
-            <div>
-                <button type="button" class="remove-btn" onclick="removeActivity(${activityIndex})">Eliminar</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Duración total:</label>
-            <input type="text" id="activityDuration${activityIndex}" placeholder="Ej: 120 o 60*2">
-        </div>
-        <div class="form-group">
-            <label>Duración diaria:</label>
-            <input type="text" id="activityDailyDuration${activityIndex}" placeholder="Ej: 60 o 30*2">
-        </div>
-        <div class="form-group">
-            <label>Tipo de inicio:</label>
-            <select id="activityStartType${activityIndex}">
-                <option value="1">Desde el primer horario disponible</option>
-                <option value="2">Después de la actividad anterior</option>
-            </select>
-        </div>
-    `;
-    
-    container.appendChild(activityDiv);
-    activities.push({ index: activityIndex });
-}
+  const container = document.getElementById("activitiesContainer");
+  const index = activities.length;
 
+  const div = document.createElement("div");
+  div.className = "activity-item";
+  div.innerHTML = `
+    <div class="inline-group">
+      <div>
+        <label>Nombre de la actividad:</label>
+        <input type="text" id="activityName${index}" placeholder="Nombre de la actividad">
+      </div>
+      <div>
+        <button type="button" class="remove-btn" data-remove-activity="${index}">Eliminar</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Duración total:</label>
+      <input type="text" id="activityDuration${index}" placeholder="Ej: 120 o 60*2">
+    </div>
+    <div class="form-group">
+      <label>Duración diaria:</label>
+      <input type="text" id="activityDailyDuration${index}" placeholder="Ej: 60 o 30*2">
+    </div>
+    <div class="form-group">
+      <label>Tipo de inicio:</label>
+      <select id="activityStartType${index}">
+        <option value="1">Desde el primer horario disponible</option>
+        <option value="2">Después de la actividad anterior</option>
+      </select>
+    </div>`;
+  container.appendChild(div);
+  activities.push({ index });
+}
 function removeActivity(index) {
-    activities = activities.filter(activity => activity.index !== index);
-    document.querySelector(`#activitiesContainer .activity-item:nth-child(${index + 1})`).remove();
+  activities = activities.filter(a => a.index !== index);
+  const el = document.querySelector(`[data-remove-activity="${index}"]`)?.closest(".activity-item");
+  if (el) el.remove();
 }
 
+// -------- Bloques --------
 function addBlock() {
-    const container = document.getElementById('blocksContainer');
-    const blockIndex = blocks.length;
-    
-    const blockDiv = document.createElement('div');
-    blockDiv.className = 'block-item';
-    blockDiv.innerHTML = `
-        <div class="inline-group">
-            <div>
-                <label>Día (1=Lunes, 7=Domingo):</label>
-                <select id="blockDay${blockIndex}">
-                    <option value="1">Lunes</option>
-                    <option value="2">Martes</option>
-                    <option value="3">Miércoles</option>
-                    <option value="4">Jueves</option>
-                    <option value="5">Viernes</option>
-                    <option value="6">Sábado</option>
-                    <option value="7">Domingo</option>
-                </select>
-            </div>
-            <div>
-                <button type="button" class="remove-btn" onclick="removeBlock(${blockIndex})">Eliminar</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Hora de inicio y fin (HH:MM - HH:MM):</label>
-            <input type="text" id="blockTime${blockIndex}" placeholder="Ej: 12:00 - 13:00">
-        </div>
-    `;
-    
-    container.appendChild(blockDiv);
-    blocks.push({ index: blockIndex });
-}
+  const container = document.getElementById("blocksContainer");
+  const index = blocks.length;
 
+  const div = document.createElement("div");
+  div.className = "block-item";
+  div.innerHTML = `
+    <div class="inline-group">
+      <div>
+        <label>Día (1=Lunes, 7=Domingo):</label>
+        <select id="blockDay${index}">
+          <option value="1">Lunes</option>
+          <option value="2">Martes</option>
+          <option value="3">Miércoles</option>
+          <option value="4">Jueves</option>
+          <option value="5">Viernes</option>
+          <option value="6">Sábado</option>
+          <option value="7">Domingo</option>
+        </select>
+      </div>
+      <div>
+        <button type="button" class="remove-btn" data-remove-block="${index}">Eliminar</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Hora de inicio y fin (HH:MM - HH:MM):</label>
+      <input type="text" id="blockTime${index}" placeholder="Ej: 12:00 - 13:00">
+    </div>`;
+  container.appendChild(div);
+  blocks.push({ index });
+}
 function removeBlock(index) {
-    blocks = blocks.filter(block => block.index !== index);
-    document.querySelector(`#blocksContainer .block-item:nth-child(${index + 1})`).remove();
+  blocks = blocks.filter(b => b.index !== index);
+  const el = document.querySelector(`[data-remove-block="${index}"]`)?.closest(".block-item");
+  if (el) el.remove();
 }
 
-// Función principal para generar el horario
+// -------- Generador --------
 function generateSchedule() {
-    try {
-        // Leer configuración básica
-        const numDays = evaluateExpression(document.getElementById('numDays').value);
-        const timeRange = document.getElementById('timeRange').value;
-        const startDay = parseInt(document.getElementById('startDay').value) - 1; // Ajustar a 0-6
-        
-        // Validar rango de tiempo
-        const timeRangeParts = timeRange.split('-');
-        if (timeRangeParts.length !== 2) {
-            throw new Error('Formato de hora incorrecto. Use HH:MM - HH:MM');
-        }
-        
-        const startTime = convertTimeToMinutes(trim(timeRangeParts[0]));
-        const endTime = convertTimeToMinutes(trim(timeRangeParts[1]));
-        
-        if (endTime <= startTime) {
-            throw new Error('La hora de fin debe ser después de la hora de inicio');
-        }
-        
-        const totalMinutes = endTime - startTime;
-        
-        // Leer actividades
-        const activityData = [];
-        const dailyDurations = [];
-        
-        for (let i = 0; i < activities.length; i++) {
-            const nameElement = document.getElementById(`activityName${activities[i].index}`);
-            const durationElement = document.getElementById(`activityDuration${activities[i].index}`);
-            const dailyDurationElement = document.getElementById(`activityDailyDuration${activities[i].index}`);
-            const startTypeElement = document.getElementById(`activityStartType${activities[i].index}`);
-            
-            if (!nameElement || !durationElement || !dailyDurationElement || !startTypeElement) continue;
-            
-            const name = nameElement.value;
-            const duration = evaluateExpression(durationElement.value);
-            const dailyDuration = evaluateExpression(dailyDurationElement.value);
-            const startType = parseInt(startTypeElement.value);
-            
-            if (name && duration > 0 && dailyDuration > 0) {
-                activityData.push({ name, duration, dailyDuration, startType });
-                dailyDurations.push(dailyDuration);
-            }
-        }
-        
-        // Leer bloques no accesibles
-        const blockData = [];
-        
-        for (let i = 0; i < blocks.length; i++) {
-            const dayElement = document.getElementById(`blockDay${blocks[i].index}`);
-            const timeElement = document.getElementById(`blockTime${blocks[i].index}`);
-            
-            if (!dayElement || !timeElement) continue;
-            
-            const day = parseInt(dayElement.value) - 1; // Ajustar a 0-6
-            const timeStr = timeElement.value;
-            
-            if (timeStr) {
-                const timeParts = timeStr.split('-');
-                if (timeParts.length === 2) {
-                    const blockStart = convertTimeToMinutes(trim(timeParts[0]));
-                    const blockEnd = convertTimeToMinutes(trim(timeParts[1]));
-                    
-                    if (blockEnd > blockStart) {
-                        // Ajustar día según día de inicio
-                        const adjustedDay = (day - startDay + 7) % 7;
-                        blockData.push({ day: adjustedDay, start: blockStart, end: blockEnd });
-                        dailyDurations.push(blockEnd - blockStart);
-                    }
-                }
-            }
-        }
-        
-        // Calcular intervalo de minutos
-        const intervalMinutes = calculateGCD(dailyDurations) || 30;
-        
-        // Calcular número de filas
-        const numRows = Math.floor(totalMinutes / intervalMinutes) + 1;
-        const cols = numDays + 2;
-        
-        // Crear matriz
-        scheduleMatrix = Array(numRows).fill().map(() => Array(cols).fill(''));
-        
-        // Llenar primera fila con encabezados
-        scheduleMatrix[0][0] = 'Inicio';
-        scheduleMatrix[0][1] = 'Final';
-        
-        for (let j = 2; j < cols; j++) {
-            scheduleMatrix[0][j] = daysOfWeek[(startDay + (j - 2)) % 7];
-        }
-        
-        // Llenar columnas de tiempo
-        let currentTime = startTime;
-        for (let i = 1; i < numRows; i++) {
-            scheduleMatrix[i][0] = convertMinutesToTime(currentTime);
-            
-            const nextTime = currentTime + intervalMinutes;
-            scheduleMatrix[i][1] = convertMinutesToTime(Math.min(nextTime, endTime));
-            
-            currentTime = nextTime;
-            if (currentTime >= endTime) break;
-        }
-        
-        // Marcar bloques no accesibles
-        for (let i = 1; i < numRows; i++) {
-            for (let j = 2; j < cols; j++) {
-                const dayIndex = (j - 2);
-                const currentMinutes = startTime + (i - 1) * intervalMinutes;
-                
-                for (const block of blockData) {
-                    if (dayIndex === block.day && 
-                        currentMinutes >= block.start && 
-                        currentMinutes < block.end) {
-                        scheduleMatrix[i][j] = 'N/A';
-                    }
-                }
-                
-                if (!scheduleMatrix[i][j]) {
-                    scheduleMatrix[i][j] = ' ';
-                }
-            }
-        }
-        
-        // Asignar actividades
-        let lastOccupiedColumn = 2;
-        
-        for (let actIndex = 0; actIndex < activityData.length; actIndex++) {
-            const activity = activityData[actIndex];
-            let remainingDuration = activity.duration;
-            let daysCounted = 0;
-            
-            let startColumn = 2;
-            if (activity.startType === 2 && actIndex > 0) {
-                startColumn = lastOccupiedColumn + 1;
-            }
-            
-            for (let col = startColumn; col < cols && daysCounted < numDays; col++) {
-                let minutesAssignedToday = 0;
-                let activityAssigned = false;
-                
-                for (let row = 1; row < numRows && minutesAssignedToday < activity.dailyDuration; row++) {
-                    if (scheduleMatrix[row][col] === ' ' && remainingDuration > 0) {
-                        const currentTime = startTime + (row - 1) * intervalMinutes;
-                        
-                        // Verificar si está en un bloque no accesible
-                        let isBlocked = false;
-                        const dayIndex = col - 2;
-                        
-                        for (const block of blockData) {
-                            if (dayIndex === block.day && 
-                                currentTime >= block.start && 
-                                currentTime < block.end) {
-                                isBlocked = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!isBlocked) {
-                            const availableMinutes = Math.min(
-                                activity.dailyDuration - minutesAssignedToday, 
-                                intervalMinutes
-                            );
-                            
-                            scheduleMatrix[row][col] = activity.name;
-                            minutesAssignedToday += availableMinutes;
-                            remainingDuration -= availableMinutes;
-                            activityAssigned = true;
-                            
-                            if (remainingDuration <= 0) break;
-                        }
-                    }
-                }
-                
-                if (activityAssigned) {
-                    daysCounted++;
-                    lastOccupiedColumn = col;
-                }
-                
-                if (remainingDuration <= 0) break;
-            }
-            
-            if (remainingDuration > 0) {
-                console.warn(`No se pudo completar la actividad: ${activity.name}`);
-            }
-        }
-        
-        // Mostrar resultado
-        displaySchedule();
-        
-    } catch (error) {
-        alert('Error: ' + error.message);
+  try {
+    const numDays = evaluateExpression(document.getElementById("numDays").value);
+    const timeRange = document.getElementById("timeRange").value;
+    const startDay = parseInt(document.getElementById("startDay").value) - 1;
+
+    // validar rango
+    const [startStr, endStr] = timeRange.split("-");
+    if (!endStr) throw new Error("Formato incorrecto. Use HH:MM - HH:MM");
+
+    const startTime = convertTimeToMinutes(trim(startStr));
+    const endTime = convertTimeToMinutes(trim(endStr));
+    if (endTime <= startTime) throw new Error("La hora de fin debe ser después");
+
+    const totalMinutes = endTime - startTime;
+
+    // actividades
+    const activityData = [];
+    const dailyDurations = [];
+    for (const a of activities) {
+      const name = document.getElementById(`activityName${a.index}`)?.value || "";
+      const duration = evaluateExpression(document.getElementById(`activityDuration${a.index}`)?.value || "");
+      const daily = evaluateExpression(document.getElementById(`activityDailyDuration${a.index}`)?.value || "");
+      const startType = parseInt(document.getElementById(`activityStartType${a.index}`)?.value || "1");
+      if (name && duration > 0 && daily > 0) {
+        activityData.push({ name, duration, dailyDuration: daily, startType });
+        dailyDurations.push(daily);
+      }
     }
+
+    // bloques
+    const blockData = [];
+    for (const b of blocks) {
+      const day = parseInt(document.getElementById(`blockDay${b.index}`)?.value || "1") - 1;
+      const str = document.getElementById(`blockTime${b.index}`)?.value || "";
+      if (str.includes("-")) {
+        const [s, e] = str.split("-");
+        const bs = convertTimeToMinutes(trim(s));
+        const be = convertTimeToMinutes(trim(e));
+        if (be > bs) {
+          const adjDay = (day - startDay + 7) % 7;
+          blockData.push({ day: adjDay, start: bs, end: be });
+          dailyDurations.push(be - bs);
+        }
+      }
+    }
+
+    const interval = calculateGCD(dailyDurations) || 30;
+    const rows = Math.floor(totalMinutes / interval) + 1;
+    const cols = numDays + 2;
+    scheduleMatrix = Array.from({ length: rows }, () => Array(cols).fill(""));
+
+    // encabezados
+    scheduleMatrix[0][0] = "Inicio";
+    scheduleMatrix[0][1] = "Final";
+    for (let j = 2; j < cols; j++) {
+      scheduleMatrix[0][j] = daysOfWeek[(startDay + j - 2) % 7];
+    }
+
+    // tiempos
+    let t = startTime;
+    for (let i = 1; i < rows; i++) {
+      scheduleMatrix[i][0] = convertMinutesToTime(t);
+      const next = t + interval;
+      scheduleMatrix[i][1] = convertMinutesToTime(Math.min(next, endTime));
+      t = next;
+      if (t >= endTime) break;
+    }
+
+    // marcar bloques
+    for (let i = 1; i < rows; i++) {
+      for (let j = 2; j < cols; j++) {
+        const dayIdx = j - 2;
+        const mins = startTime + (i - 1) * interval;
+        const block = blockData.find(b => b.day === dayIdx && mins >= b.start && mins < b.end);
+        scheduleMatrix[i][j] = block ? "N/A" : " ";
+      }
+    }
+
+    // asignar actividades
+    let lastCol = 2;
+    for (let a = 0; a < activityData.length; a++) {
+      let act = activityData[a];
+      let remain = act.duration;
+      let counted = 0;
+      let startCol = act.startType === 2 && a > 0 ? lastCol + 1 : 2;
+
+      for (let c = startCol; c < cols && counted < numDays; c++) {
+        let today = 0;
+        for (let r = 1; r < rows && today < act.dailyDuration; r++) {
+          if (scheduleMatrix[r][c] === " " && remain > 0) {
+            scheduleMatrix[r][c] = act.name;
+            today += interval;
+            remain -= interval;
+          }
+        }
+        if (today > 0) {
+          counted++;
+          lastCol = c;
+        }
+        if (remain <= 0) break;
+      }
+    }
+
+    displaySchedule();
+  } catch (e) {
+    alert("Error: " + e.message);
+  }
 }
 
 function displaySchedule() {
-    const tableContainer = document.getElementById('scheduleTable');
-    const exportBtn = document.getElementById('exportBtn');
-    
-    if (scheduleMatrix.length === 0) {
-        tableContainer.innerHTML = '<p>No hay horario generado</p>';
-        exportBtn.classList.add('hidden');
-        return;
-    }
-    
-    let tableHTML = '<table class="schedule-table">';
-    
-    for (let i = 0; i < scheduleMatrix.length; i++) {
-        tableHTML += '<tr>';
-        
-        for (let j = 0; j < scheduleMatrix[i].length; j++) {
-            const cell = scheduleMatrix[i][j];
-            let cellClass = '';
-            
-            if (i === 0) {
-                cellClass = 'time-cell';
-            } else if (j < 2) {
-                cellClass = 'time-cell';
-            } else if (cell === 'N/A') {
-                cellClass = 'na-cell';
-            } else if (cell !== ' ' && cell !== '') {
-                cellClass = 'activity-cell';
-            }
-            
-            const tag = i === 0 ? 'th' : 'td';
-            tableHTML += `<${tag} class="${cellClass}">${cell || ''}</${tag}>`;
-        }
-        
-        tableHTML += '</tr>';
-    }
-    
-    tableHTML += '</table>';
-    tableContainer.innerHTML = tableHTML;
-    exportBtn.classList.remove('hidden');
+  const tableContainer = document.getElementById("scheduleTable");
+  const exportBtn = document.getElementById("exportBtn");
+  if (!scheduleMatrix.length) {
+    tableContainer.innerHTML = "<p>No hay horario generado</p>";
+    exportBtn.classList.add("hidden");
+    return;
+  }
+
+  let html = '<table class="schedule-table">';
+  scheduleMatrix.forEach((row, i) => {
+    html += "<tr>";
+    row.forEach((cell, j) => {
+      let cls = "";
+      if (i === 0 || j < 2) cls = "time-cell";
+      else if (cell === "N/A") cls = "na-cell";
+      else if (cell.trim()) cls = "activity-cell";
+      const tag = i === 0 ? "th" : "td";
+      html += `<${tag} class="${cls}">${cell || ""}</${tag}>`;
+    });
+    html += "</tr>";
+  });
+  html += "</table>";
+  tableContainer.innerHTML = html;
+  exportBtn.classList.remove("hidden");
 }
 
 function exportToCSV() {
-    if (scheduleMatrix.length === 0) {
-        alert('No hay horario para exportar');
-        return;
-    }
-    
-    let csvContent = '';
-    
-    for (let i = 0; i < scheduleMatrix.length; i++) {
-        const row = scheduleMatrix[i].map(cell => `"${cell || ''}"`).join(',');
-        csvContent += row + '\n';
-    }
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'horarios.csv');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+  if (!scheduleMatrix.length) return alert("No hay horario para exportar");
+  let csv = scheduleMatrix.map(row => row.map(c => `"${c || ""}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "horarios.csv";
+  link.click();
 }
 
-// Inicializar con una actividad y un bloque por defecto
-document.addEventListener('DOMContentLoaded', function() {
-    addActivity();
-    addBlock();
+// -------- Inicializar --------
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("addActivityBtn").addEventListener("click", addActivity);
+  document.getElementById("addBlockBtn").addEventListener("click", addBlock);
+  document.getElementById("generateBtn").addEventListener("click", generateSchedule);
+  document.getElementById("exportBtn").addEventListener("click", exportToCSV);
+
+  // eliminar dinámicamente
+  document.addEventListener("click", e => {
+    if (e.target.dataset.removeActivity !== undefined) {
+      removeActivity(parseInt(e.target.dataset.removeActivity));
+    }
+    if (e.target.dataset.removeBlock !== undefined) {
+      removeBlock(parseInt(e.target.dataset.removeBlock));
+    }
+  });
+
+  // valores por defecto
+  addActivity();
+  addBlock();
 });
