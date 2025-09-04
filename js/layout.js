@@ -110,7 +110,7 @@
         customSizeInputs.style.display = 'block';
       } else {
         customSizeInputs.style.display = 'none';
-        applyPageSize(pageSizeSelector.value); // existing function for standard sizes
+        updateRectSize(pageSizeSelector.value.toLowerCase());
       }
     });
     
@@ -120,8 +120,15 @@
       if (!width || !height) return;
     
       const page = pages[currentPageIndex];
-      page.style.width = width + 'px';
-      page.style.height = height + 'px';
+      
+      // Apply orientation
+      if (!isPortrait) {
+        page.style.width = height + 'px';
+        page.style.height = width + 'px';
+      } else {
+        page.style.width = width + 'px';
+        page.style.height = height + 'px';
+      }
     });
 
     function updateOrientation() {
