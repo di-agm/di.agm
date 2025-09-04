@@ -64,9 +64,9 @@ button:hover {
 }
 
 #orientationBtn {
-  padding: 10px 16px;
+  padding: 10px 10px;
   font-size: 16px;
-  border-radius: 49%;
+  border-radius: 50%;
   border: none;
   background-color: #292929;
   color: white;
