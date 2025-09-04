@@ -99,6 +99,31 @@
       }
     }
 
+    const pageSizeSelector = document.getElementById('pageSizeSelector');
+    const customSizeInputs = document.getElementById('customSizeInputs');
+    const customWidth = document.getElementById('customWidth');
+    const customHeight = document.getElementById('customHeight');
+    const applyCustomSizeBtn = document.getElementById('applyCustomSize');
+    
+    pageSizeSelector.addEventListener('change', () => {
+      if (pageSizeSelector.value === 'Custom') {
+        customSizeInputs.style.display = 'block';
+      } else {
+        customSizeInputs.style.display = 'none';
+        applyPageSize(pageSizeSelector.value); // existing function for standard sizes
+      }
+    });
+    
+    applyCustomSizeBtn.addEventListener('click', () => {
+      const width = parseInt(customWidth.value, 10);
+      const height = parseInt(customHeight.value, 10);
+      if (!width || !height) return;
+    
+      const page = pages[currentPageIndex];
+      page.style.width = width + 'px';
+      page.style.height = height + 'px';
+    });
+
     function updateOrientation() {
       if (!pages[currentPageIndex]) return;
       
