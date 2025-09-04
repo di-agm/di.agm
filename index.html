@@ -259,7 +259,10 @@
     </div>
 
 <div id="tt" style="display:none;">
-  <h1>Generador de Cronogramas</h1>
+  <div class="container">
+        <h1>Generador de Horarios</h1>
+        
+        <!-- Configuración básica -->
         <div class="form-group">
             <label for="numDays">Número de días:</label>
             <input type="text" id="numDays" placeholder="Ej: 7 o 5+2">
@@ -295,19 +298,13 @@
         
         <!-- Botón generar -->
         <button type="button" onclick="generateSchedule()">Generar Horario</button>
-
-        <div class="container" id="scheduleResult">
-            <h2>Horario Generado</h2>
-            <div id="scheduleTable"></div>
-            <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
-        </div>
     </div>
     
-    <script src="js/windows.js" defer></script>
-    <script src="js/color.js" defer></script>
-    <script src="js/translations.js" defer></script>
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="js/layout.js" defer></script>
-    <script src="js/horarios.js" defer></script>
+    <!-- Resultado -->
+    <div class="container" id="scheduleResult">
+        <h2>Horario Generado</h2>
+        <div id="scheduleTable"></div>
+        <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
+    </div>
 </body>
 </html>
