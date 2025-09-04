@@ -528,26 +528,23 @@ document.addEventListener('click', (e) => {
     
     // Handle click outside elements to deselect
     document.addEventListener('click', (e) => {
-      const toolbar = document.getElementById('elementToolbar');
       const clickedElement = e.target.closest('.text-element');
+      const toolbar = document.getElementById('elementToolbar');
     
       if (clickedElement) {
-        // If the same element is already selected → deselect
+        // If the same element is already selected → keep selected
         if (selectedElement === clickedElement) {
-          clickedElement.classList.remove('selected');
-          toolbar.style.display = 'none';
-          selectedElement = null;
-        } else {
-          // Switch selection to new element
-          document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
-          selectedElement = clickedElement;
-          selectedElement.classList.add('selected');
-    
-          toolbar.style.display = 'flex';
-          const rect = selectedElement.getBoundingClientRect();
-          toolbar.style.top = window.scrollY + rect.bottom + 'px';
-          toolbar.style.left = window.scrollX + rect.left + 'px';
+          return;
         }
+        // Use the main selectElement function
+        selectElement(clickedElement);
+      } else if (
+        !e.target.closest('#elementEditor') &&
+        !e.target.closest('#elementToolbar') &&
+        !e.target.closest('.sidebar-btn')
+      ) {
+        // Clicked outside → deselect
+        deselectElement();
       }
     });
 
