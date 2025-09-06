@@ -3,6 +3,9 @@
     let isPortrait = true;
     let selectedElement = null;
     let savedLayouts = [];
+    let rulersVisible = false;
+    let marginsVisible = false;
+    let pageNumbersVisible = true;
 
     function createPage(pageNumber) {
       const page = document.createElement('div');
@@ -157,7 +160,73 @@
       showPage(index + 1);
       updatePageNumbers();
     }
+
+    function toggleRulers() {
+  rulersVisible = !rulersVisible;
+  pages.forEach(page => {
+    if (rulersVisible) {
+      // Add rulers if not already present
+      if (!page.querySelector('.page-ruler.horizontal.top')) {
+        const top = document.createElement('div');
+        top.className = 'page-ruler horizontal top';
+        page.appendChild(top);
+      }
+      if (!page.querySelector('.page-ruler.horizontal.bottom')) {
+        const bottom = document.createElement('div');
+        bottom.className = 'page-ruler horizontal bottom';
+        bottom.style.bottom = '0';
+        bottom.style.top = 'auto';
+        page.appendChild(bottom);
+      }
+      if (!page.querySelector('.page-ruler.vertical.left')) {
+        const left = document.createElement('div');
+        left.className = 'page-ruler vertical left';
+        page.appendChild(left);
+      }
+      if (!page.querySelector('.page-ruler.vertical.right')) {
+        const right = document.createElement('div');
+        right.className = 'page-ruler vertical right';
+        right.style.right = '0';
+        right.style.left = 'auto';
+        page.appendChild(right);
+      }
+    } else {
+      page.querySelectorAll('.page-ruler').forEach(r => r.remove());
+    }
+  });
+}
+
+function toggleMargins() {
+  marginsVisible = !marginsVisible;
+  pages.forEach(page => {
+    if (marginsVisible) {
+      if (!page.querySelector('.page-margins')) {
+        const margins = document.createElement('div');
+        margins.className = 'page-margins';
+        page.appendChild(margins);
+      }
+    } else {
+      const margins = page.querySelector('.page-margins');
+      if (margins) margins.remove();
+    }
+  });
+}
+
+    function togglePageNumbers() {
+      pageNumbersVisible = !pageNumbersVisible;
+      pages.forEach(page => {
+        const pageNumberLabel = page.querySelector('div:last-child');
+        if (pageNumberLabel) {
+          pageNumberLabel.style.display = pageNumbersVisible ? 'block' : 'none';
+        }
+      });
+    }
     
+    // Button handlers
+    document.getElementById('toggleRulersBtn').addEventListener('click', toggleRulers);
+    document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
+    document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
+
     function addTextElement(type) {
       if (!pages[currentPageIndex]) return;
       
