@@ -289,22 +289,22 @@
         <!-- Actividades -->
         <h3>Actividades</h3>
         <div id="activitiesContainer"></div>
-        <button type="button" class="add-btn" onclick="addActivity()">Agregar Actividad</button>
+        <button type="button" class="add-btn" id="addActivityBtn">+ Actividad</button>
         
         <!-- Bloques no accesibles -->
-        <h3>Bloques No Accesibles</h3>
+        <h3>Horarios no accesibles</h3>
         <div id="blocksContainer"></div>
-        <button type="button" class="add-btn" onclick="addBlock()">Agregar Bloque</button>
-        
+        <button type="button" class="add-btn" id="addBlockBtn">+</button>
+        <p></p>
         <!-- Botón generar -->
-        <button type="button" onclick="generateSchedule()">Generar Horario</button>
+        <button type="button" id="generateBtn">Generar Horario</button>
     </div>
     
     <!-- Resultado -->
     <div class="container" id="scheduleResult">
         <h2>Horario Generado</h2>
         <div id="scheduleTable"></div>
-        <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
+        <button type="button" class="hidden" id="exportBtn">Exportar a CSV</button>
     </div>
     
     <script src="js/windows.js" defer></script>
