@@ -107,7 +107,7 @@ button:hover {
 
 .text-element {
   position: absolute;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0);
   min-width: 100px;
   min-height: 30px;
   padding: 2px;
