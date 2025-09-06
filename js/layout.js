@@ -4,6 +4,7 @@
     let selectedElement = null;
     let savedLayouts = [];
     let rulersVisible = false;
+    let currentRulerUnit = "px"; // px, pt, mm, cm, in
     let marginsVisible = false;
     let pageNumbersVisible = true;
 
@@ -162,55 +163,55 @@
     }
 
     function toggleRulers() {
-  rulersVisible = !rulersVisible;
-  pages.forEach(page => {
-    if (rulersVisible) {
-      // Add rulers if not already present
-      if (!page.querySelector('.page-ruler.horizontal.top')) {
-        const top = document.createElement('div');
-        top.className = 'page-ruler horizontal top';
-        page.appendChild(top);
-      }
-      if (!page.querySelector('.page-ruler.horizontal.bottom')) {
-        const bottom = document.createElement('div');
-        bottom.className = 'page-ruler horizontal bottom';
-        bottom.style.bottom = '0';
-        bottom.style.top = 'auto';
-        page.appendChild(bottom);
-      }
-      if (!page.querySelector('.page-ruler.vertical.left')) {
-        const left = document.createElement('div');
-        left.className = 'page-ruler vertical left';
-        page.appendChild(left);
-      }
-      if (!page.querySelector('.page-ruler.vertical.right')) {
-        const right = document.createElement('div');
-        right.className = 'page-ruler vertical right';
-        right.style.right = '0';
-        right.style.left = 'auto';
-        page.appendChild(right);
-      }
-    } else {
-      page.querySelectorAll('.page-ruler').forEach(r => r.remove());
+      rulersVisible = !rulersVisible;
+      pages.forEach(page => {
+        if (rulersVisible) {
+          // Add rulers if not already present
+          if (!page.querySelector('.page-ruler.horizontal.top')) {
+            const top = document.createElement('div');
+            top.className = 'page-ruler horizontal top';
+            page.appendChild(top);
+          }
+          if (!page.querySelector('.page-ruler.horizontal.bottom')) {
+            const bottom = document.createElement('div');
+            bottom.className = 'page-ruler horizontal bottom';
+            bottom.style.bottom = '0';
+            bottom.style.top = 'auto';
+            page.appendChild(bottom);
+          }
+          if (!page.querySelector('.page-ruler.vertical.left')) {
+            const left = document.createElement('div');
+            left.className = 'page-ruler vertical left';
+            page.appendChild(left);
+          }
+          if (!page.querySelector('.page-ruler.vertical.right')) {
+            const right = document.createElement('div');
+            right.className = 'page-ruler vertical right';
+            right.style.right = '0';
+            right.style.left = 'auto';
+            page.appendChild(right);
+          }
+        } else {
+          page.querySelectorAll('.page-ruler').forEach(r => r.remove());
+        }
+      });
     }
-  });
-}
-
-function toggleMargins() {
-  marginsVisible = !marginsVisible;
-  pages.forEach(page => {
-    if (marginsVisible) {
-      if (!page.querySelector('.page-margins')) {
-        const margins = document.createElement('div');
-        margins.className = 'page-margins';
-        page.appendChild(margins);
-      }
-    } else {
-      const margins = page.querySelector('.page-margins');
-      if (margins) margins.remove();
+    
+    function toggleMargins() {
+      marginsVisible = !marginsVisible;
+      pages.forEach(page => {
+        if (marginsVisible) {
+          if (!page.querySelector('.page-margins')) {
+            const margins = document.createElement('div');
+            margins.className = 'page-margins';
+            page.appendChild(margins);
+          }
+        } else {
+          const margins = page.querySelector('.page-margins');
+          if (margins) margins.remove();
+        }
+      });
     }
-  });
-}
 
     function togglePageNumbers() {
       pageNumbersVisible = !pageNumbersVisible;
@@ -226,6 +227,104 @@ function toggleMargins() {
     document.getElementById('toggleRulersBtn').addEventListener('click', toggleRulers);
     document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
     document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
+
+    const units = ["px", "pt", "mm", "cm", "in"];
+function convertToPx(value, unit) {
+  switch (unit) {
+    case "px": return value;
+    case "pt": return value * 96 / 72;  // 1pt = 1/72 in
+    case "mm": return value * 3.78;
+    case "cm": return value * 37.8;
+    case "in": return value * 96;
+  }
+}
+
+function drawRulers() {
+  // Remove old rulers
+  document.querySelectorAll(".ruler").forEach(r => r.remove());
+  if (!rulersVisible) return;
+
+  const container = document.querySelector(".center-container");
+  if (!container) return;
+  const page = pages[currentPageIndex];
+  if (!page) return;
+
+  const pageRect = page.getBoundingClientRect();
+
+  // Horizontal ruler
+  const hRuler = document.createElement("div");
+  hRuler.className = "ruler horizontal";
+  hRuler.style.width = pageRect.width + "px";
+  hRuler.style.left = page.offsetLeft + "px";
+  container.appendChild(hRuler);
+
+  // Vertical ruler
+  const vRuler = document.createElement("div");
+  vRuler.className = "ruler vertical";
+  vRuler.style.height = pageRect.height + "px";
+  vRuler.style.top = page.offsetTop + "px";
+  container.appendChild(vRuler);
+
+  // Tick spacing: every 50px in current unit
+  const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
+  const maxX = pageRect.width;
+  const maxY = pageRect.height;
+
+  // Horizontal ticks
+  for (let x = 0; x <= maxX; x += spacing) {
+    const tick = document.createElement("div");
+    tick.className = "tick";
+    tick.style.left = x + "px";
+    tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; // longer tick every 5
+    hRuler.appendChild(tick);
+
+    if (x % (spacing * 5) === 0) {
+      const label = document.createElement("div");
+      label.style.position = "absolute";
+      label.style.left = x + 2 + "px";
+      label.style.bottom = "10px";
+      label.textContent = Math.round(x / convertToPx(1, currentRulerUnit));
+      hRuler.appendChild(label);
+    }
+  }
+
+  // Vertical ticks
+  for (let y = 0; y <= maxY; y += spacing) {
+    const tick = document.createElement("div");
+    tick.className = "tick";
+    tick.style.top = y + "px";
+    tick.style.width = (y % (spacing * 5) === 0) ? "10px" : "6px";
+    vRuler.appendChild(tick);
+
+    if (y % (spacing * 5) === 0) {
+      const label = document.createElement("div");
+      label.style.position = "absolute";
+      label.style.top = y + "px";
+      label.style.right = "12px";
+      label.textContent = Math.round(y / convertToPx(1, currentRulerUnit));
+      vRuler.appendChild(label);
+    }
+  }
+}
+
+    function toggleRulers() {
+      rulersVisible = !rulersVisible;
+      drawRulers();
+    }
+    
+    function cycleRulerUnit() {
+      let idx = units.indexOf(currentRulerUnit);
+      currentRulerUnit = units[(idx + 1) % units.length];
+      document.getElementById("rulerUnitBtn").textContent = "Unit: " + currentRulerUnit;
+      if (rulersVisible) drawRulers();
+    }
+    
+    // Re-draw rulers when page changes
+    const oldShowPage = showPage;
+    showPage = function(index) {
+      oldShowPage(index);
+      if (rulersVisible) drawRulers();
+    };
 
     function addTextElement(type) {
       if (!pages[currentPageIndex]) return;
