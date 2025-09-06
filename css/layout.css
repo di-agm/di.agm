@@ -105,6 +105,36 @@ button:hover {
   overflow: auto;
 }
 
+/* Rulers */
+.page-ruler {
+  position: absolute;
+  background: rgba(0,0,0,0.15);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.page-ruler.horizontal {
+  height: 1px;
+  width: 100%;
+}
+
+.page-ruler.vertical {
+  width: 1px;
+  height: 100%;
+}
+
+/* Margins */
+.page-margins {
+  position: absolute;
+  border: 1px dotted rgba(0,0,0,0.4);
+  top: 5%;
+  left: 5%;
+  right: 5%;
+  bottom: 5%;
+  pointer-events: none;
+  z-index: 15;
+}
+
 .text-element {
   position: absolute;
   background: rgba(255,255,255,0);
