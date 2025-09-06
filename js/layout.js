@@ -581,6 +581,16 @@ document.addEventListener('click', (e) => {
       }
     });
 
+    document.getElementById('btnAlign').addEventListener('click', () => {
+      if (!selectedElement) return;
+    
+      // Cycle through alignment options
+      const alignments = ['left', 'center', 'right', 'justify'];
+      let current = selectedElement.style.textAlign || 'left';
+      let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
+      selectedElement.style.textAlign = alignments[nextIndex];
+    });
+
     // Load saved layouts from localStorage
     function loadSavedLayouts() {
       const saved = localStorage.getItem('paperSizeSelectorLayouts');
