@@ -100,12 +100,13 @@
         heightPx = heightPx * scale;
 
     if (rulersVisible) drawRulers();
-
-    window.addEventListener("resize", () => {
-      updateRuler();
-    });
     }
-      
+
+window.addEventListener("resize", () => {
+  updateRectSize(currentPaperKey);
+  updateRuler();
+});
+        
       const page = pages[currentPageIndex];
 
       // Apply the correct dimensions based on orientation
@@ -867,6 +868,7 @@
     document.getElementById('addSubtitleBtn').addEventListener('click', () => addTextElement('subtitle'));
     document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
     document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
+    document.getElementById('addShapeBtn').addEventListener('click', () => addShapeElement('Shape'));
    
     const deleteBtn = document.getElementById('deleteElementBtn');
     if (deleteBtn) {
