@@ -271,13 +271,17 @@
       const hRuler = document.createElement("div");
       hRuler.className = "ruler horizontal";
       hRuler.style.width = pageRect.width + "px";
-      page.appendChild(hRuler);
+      hRuler.style.left = page.offsetLeft + "px";
+      hRuler.style.top = (page.offsetTop - 22) + "px"; // 20px ruler + 2px gap
+      page.parentElement.appendChild(hRuler);
     
       // Vertical ruler
       const vRuler = document.createElement("div");
       vRuler.className = "ruler vertical";
       vRuler.style.height = pageRect.height + "px";
-      page.appendChild(vRuler);
+      vRuler.style.top = page.offsetTop + "px";
+      vRuler.style.left = (page.offsetLeft - 22) + "px"; // 20px ruler + 2px gap
+      page.parentElement.appendChild(vRuler);
     
       /*const container = document.querySelector(".center-container");
       if (!container) return;
