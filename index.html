@@ -278,6 +278,23 @@
       <div class="toolbar-button" id="btnAlign">≡</button>
     </div>
 
+    <div class="shape-toolbar">
+      <label for="shapeType">Shape:</label>
+      <select id="shapeType">
+        <option value="circle">Circle</option>
+        <option value="polygon">Polygon</option>
+        <option value="star">Star</option>
+      </select>
+    
+      <label for="sides">Sides:</label>
+      <input type="number" id="sides" min="3" value="5">
+    
+      <label for="peaks">Peaks:</label>
+      <input type="number" id="peaks" min="3" value="5">
+    
+      <button onclick="updateSelectedShape()">Apply</button>
+    </div>
+        
 <div id="tt" style="display:none;">
     <div class="container">
         <h1>Generador de Horarios</h1>
