@@ -49,7 +49,7 @@
       tabloid: { widthIN: 11, heightIN: 17 }
     };
 
-    function addCustomPaperSize(name, width, height, unit = 'px') {
+    /*function addCustomPaperSize(name, width, height, unit = 'px') {
       paperSizes[name.toLowerCase()] = unit === 'mm'
         ? { widthMM: width, heightMM: height }
         : unit === 'in'
@@ -59,7 +59,26 @@
     
     // Example usage:
     addCustomPaperSize('MyPoster', 500, 700, 'px');
-    console.log(paperSizes);
+    console.log(paperSizes);*/
+
+    selector.addEventListener("change", (e) => {
+      if (e.target.value === "custom") {
+        document.getElementById("customSizeInputs").style.display = "block";
+      } else {
+        document.getElementById("customSizeInputs").style.display = "none";
+        updateRectSize(e.target.value);
+      }
+    });
+    
+    document.getElementById("applyCustomSize").addEventListener("click", () => {
+      const w = parseFloat(document.getElementById("customWidth").value);
+      const h = parseFloat(document.getElementById("customHeight").value);
+      const unit = document.getElementById("customUnit").value;
+      if (!isNaN(w) && !isNaN(h)) {
+        addCustomPaperSize("custom", w, h, unit);
+        updateRectSize("custom");
+      }
+    });
 
     function mmToPx(mm) { return mm * 3.78; }
     function inToPx(inches) { return inches * 96; }
@@ -229,83 +248,99 @@
     document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
 
     const units = ["px", "pt", "mm", "cm", "in"];
-function convertToPx(value, unit) {
-  switch (unit) {
-    case "px": return value;
-    case "pt": return value * 96 / 72;  // 1pt = 1/72 in
-    case "mm": return value * 3.78;
-    case "cm": return value * 37.8;
-    case "in": return value * 96;
-  }
-}
-
-function drawRulers() {
-  // Remove old rulers
-  document.querySelectorAll(".ruler").forEach(r => r.remove());
-  if (!rulersVisible) return;
-
-  const container = document.querySelector(".center-container");
-  if (!container) return;
-  const page = pages[currentPageIndex];
-  if (!page) return;
-
-  const pageRect = page.getBoundingClientRect();
-
-  // Horizontal ruler
-  const hRuler = document.createElement("div");
-  hRuler.className = "ruler horizontal";
-  hRuler.style.width = pageRect.width + "px";
-  hRuler.style.left = page.offsetLeft + "px";
-  container.appendChild(hRuler);
-
-  // Vertical ruler
-  const vRuler = document.createElement("div");
-  vRuler.className = "ruler vertical";
-  vRuler.style.height = pageRect.height + "px";
-  vRuler.style.top = page.offsetTop + "px";
-  container.appendChild(vRuler);
-
-  // Tick spacing: every 50px in current unit
-  const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
-  const maxX = pageRect.width;
-  const maxY = pageRect.height;
-
-  // Horizontal ticks
-  for (let x = 0; x <= maxX; x += spacing) {
-    const tick = document.createElement("div");
-    tick.className = "tick";
-    tick.style.left = x + "px";
-    tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; // longer tick every 5
-    hRuler.appendChild(tick);
-
-    if (x % (spacing * 5) === 0) {
-      const label = document.createElement("div");
-      label.style.position = "absolute";
-      label.style.left = x + 2 + "px";
-      label.style.bottom = "10px";
-      label.textContent = Math.round(x / convertToPx(1, currentRulerUnit));
-      hRuler.appendChild(label);
+    function convertToPx(value, unit) {
+      switch (unit) {
+        case "px": return value;
+        case "pt": return value * 96 / 72;  // 1pt = 1/72 in
+        case "mm": return value * 3.78;
+        case "cm": return value * 37.8;
+        case "in": return value * 96;
+      }
     }
-  }
-
-  // Vertical ticks
-  for (let y = 0; y <= maxY; y += spacing) {
-    const tick = document.createElement("div");
-    tick.className = "tick";
-    tick.style.top = y + "px";
-    tick.style.width = (y % (spacing * 5) === 0) ? "10px" : "6px";
-    vRuler.appendChild(tick);
-
-    if (y % (spacing * 5) === 0) {
-      const label = document.createElement("div");
-      label.style.position = "absolute";
-      label.style.top = y + "px";
-      label.style.right = "12px";
-      label.textContent = Math.round(y / convertToPx(1, currentRulerUnit));
-      vRuler.appendChild(label);
+    
+    function drawRulers() {
+      document.querySelectorAll(".ruler").forEach(r => r.remove());
+      if (!rulersVisible) return;
+    
+      const page = pages[currentPageIndex];
+      if (!page) return;
+    
+      const pageRect = page.getBoundingClientRect();
+    
+      // Horizontal ruler
+      const hRuler = document.createElement("div");
+      hRuler.className = "ruler horizontal";
+      hRuler.style.width = pageRect.width + "px";
+      page.appendChild(hRuler);
+    
+      // Vertical ruler
+      const vRuler = document.createElement("div");
+      vRuler.className = "ruler vertical";
+      vRuler.style.height = pageRect.height + "px";
+      page.appendChild(vRuler);
+    
+      /*const container = document.querySelector(".center-container");
+      if (!container) return;
+      const page = pages[currentPageIndex];
+      if (!page) return;
+    
+      const pageRect = page.getBoundingClientRect();
+    
+      // Horizontal ruler
+      const hRuler = document.createElement("div");
+      hRuler.className = "ruler horizontal";
+      hRuler.style.width = pageRect.width + "px";
+      hRuler.style.left = page.offsetLeft + "px";
+      container.appendChild(hRuler);
+    
+      // Vertical ruler
+      const vRuler = document.createElement("div");
+      vRuler.className = "ruler vertical";
+      vRuler.style.height = pageRect.height + "px";
+      vRuler.style.top = page.offsetTop + "px";
+      container.appendChild(vRuler);*/
+    
+      // Tick spacing: every 50px in current unit
+      const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
+      const maxX = pageRect.width;
+      const maxY = pageRect.height;
+    
+      // Horizontal ticks
+      for (let x = 0; x <= maxX; x += spacing) {
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        tick.style.left = x + "px";
+        tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; // longer tick every 5
+        hRuler.appendChild(tick);
+    
+        if (x % (spacing * 5) === 0) {
+          const label = document.createElement("div");
+          label.style.position = "absolute";
+          label.style.left = x + 2 + "px";
+          label.style.bottom = "10px";
+          label.textContent = Math.round(x / convertToPx(1, currentRulerUnit));
+          hRuler.appendChild(label);
+        }
+      }
+    
+      // Vertical ticks
+      for (let y = 0; y <= maxY; y += spacing) {
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        tick.style.top = y + "px";
+        tick.style.width = (y % (spacing * 5) === 0) ? "10px" : "6px";
+        vRuler.appendChild(tick);
+    
+        if (y % (spacing * 5) === 0) {
+          const label = document.createElement("div");
+          label.style.position = "absolute";
+          label.style.top = y + "px";
+          label.style.right = "12px";
+          label.textContent = Math.round(y / convertToPx(1, currentRulerUnit));
+          vRuler.appendChild(label);
+        }
+      }
     }
-  }
-}
 
     function toggleRulers() {
       rulersVisible = !rulersVisible;
