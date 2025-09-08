@@ -387,7 +387,104 @@
       makeElementDraggable(element);
       selectElement(element);
     }
+
+    function addShapeElement(shapeType = 'circle') {
+      if (!pages[currentPageIndex]) return;
     
+      const pageContent = pages[currentPageIndex].querySelector('.page-content');
+      const element = document.createElement('div');
+      element.className = 'shape-element';
+      element.setAttribute('tabindex', '0');
+      element.style.top = '50px';
+      element.style.left = '50px';
+      element.style.position = 'absolute';
+      element.style.width = '100px';
+      element.style.height = '100px';
+      element.style.display = 'flex';
+      element.style.alignItems = 'center';
+      element.style.justifyContent = 'center';
+    
+      // defaults
+      element.dataset.shape = shapeType;
+      element.dataset.sides = 5; // for polygon
+      element.dataset.peaks = 5; // for star
+    
+      // helper to draw shape in element
+      function renderShape() {
+        const type = element.dataset.shape;
+        const sides = parseInt(element.dataset.sides);
+        const peaks = parseInt(element.dataset.peaks);
+    
+        // reset
+        element.innerHTML = '';
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        svg.setAttribute('viewBox', '0 0 100 100');
+    
+        let shape;
+    
+        if (type === 'circle') {
+          shape = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          shape.setAttribute('cx', '50');
+          shape.setAttribute('cy', '50');
+          shape.setAttribute('r', '40');
+          shape.setAttribute('fill', '#d0e0ff');
+        } else if (type === 'polygon') {
+          let points = [];
+          for (let i = 0; i < sides; i++) {
+            const angle = 2 * Math.PI * i / sides;
+            const x = 50 + 40 * Math.cos(angle);
+            const y = 50 + 40 * Math.sin(angle);
+            points.push(`${x},${y}`);
+          }
+          shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          shape.setAttribute('points', points.join(' '));
+          shape.setAttribute('fill', '#ffd0d0');
+        } else if (type === 'star') {
+          let points = [];
+          for (let i = 0; i < peaks * 2; i++) {
+            const r = i % 2 === 0 ? 40 : 20;
+            const angle = Math.PI * i / peaks;
+            const x = 50 + r * Math.cos(angle);
+            const y = 50 + r * Math.sin(angle);
+            points.push(`${x},${y}`);
+          }
+          shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          shape.setAttribute('points', points.join(' '));
+          shape.setAttribute('fill', '#d0ffd0');
+        }
+    
+        svg.appendChild(shape);
+        element.appendChild(svg);
+      }
+    
+      renderShape();
+    
+      // toolbar-like interaction
+      element.addEventListener('dblclick', () => {
+        const choice = prompt('Choose shape: circle, polygon, star', element.dataset.shape);
+        if (choice) {
+          element.dataset.shape = choice.toLowerCase();
+          if (choice === 'polygon') {
+            const sides = prompt('Number of sides?', element.dataset.sides);
+            if (sides) element.dataset.sides = sides;
+          } else if (choice === 'star') {
+            const peaks = prompt('Number of peaks?', element.dataset.peaks);
+            if (peaks) element.dataset.peaks = peaks;
+          }
+          renderShape();
+        }
+      });
+    
+      element.style.resize = 'both';
+      element.style.overflow = 'hidden';
+    
+      pageContent.appendChild(element);
+      makeElementDraggable(element);
+      selectElement(element);
+    }
+
     function selectElement(element) {
       if (selectedElement) {
         selectedElement.classList.remove('selected');
