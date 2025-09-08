@@ -388,9 +388,6 @@ window.addEventListener("resize", () => {
           element.style.background = '#f0f0f0';
           element.contentEditable = false;
           break;
-        case 'shape':
-          element.style.background = '#f0f0f0';
-          break;
       }
         
       element.style.resize = 'both';
@@ -400,6 +397,50 @@ window.addEventListener("resize", () => {
       makeElementDraggable(element);
       selectElement(element);
     }
+
+    // Helper function to create a shape element
+    function addShape(type) {
+      if (!pages[currentPageIndex]) return;
+    
+      const pageContent = pages[currentPageIndex].querySelector('.page-content');
+      const shape = document.createElement('div');
+      shape.className = 'shape-element';
+      shape.style.position = 'absolute';
+      shape.style.top = '50px';
+      shape.style.left = '50px';
+      shape.style.width = '80px';
+      shape.style.height = '80px';
+      shape.style.background = '#f0f0f0';
+      shape.style.display = 'flex';
+      shape.style.alignItems = 'center';
+      shape.style.justifyContent = 'center';
+      shape.style.cursor = 'move';
+      shape.style.resize = 'both';
+      shape.style.overflow = 'hidden';
+    
+      switch(type) {
+        case 'circle':
+          shape.style.borderRadius = '50%';
+          break;
+        case 'Polygon':
+          // simple hexagon with clip-path
+          shape.style.clipPath = 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)';
+          break;
+        case 'Star':
+          // 5-point star using clip-path
+          shape.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+          break;
+      }
+    
+      pageContent.appendChild(shape);
+      makeElementDraggable(shape);
+      selectElement(shape);
+    }
+    
+    // Attach buttons
+    document.getElementById('circle').addEventListener('click', () => addShape('circle'));
+    document.getElementById('Polygon').addEventListener('click', () => addShape('Polygon'));
+    document.getElementById('Star').addEventListener('click', () => addShape('Star'));
     
     function selectElement(element) {
       if (selectedElement) {
@@ -877,7 +918,6 @@ window.addEventListener("resize", () => {
     document.getElementById('addSubtitleBtn').addEventListener('click', () => addTextElement('subtitle'));
     document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
     document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
-    document.getElementById('addShapeBtn').addEventListener('click', () => addShapeElement('shape'));
    
     const deleteBtn = document.getElementById('deleteElementBtn');
     if (deleteBtn) {
