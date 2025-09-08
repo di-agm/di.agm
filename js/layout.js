@@ -961,6 +961,7 @@
     document.getElementById('addSubtitleBtn').addEventListener('click', () => addTextElement('subtitle'));
     document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
     document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
+    document.getElementById('addShapeBtn').addEventListener('click', () => { addShapeElement('circle');});
    
     const deleteBtn = document.getElementById('deleteElementBtn');
     if (deleteBtn) {
