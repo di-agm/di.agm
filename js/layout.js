@@ -52,18 +52,6 @@
       tabloid: { widthIN: 11, heightIN: 17 }
     };
 
-    /*function addCustomPaperSize(name, width, height, unit = 'px') {
-      paperSizes[name.toLowerCase()] = unit === 'mm'
-        ? { widthMM: width, heightMM: height }
-        : unit === 'in'
-          ? { widthIN: width, heightIN: height }
-          : { widthPX: width, heightPX: height };
-    }
-    
-    // Example usage:
-    addCustomPaperSize('MyPoster', 500, 700, 'px');
-    console.log(paperSizes);*/
-
     selector.addEventListener("change", (e) => {
       if (e.target.value === "custom") {
         document.getElementById("customSizeInputs").style.display = "block";
@@ -112,6 +100,10 @@
         heightPx = heightPx * scale;
 
     if (rulersVisible) drawRulers();
+
+    window.addEventListener("resize", () => {
+      if (rulersVisible) drawRulers();
+    });
     }
       
       const page = pages[currentPageIndex];
@@ -287,27 +279,6 @@
       vRuler.style.top = page.offsetTop + "px";
       vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
       page.parentElement.appendChild(vRuler);
-    
-      /*const container = document.querySelector(".center-container");
-      if (!container) return;
-      const page = pages[currentPageIndex];
-      if (!page) return;
-    
-      const pageRect = page.getBoundingClientRect();
-    
-      // Horizontal ruler
-      const hRuler = document.createElement("div");
-      hRuler.className = "ruler horizontal";
-      hRuler.style.width = pageRect.width + "px";
-      hRuler.style.left = page.offsetLeft + "px";
-      container.appendChild(hRuler);
-    
-      // Vertical ruler
-      const vRuler = document.createElement("div");
-      vRuler.className = "ruler vertical";
-      vRuler.style.height = pageRect.height + "px";
-      vRuler.style.top = page.offsetTop + "px";
-      container.appendChild(vRuler);*/
     
       // Tick spacing: every 50px in current unit
       const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
