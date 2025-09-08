@@ -102,7 +102,7 @@
     if (rulersVisible) drawRulers();
 
     window.addEventListener("resize", () => {
-      if (rulersVisible) drawRulers();
+      updateRuler();
     });
     }
       
