@@ -378,6 +378,9 @@
           element.style.background = '#f0f0f0';
           element.contentEditable = false;
           break;
+        case 'shape':
+          element.style.background = '#f0f0f0';
+          break;
       }
         
       element.style.resize = 'both';
