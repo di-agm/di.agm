@@ -52,18 +52,6 @@
       tabloid: { widthIN: 11, heightIN: 17 }
     };
 
-    /*function addCustomPaperSize(name, width, height, unit = 'px') {
-      paperSizes[name.toLowerCase()] = unit === 'mm'
-        ? { widthMM: width, heightMM: height }
-        : unit === 'in'
-          ? { widthIN: width, heightIN: height }
-          : { widthPX: width, heightPX: height };
-    }
-    
-    // Example usage:
-    addCustomPaperSize('MyPoster', 500, 700, 'px');
-    console.log(paperSizes);*/
-
     selector.addEventListener("change", (e) => {
       if (e.target.value === "custom") {
         document.getElementById("customSizeInputs").style.display = "block";
@@ -287,27 +275,6 @@
       vRuler.style.top = page.offsetTop + "px";
       vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
       page.parentElement.appendChild(vRuler);
-    
-      /*const container = document.querySelector(".center-container");
-      if (!container) return;
-      const page = pages[currentPageIndex];
-      if (!page) return;
-    
-      const pageRect = page.getBoundingClientRect();
-    
-      // Horizontal ruler
-      const hRuler = document.createElement("div");
-      hRuler.className = "ruler horizontal";
-      hRuler.style.width = pageRect.width + "px";
-      hRuler.style.left = page.offsetLeft + "px";
-      container.appendChild(hRuler);
-    
-      // Vertical ruler
-      const vRuler = document.createElement("div");
-      vRuler.className = "ruler vertical";
-      vRuler.style.height = pageRect.height + "px";
-      vRuler.style.top = page.offsetTop + "px";
-      container.appendChild(vRuler);*/
     
       // Tick spacing: every 50px in current unit
       const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
@@ -598,7 +565,50 @@
       center.removeEventListener("mousemove", panMove);
       center.removeEventListener("mouseup", endPan);
     }
+
+    //Shape
+    document.getElementById("addShapeBtn").addEventListener("click", () => {
+      const shapeType = prompt("Enter shape: circle or polygon?");
+      let shape;
     
+      if (shapeType === "circle") {
+        shape = document.createElement("div");
+        shape.style.width = "100px";
+        shape.style.height = "100px";
+        shape.style.borderRadius = "50%";
+        shape.style.background = "lightblue";
+      } 
+      else if (shapeType === "polygon") {
+        const sides = parseInt(prompt("How many sides?"), 10);
+        if (isNaN(sides) || sides < 3) return;
+        shape = document.createElement("div");
+        shape.style.width = "120px";
+        shape.style.height = "120px";
+        shape.style.background = "lightcoral";
+        shape.style.clipPath = `polygon(${polygonPoints(sides, 60).join(",")})`;
+      } else {
+        return;
+      }
+    
+      shape.classList.add("draggable");
+      shape.style.position = "absolute";
+      shape.style.top = "50px";
+      shape.style.left = "50px";
+      pages[currentPageIndex].appendChild(shape);
+    });
+    
+    // Helper: generate polygon points in percentage coords
+    function polygonPoints(sides, radiusPercent) {
+      const points = [];
+      for (let i = 0; i < sides; i++) {
+        const angle = (i / sides) * 2 * Math.PI - Math.PI / 2;
+        const x = 50 + radiusPercent * Math.cos(angle);
+        const y = 50 + radiusPercent * Math.sin(angle);
+        points.push(`${x}% ${y}%`);
+      }
+      return points;
+    }
+
     // Export functions
     function exportAsImage(format) {
       if (!pages[currentPageIndex]) return;
