@@ -447,7 +447,7 @@ window.addEventListener("resize", () => {
         selectedElement.classList.remove('selected');
       }
       selectedElement = element;
-      document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
       selectedElement.classList.add('selected');
       const toolbar = document.getElementById('elementToolbar');
       const rect = element.getBoundingClientRect();
