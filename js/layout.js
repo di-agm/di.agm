@@ -401,10 +401,9 @@
       element.style.width = '120px';
       element.style.height = '120px';
       element.style.display = 'flex';
-      element.style.flexDirection = 'column'; // so toolbar is above the shape
+      element.style.flexDirection = 'column';
       element.style.alignItems = 'center';
       element.style.justifyContent = 'flex-start';
-      element.style.background = 'transparent';
     
       // defaults
       element.dataset.shape = shapeType;
@@ -418,27 +417,14 @@
       toolbar.style.margin = '2px';
       toolbar.style.zIndex = '10';
     
-      const circleBtn = document.createElement('button');
-      circleBtn.textContent = '○';
-      const polygonBtn = document.createElement('button');
-      polygonBtn.textContent = '⬠';
-      const starBtn = document.createElement('button');
-      starBtn.textContent = '★';
+      const changeBtn = document.createElement('button');
+      changeBtn.textContent = '✎'; // change shape
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '🗑'; // delete
     
-      toolbar.appendChild(circleBtn);
-      toolbar.appendChild(polygonBtn);
-      toolbar.appendChild(starBtn);
+      toolbar.appendChild(changeBtn);
+      toolbar.appendChild(deleteBtn);
       element.appendChild(toolbar);
-    
-      // ---- Shape Container ----
-      const shapeContainer = document.createElement('div');
-      shapeContainer.style.flex = '1';
-      shapeContainer.style.width = '100%';
-      shapeContainer.style.height = '100%';
-      shapeContainer.style.display = 'flex';
-      shapeContainer.style.alignItems = 'center';
-      shapeContainer.style.justifyContent = 'center';
-      element.appendChild(shapeContainer);
     
       // ---- Render Shape ----
       function renderShape() {
@@ -446,7 +432,9 @@
         const sides = parseInt(element.dataset.sides);
         const peaks = parseInt(element.dataset.peaks);
     
-        shapeContainer.innerHTML = '';
+        // clear previous shape
+        element.querySelectorAll('svg').forEach(s => s.remove());
+    
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
@@ -486,29 +474,34 @@
         }
     
         svg.appendChild(shape);
-        shapeContainer.appendChild(svg);
+        element.appendChild(svg);
       }
     
       renderShape();
     
       // ---- Toolbar Actions ----
-      circleBtn.addEventListener('click', () => {
-        element.dataset.shape = 'circle';
-        renderShape();
+      changeBtn.addEventListener('click', () => {
+        const choice = prompt('Choose shape: circle, polygon, star', element.dataset.shape);
+        if (!choice) return;
+    
+        const type = choice.toLowerCase();
+        if (['circle', 'polygon', 'star'].includes(type)) {
+          element.dataset.shape = type;
+    
+          if (type === 'polygon') {
+            const sides = prompt('Number of sides?', element.dataset.sides);
+            if (sides) element.dataset.sides = sides;
+          } else if (type === 'star') {
+            const peaks = prompt('Number of peaks?', element.dataset.peaks);
+            if (peaks) element.dataset.peaks = peaks;
+          }
+    
+          renderShape();
+        }
       });
     
-      polygonBtn.addEventListener('click', () => {
-        const sides = prompt('Number of sides?', element.dataset.sides);
-        if (sides) element.dataset.sides = sides;
-        element.dataset.shape = 'polygon';
-        renderShape();
-      });
-    
-      starBtn.addEventListener('click', () => {
-        const peaks = prompt('Number of peaks?', element.dataset.peaks);
-        if (peaks) element.dataset.peaks = peaks;
-        element.dataset.shape = 'star';
-        renderShape();
+      deleteBtn.addEventListener('click', () => {
+        element.remove();
       });
     
       // resizable + draggable
