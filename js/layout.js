@@ -99,7 +99,12 @@
         widthPx = widthPx * scale;
         heightPx = heightPx * scale;
 
-    if (rulersVisible) drawRulers();
+      pages[currentPageIndex].width = widthPx;
+      pages[currentPageIndex].height = heightPx;
+
+      if (rulersVisible) {
+        drawRulers(widthPx, heightPx);
+      }
     }
 
 window.addEventListener("resize", () => {
