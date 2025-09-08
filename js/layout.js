@@ -268,40 +268,27 @@ window.addEventListener("resize", () => {
       const page = pages[currentPageIndex];
       if (!page) return;
     
-      const pageRect = page.getBoundingClientRect();
+      const container = page.parentElement;
     
-      /*
+      // Horizontal ruler (above page)
       const hRuler = document.createElement("div");
       hRuler.className = "ruler horizontal";
-      hRuler.style.width = pageRect.width + "px";
+      hRuler.style.position = "absolute";
+      hRuler.style.width = page.clientWidth + "px";
+      hRuler.style.height = "20px"; // ruler thickness
       hRuler.style.left = page.offsetLeft + "px";
-      hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
-      page.parentElement.appendChild(hRuler);
+      hRuler.style.top = (page.offsetTop - 25) + "px"; // adjust gap above page
+      container.appendChild(hRuler);
     
-      // Vertical ruler
+      // Vertical ruler (left of page)
       const vRuler = document.createElement("div");
       vRuler.className = "ruler vertical";
-      vRuler.style.height = pageRect.height + "px";
+      vRuler.style.position = "absolute";
+      vRuler.style.height = page.clientHeight + "px";
+      vRuler.style.width = "20px"; // ruler thickness
+      vRuler.style.left = (page.offsetLeft - 25) + "px"; // adjust gap
       vRuler.style.top = page.offsetTop + "px";
-      vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
-      page.parentElement.appendChild(vRuler);*/
-        // Horizontal ruler
-        const hRuler = document.createElement("div");
-        hRuler.className = "ruler horizontal";
-        hRuler.style.position = "absolute";
-        hRuler.style.top = "0px";
-        hRuler.style.left = "0px";
-        hRuler.style.width = page.clientWidth + "px";
-        page.appendChild(hRuler);
-        
-        // Vertical ruler
-        const vRuler = document.createElement("div");
-        vRuler.className = "ruler vertical";
-        vRuler.style.position = "absolute";
-        vRuler.style.top = "0px";
-        vRuler.style.left = "0px";
-        vRuler.style.height = page.clientHeight + "px";
-        page.appendChild(vRuler);
+      container.appendChild(vRuler);
 
       // Tick spacing: every 50px in current unit
       const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
