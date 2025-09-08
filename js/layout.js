@@ -398,25 +398,55 @@
       element.style.top = '50px';
       element.style.left = '50px';
       element.style.position = 'absolute';
-      element.style.width = '100px';
-      element.style.height = '100px';
+      element.style.width = '120px';
+      element.style.height = '120px';
       element.style.display = 'flex';
+      element.style.flexDirection = 'column'; // so toolbar is above the shape
       element.style.alignItems = 'center';
-      element.style.justifyContent = 'center';
+      element.style.justifyContent = 'flex-start';
+      element.style.background = 'transparent';
     
       // defaults
       element.dataset.shape = shapeType;
-      element.dataset.sides = 5; // for polygon
-      element.dataset.peaks = 5; // for star
+      element.dataset.sides = 5; // polygon
+      element.dataset.peaks = 5; // star
     
-      // helper to draw shape in element
+      // ---- Toolbar ----
+      const toolbar = document.createElement('div');
+      toolbar.style.display = 'flex';
+      toolbar.style.gap = '4px';
+      toolbar.style.margin = '2px';
+      toolbar.style.zIndex = '10';
+    
+      const circleBtn = document.createElement('button');
+      circleBtn.textContent = '○';
+      const polygonBtn = document.createElement('button');
+      polygonBtn.textContent = '⬠';
+      const starBtn = document.createElement('button');
+      starBtn.textContent = '★';
+    
+      toolbar.appendChild(circleBtn);
+      toolbar.appendChild(polygonBtn);
+      toolbar.appendChild(starBtn);
+      element.appendChild(toolbar);
+    
+      // ---- Shape Container ----
+      const shapeContainer = document.createElement('div');
+      shapeContainer.style.flex = '1';
+      shapeContainer.style.width = '100%';
+      shapeContainer.style.height = '100%';
+      shapeContainer.style.display = 'flex';
+      shapeContainer.style.alignItems = 'center';
+      shapeContainer.style.justifyContent = 'center';
+      element.appendChild(shapeContainer);
+    
+      // ---- Render Shape ----
       function renderShape() {
         const type = element.dataset.shape;
         const sides = parseInt(element.dataset.sides);
         const peaks = parseInt(element.dataset.peaks);
     
-        // reset
-        element.innerHTML = '';
+        shapeContainer.innerHTML = '';
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
@@ -456,27 +486,32 @@
         }
     
         svg.appendChild(shape);
-        element.appendChild(svg);
+        shapeContainer.appendChild(svg);
       }
     
       renderShape();
     
-      // toolbar-like interaction
-      element.addEventListener('dblclick', () => {
-        const choice = prompt('Choose shape: circle, polygon, star', element.dataset.shape);
-        if (choice) {
-          element.dataset.shape = choice.toLowerCase();
-          if (choice === 'polygon') {
-            const sides = prompt('Number of sides?', element.dataset.sides);
-            if (sides) element.dataset.sides = sides;
-          } else if (choice === 'star') {
-            const peaks = prompt('Number of peaks?', element.dataset.peaks);
-            if (peaks) element.dataset.peaks = peaks;
-          }
-          renderShape();
-        }
+      // ---- Toolbar Actions ----
+      circleBtn.addEventListener('click', () => {
+        element.dataset.shape = 'circle';
+        renderShape();
       });
     
+      polygonBtn.addEventListener('click', () => {
+        const sides = prompt('Number of sides?', element.dataset.sides);
+        if (sides) element.dataset.sides = sides;
+        element.dataset.shape = 'polygon';
+        renderShape();
+      });
+    
+      starBtn.addEventListener('click', () => {
+        const peaks = prompt('Number of peaks?', element.dataset.peaks);
+        if (peaks) element.dataset.peaks = peaks;
+        element.dataset.shape = 'star';
+        renderShape();
+      });
+    
+      // resizable + draggable
       element.style.resize = 'both';
       element.style.overflow = 'hidden';
     
