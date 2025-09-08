@@ -99,19 +99,13 @@
         widthPx = widthPx * scale;
         heightPx = heightPx * scale;
 
-      pages[currentPageIndex].width = widthPx;
-      pages[currentPageIndex].height = heightPx;
+    if (rulersVisible) drawRulers();
 
-      if (rulersVisible) {
-        drawRulers(widthPx, heightPx);
-      }
+    window.addEventListener("resize", () => {
+      updateRuler();
+    });
     }
-
-window.addEventListener("resize", () => {
-  updateRectSize(currentPaperKey);
-  updateRuler();
-});
-        
+      
       const page = pages[currentPageIndex];
 
       // Apply the correct dimensions based on orientation
@@ -268,28 +262,24 @@ window.addEventListener("resize", () => {
       const page = pages[currentPageIndex];
       if (!page) return;
     
-      const container = page.parentElement;
+      const pageRect = page.getBoundingClientRect();
     
-      // Horizontal ruler (above page)
+      // Horizontal ruler
       const hRuler = document.createElement("div");
       hRuler.className = "ruler horizontal";
-      hRuler.style.position = "absolute";
-      hRuler.style.width = page.clientWidth + "px";
-      hRuler.style.height = "20px"; // ruler thickness
+      hRuler.style.width = pageRect.width + "px";
       hRuler.style.left = page.offsetLeft + "px";
-      hRuler.style.top = (page.offsetTop - 25) + "px"; // adjust gap above page
-      container.appendChild(hRuler);
+      hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
+      page.parentElement.appendChild(hRuler);
     
-      // Vertical ruler (left of page)
+      // Vertical ruler
       const vRuler = document.createElement("div");
       vRuler.className = "ruler vertical";
-      vRuler.style.position = "absolute";
-      vRuler.style.height = page.clientHeight + "px";
-      vRuler.style.width = "20px"; // ruler thickness
-      vRuler.style.left = (page.offsetLeft - 25) + "px"; // adjust gap
+      vRuler.style.height = pageRect.height + "px";
       vRuler.style.top = page.offsetTop + "px";
-      container.appendChild(vRuler);
-
+      vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
+      page.parentElement.appendChild(vRuler);
+    
       // Tick spacing: every 50px in current unit
       const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
       const maxX = pageRect.width;
@@ -397,86 +387,43 @@ window.addEventListener("resize", () => {
       makeElementDraggable(element);
       selectElement(element);
     }
-
-    function selectElement(element) {
-      if (selectedElement) selectedElement.classList.remove('selected');
-      selectedElement = element;
-      document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
-      selectedElement.classList.add('selected');
     
+    function selectElement(element) {
+      if (selectedElement) {
+        selectedElement.classList.remove('selected');
+      }
+      selectedElement = element;
+      document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
+      selectedElement.classList.add('selected');
       const toolbar = document.getElementById('elementToolbar');
       const rect = element.getBoundingClientRect();
       const containerRect = document.body.getBoundingClientRect();
       toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
       toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       toolbar.style.display = 'flex';
-    
       document.getElementById('elementEditor').style.display = 'block';
       document.getElementById('noElementSelected').style.display = 'none';
-    
-      // Only set font controls if text element
-      if (element.classList.contains('text-element')) {
-        const fontSizeInput = document.getElementById('fontSizeInput');
-        fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-        const fontFamilySelect = document.getElementById('fontFamilySelect');
-        fontFamilySelect.value = selectedElement.style.fontFamily || '';
-        const colorInput = document.getElementById('colorPickerInput');
-        colorInput.value = selectedElement.style.color || '#000000';
-      }
-    }
-    
-    // Create shapes
-    function addShape(type) {
-      if (!pages[currentPageIndex]) return;
-      const pageContent = pages[currentPageIndex].querySelector('.page-content');
-    
-      const shape = document.createElement('div');
-      shape.className = 'shape-element';
-      shape.style.position = 'absolute';
-      shape.style.top = '50px';
-      shape.style.left = '50px';
-      shape.style.width = '80px';
-      shape.style.height = '80px';
-      shape.style.background = '#f0f0f0';
-      shape.style.display = 'flex';
-      shape.style.alignItems = 'center';
-      shape.style.justifyContent = 'center';
-      shape.style.cursor = 'move';
-      shape.style.resize = 'both';
-      shape.style.overflow = 'hidden';
-    
-      switch(type) {
-        case 'circle':
-          shape.style.borderRadius = '50%';
-          break;
-        case 'Polygon':
-          shape.style.clipPath = 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)';
-          break;
-        case 'Star':
-          shape.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
-          break;
-      }
-    
-      pageContent.appendChild(shape);
-      makeElementDraggable(shape);
-      selectElement(shape);
-    }
-    
-    // Buttons
-    document.getElementById('circle').addEventListener('click', () => addShape('circle'));
-    document.getElementById('Polygon').addEventListener('click', () => addShape('Polygon'));
-    document.getElementById('Star').addEventListener('click', () => addShape('Star'));
+      const fontSizeInput = document.getElementById('fontSizeInput');
+      if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+      const fontFamilySelect = document.getElementById('fontFamilySelect');
+      if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+      const colorInput = document.getElementById('colorPickerInput');
+      if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
     function makeElementDraggable(el) {
       let offsetX = 0, offsetY = 0, isDragging = false;
       el.addEventListener('mousedown', (e) => {
-          // If resizing, skip drag
+          // If the element is resizable and the user clicked on the resize handle, skip dragging
           if (getComputedStyle(el).resize !== "none") {
             const rect = el.getBoundingClientRect();
-            const resizeHandle = 16; 
-            if (e.clientX > rect.right - resizeHandle && e.clientY > rect.bottom - resizeHandle) return;
+            const resizeHandleSize = 16; // px size for the corner region
+        
+            // bottom-right corner = resize zone
+            if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
+              return; // let the browser handle resizing
+            }
           }
-          
+        
           e.preventDefault();
           isDragging = true;
           const rect = el.getBoundingClientRect();
@@ -484,7 +431,7 @@ window.addEventListener("resize", () => {
           offsetY = e.clientY - rect.top;
           document.addEventListener('mousemove', onMouseMove);
           document.addEventListener('mouseup', onMouseUp);
-      });
+        });
 
       function onMouseMove(e) {
         if (!isDragging) return;
@@ -497,7 +444,6 @@ window.addEventListener("resize", () => {
         el.style.left = newLeft + 'px';
         el.style.top = newTop + 'px';
       }
-    
       function onMouseUp() {
         isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
