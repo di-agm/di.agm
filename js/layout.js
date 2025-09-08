@@ -398,11 +398,38 @@ window.addEventListener("resize", () => {
       selectElement(element);
     }
 
-    // Helper function to create a shape element
+    function selectElement(element) {
+      if (selectedElement) selectedElement.classList.remove('selected');
+      selectedElement = element;
+      document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
+      selectedElement.classList.add('selected');
+    
+      const toolbar = document.getElementById('elementToolbar');
+      const rect = element.getBoundingClientRect();
+      const containerRect = document.body.getBoundingClientRect();
+      toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+      toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+      toolbar.style.display = 'flex';
+    
+      document.getElementById('elementEditor').style.display = 'block';
+      document.getElementById('noElementSelected').style.display = 'none';
+    
+      // Only set font controls if text element
+      if (element.classList.contains('text-element')) {
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+        const fontFamilySelect = document.getElementById('fontFamilySelect');
+        fontFamilySelect.value = selectedElement.style.fontFamily || '';
+        const colorInput = document.getElementById('colorPickerInput');
+        colorInput.value = selectedElement.style.color || '#000000';
+      }
+    }
+    
+    // Create shapes
     function addShape(type) {
       if (!pages[currentPageIndex]) return;
-    
       const pageContent = pages[currentPageIndex].querySelector('.page-content');
+    
       const shape = document.createElement('div');
       shape.className = 'shape-element';
       shape.style.position = 'absolute';
@@ -423,11 +450,9 @@ window.addEventListener("resize", () => {
           shape.style.borderRadius = '50%';
           break;
         case 'Polygon':
-          // simple hexagon with clip-path
           shape.style.clipPath = 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)';
           break;
         case 'Star':
-          // 5-point star using clip-path
           shape.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
           break;
       }
@@ -437,47 +462,21 @@ window.addEventListener("resize", () => {
       selectElement(shape);
     }
     
-    // Attach buttons
+    // Buttons
     document.getElementById('circle').addEventListener('click', () => addShape('circle'));
     document.getElementById('Polygon').addEventListener('click', () => addShape('Polygon'));
     document.getElementById('Star').addEventListener('click', () => addShape('Star'));
-    
-    function selectElement(element) {
-      if (selectedElement) {
-        selectedElement.classList.remove('selected');
-      }
-      selectedElement = element;
-      document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
-      selectedElement.classList.add('selected');
-      const toolbar = document.getElementById('elementToolbar');
-      const rect = element.getBoundingClientRect();
-      const containerRect = document.body.getBoundingClientRect();
-      toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
-      toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-      toolbar.style.display = 'flex';
-      document.getElementById('elementEditor').style.display = 'block';
-      document.getElementById('noElementSelected').style.display = 'none';
-      const fontSizeInput = document.getElementById('fontSizeInput');
-      if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-      const fontFamilySelect = document.getElementById('fontFamilySelect');
-      if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-      const colorInput = document.getElementById('colorPickerInput');
-      if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
     function makeElementDraggable(el) {
       let offsetX = 0, offsetY = 0, isDragging = false;
       el.addEventListener('mousedown', (e) => {
-          // If the element is resizable and the user clicked on the resize handle, skip dragging
+          // If resizing, skip drag
           if (getComputedStyle(el).resize !== "none") {
             const rect = el.getBoundingClientRect();
-            const resizeHandleSize = 16; // px size for the corner region
-        
-            // bottom-right corner = resize zone
-            if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
-              return; // let the browser handle resizing
-            }
+            const resizeHandle = 16; 
+            if (e.clientX > rect.right - resizeHandle && e.clientY > rect.bottom - resizeHandle) return;
           }
-        
+          
           e.preventDefault();
           isDragging = true;
           const rect = el.getBoundingClientRect();
@@ -485,7 +484,7 @@ window.addEventListener("resize", () => {
           offsetY = e.clientY - rect.top;
           document.addEventListener('mousemove', onMouseMove);
           document.addEventListener('mouseup', onMouseUp);
-        });
+      });
 
       function onMouseMove(e) {
         if (!isDragging) return;
@@ -498,6 +497,7 @@ window.addEventListener("resize", () => {
         el.style.left = newLeft + 'px';
         el.style.top = newTop + 'px';
       }
+    
       function onMouseUp() {
         isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
