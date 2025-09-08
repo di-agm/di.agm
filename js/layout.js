@@ -270,7 +270,7 @@ window.addEventListener("resize", () => {
     
       const pageRect = page.getBoundingClientRect();
     
-      // Horizontal ruler
+      /*
       const hRuler = document.createElement("div");
       hRuler.className = "ruler horizontal";
       hRuler.style.width = pageRect.width + "px";
@@ -284,8 +284,25 @@ window.addEventListener("resize", () => {
       vRuler.style.height = pageRect.height + "px";
       vRuler.style.top = page.offsetTop + "px";
       vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
-      page.parentElement.appendChild(vRuler);
-    
+      page.parentElement.appendChild(vRuler);*/
+        // Horizontal ruler
+        const hRuler = document.createElement("div");
+        hRuler.className = "ruler horizontal";
+        hRuler.style.position = "absolute";
+        hRuler.style.top = "0px";
+        hRuler.style.left = "0px";
+        hRuler.style.width = page.clientWidth + "px";
+        page.appendChild(hRuler);
+        
+        // Vertical ruler
+        const vRuler = document.createElement("div");
+        vRuler.className = "ruler vertical";
+        vRuler.style.position = "absolute";
+        vRuler.style.top = "0px";
+        vRuler.style.left = "0px";
+        vRuler.style.height = page.clientHeight + "px";
+        page.appendChild(vRuler);
+
       // Tick spacing: every 50px in current unit
       const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
       const maxX = pageRect.width;
