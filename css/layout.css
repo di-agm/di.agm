@@ -1,3 +1,25 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden; /* no global scrollbars */
+}
+.main-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+.center-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto; /* only page scrolls here */
+}
+.sidebar {
+  width: 250px;
+  overflow-y: auto;
+}
+
 #sizeSelector {
   padding: 10px 16px;
   font-size: 16px;
