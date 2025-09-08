@@ -272,7 +272,7 @@
       hRuler.className = "ruler horizontal";
       hRuler.style.width = pageRect.width + "px";
       hRuler.style.left = page.offsetLeft + "px";
-      hRuler.style.top = (page.offsetTop - 22) + "px"; // 20px ruler + 2px gap
+      hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
       page.parentElement.appendChild(hRuler);
     
       // Vertical ruler
@@ -280,7 +280,7 @@
       vRuler.className = "ruler vertical";
       vRuler.style.height = pageRect.height + "px";
       vRuler.style.top = page.offsetTop + "px";
-      vRuler.style.left = (page.offsetLeft - 22) + "px"; // 20px ruler + 2px gap
+      vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
       page.parentElement.appendChild(vRuler);
     
       /*const container = document.querySelector(".center-container");
