@@ -137,6 +137,17 @@
         <option value="tabloid">Tabloid (11 × 17 in)</option>
         <option value="custom">Custom Size...</option>
       </select>
+        <div id="customSizeInputs" style="display:none; margin-top:5px;">
+          <input type="number" id="customWidth" placeholder="Width">
+          <input type="number" id="customHeight" placeholder="Height">
+          <select id="customUnit">
+            <option value="px">px</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="in">in</option>
+          </select>
+          <button id="applyCustomSize">Apply</button>
+        </div>
       <div style="margin-top: 10px;"></div>
       <button class="sidebar-btn full-width" id="orientationBtn">↺</button>
     </div>
