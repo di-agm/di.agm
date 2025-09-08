@@ -7,6 +7,9 @@
     let currentRulerUnit = "px"; // px, pt, mm, cm, in
     let marginsVisible = false;
     let pageNumbersVisible = true;
+    let zoomLevel = 1;
+    let isPanning = false;
+    let startX, startY, scrollLeft, scrollTop;
 
     function createPage(pageNumber) {
       const page = document.createElement('div');
@@ -107,7 +110,9 @@
         const scale = maxWidthPx / widthPx;
         widthPx = widthPx * scale;
         heightPx = heightPx * scale;
-      }
+
+    if (rulersVisible) drawRulers();
+    }
       
       const page = pages[currentPageIndex];
 
@@ -509,32 +514,32 @@
      });
     });
 
-document.addEventListener('click', (e) => {
-  const toolbar = document.getElementById('elementToolbar');
-  if (!toolbar) {
-    console.error('Toolbar element not found');
-    return;
-  }
-
-  if (e.target.closest('.text-element')) {
-    // Show the toolbar when a text-element is clicked
-    toolbar.style.display = 'flex'; // use flex if it contains multiple icons
-    // Position the toolbar under the clicked element
-    const rect = e.target.getBoundingClientRect();
-    toolbar.style.position = 'absolute';
-    toolbar.style.top = window.scrollY + rect.bottom + 'px';
-    toolbar.style.left = window.scrollX + rect.left + 'px';
-  } 
-  else if (!e.target.closest('#elementEditor') &&
-           !e.target.closest('#elementToolbar') &&
-           !e.target.closest('.sidebar-btn')) {
-    // Hide the toolbar when clicking outside
-    toolbar.style.display = 'none';
-    if (typeof deselectElement === 'function') {
-      deselectElement();
-    }
-  }
-});
+    document.addEventListener('click', (e) => {
+      const toolbar = document.getElementById('elementToolbar');
+      if (!toolbar) {
+        console.error('Toolbar element not found');
+        return;
+      }
+    
+      if (e.target.closest('.text-element')) {
+        // Show the toolbar when a text-element is clicked
+        toolbar.style.display = 'flex'; // use flex if it contains multiple icons
+        // Position the toolbar under the clicked element
+        const rect = e.target.getBoundingClientRect();
+        toolbar.style.position = 'absolute';
+        toolbar.style.top = window.scrollY + rect.bottom + 'px';
+        toolbar.style.left = window.scrollX + rect.left + 'px';
+      } 
+      else if (!e.target.closest('#elementEditor') &&
+               !e.target.closest('#elementToolbar') &&
+               !e.target.closest('.sidebar-btn')) {
+        // Hide the toolbar when clicking outside
+        toolbar.style.display = 'none';
+        if (typeof deselectElement === 'function') {
+          deselectElement();
+        }
+      }
+    });
 
     // Toggle sidebar functions
     function toggleLeftSidebar() {
@@ -549,6 +554,49 @@ document.addEventListener('click', (e) => {
       const hamburger = document.querySelector('#rightMenuBtn .hamburger-icon');
       sidebar.classList.toggle('open');
       hamburger.classList.toggle('open');
+    }
+//Zoom
+    const center = document.querySelector(".center-container");
+    
+    document.getElementById("zoomInBtn").addEventListener("click", () => {
+      zoomLevel *= 1.1;
+      pages[currentPageIndex].style.transform = `scale(${zoomLevel})`;
+    });
+    
+    document.getElementById("zoomOutBtn").addEventListener("click", () => {
+      zoomLevel /= 1.1;
+      pages[currentPageIndex].style.transform = `scale(${zoomLevel})`;
+    });
+    
+    document.getElementById("handBtn").addEventListener("click", () => {
+      center.style.cursor = "grab";
+      center.addEventListener("mousedown", startPan);
+    });
+    
+    function startPan(e) {
+      isPanning = true;
+      startX = e.pageX - center.offsetLeft;
+      startY = e.pageY - center.offsetTop;
+      scrollLeft = center.scrollLeft;
+      scrollTop = center.scrollTop;
+      center.style.cursor = "grabbing";
+      center.addEventListener("mousemove", panMove);
+      center.addEventListener("mouseup", endPan);
+    }
+    
+    function panMove(e) {
+      if (!isPanning) return;
+      const x = e.pageX - center.offsetLeft;
+      const y = e.pageY - center.offsetTop;
+      center.scrollLeft = scrollLeft - (x - startX);
+      center.scrollTop = scrollTop - (y - startY);
+    }
+    
+    function endPan() {
+      isPanning = false;
+      center.style.cursor = "grab";
+      center.removeEventListener("mousemove", panMove);
+      center.removeEventListener("mouseup", endPan);
     }
     
     // Export functions
