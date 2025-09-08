@@ -158,15 +158,11 @@ button:hover {
 }
 
 .ruler.horizontal {
-  top: 0;
-  left: 0;
   height: 20px;
   border-bottom: 1px solid #ccc;
 }
 
 .ruler.vertical {
-  top: 0;
-  left: 0;
   width: 20px;
   border-right: 1px solid #ccc;
 }
