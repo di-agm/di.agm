@@ -98,13 +98,12 @@
         const scale = maxWidthPx / widthPx;
         widthPx = widthPx * scale;
         heightPx = heightPx * scale;
+    }
 
     if (rulersVisible) drawRulers();
-
     window.addEventListener("resize", () => {
-      updateRuler();
+      if (rulersVisible) drawRulers();
     });
-    }
       
       const page = pages[currentPageIndex];
 
