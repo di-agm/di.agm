@@ -949,6 +949,8 @@ document.getElementById('btnAlign').addEventListener('click', () => {
   selectedElement.style.textAlign = alignments[nextIndex];
 });
 
+document.getElementById('btnRotate').style.display = isShape ? 'flex' : 'none';
+
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
   const saved = localStorage.getItem('paperSizeSelectorLayouts');
