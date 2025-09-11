@@ -495,7 +495,33 @@ function addShapeElement(shapeType = 'circle') {
   });
 
   rotateBtn.addEventListener('click', () => {
-    element.dataset.rotation = (parseInt(element.dataset.rotation) + 15) % 360;
+    rotateBtn.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+  
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+  
+    const startAngle = parseInt(element.dataset.rotation) || 0;
+    const startCursorAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+  
+    function onMouseMove(ev) {
+      const currentCursorAngle = Math.atan2(ev.clientY - centerY, ev.clientX - centerX) * 180 / Math.PI;
+      const delta = currentCursorAngle - startCursorAngle;
+      element.dataset.rotation = startAngle + delta;
+      renderShape();
+    }
+  
+    function onMouseUp() {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+  
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+  element.dataset.rotation = (parseInt(element.dataset.rotation) + 15) % 360;
     renderShape();
   });
 
