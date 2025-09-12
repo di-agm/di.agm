@@ -511,24 +511,40 @@ function addShapeElement(shapeType = 'circle') {
 function selectElement(element) {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
+
+    // Hide the shape toolbar of the previously selected element
+    const prevToolbar = selectedElement.querySelector('.shape-toolbar');
+    if (prevToolbar) prevToolbar.style.display = 'none';
   }
+
   selectedElement = element;
-  document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
+
+  document.querySelectorAll('.shape-element, .text-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
+
+  // Show shape toolbar if this element has one
+  const shapeToolbar = selectedElement.querySelector('.shape-toolbar');
+  if (shapeToolbar) shapeToolbar.style.display = 'flex';
+
   const toolbar = document.getElementById('elementToolbar');
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
   toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
   toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
   toolbar.style.display = 'flex';
+
   document.getElementById('elementEditor').style.display = 'block';
   document.getElementById('noElementSelected').style.display = 'none';
+
   const fontSizeInput = document.getElementById('fontSizeInput');
   if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+
   const fontFamilySelect = document.getElementById('fontFamilySelect');
   if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+
   const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
