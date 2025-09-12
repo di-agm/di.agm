@@ -401,6 +401,26 @@ function addShapeElement(shapeType = 'circle') {
   element.dataset.peaks = 5; // star
   element.dataset.rotation = 0;
 
+  // ---- Toolbar ----
+  const toolbar = document.createElement('div');
+  toolbar.classList.add('shape-toolbar');
+  toolbar.id = 'shapeToolbar';
+
+  const changeBtn = document.createElement('div');
+  changeBtn.classList.add('toolbar-button');
+  changeBtn.textContent = '✎';
+
+  const rotateBtn = document.createElement('div');
+  rotateBtn.classList.add('toolbar-button');
+  rotateBtn.textContent = '⟳';
+
+  const deleteBtn = document.createElement('div');
+  deleteBtn.classList.add('toolbar-button');
+  deleteBtn.textContent = '🗑';
+
+  toolbar.append(changeBtn, rotateBtn, deleteBtn);
+  element.appendChild(toolbar);
+
   // ---- Render Shape ----
   function renderShape() {
     const type = element.dataset.shape;
@@ -493,24 +513,22 @@ function selectElement(element) {
     selectedElement.classList.remove('selected');
   }
   selectedElement = element;
+  document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
-
   const toolbar = document.getElementById('elementToolbar');
   const rect = element.getBoundingClientRect();
+  const containerRect = document.body.getBoundingClientRect();
   toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
-  toolbar.style.top = `${rect.top - 40}px`;
+  toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
   toolbar.style.display = 'flex';
-
-  const isText = element.classList.contains('text-element');
-  const isShape = element.classList.contains('shape-element');
-
-  // Toggle button visibility
-  document.querySelector('[data-action="edit"]').style.display   = isText ? 'flex' : 'none';
-  document.querySelector('[data-action="align"]').style.display  = isText ? 'flex' : 'none';
-  document.querySelector('[data-action="rotate"]').style.display = isShape ? 'flex' : 'none';
-  document.querySelector('[data-action="change"]').style.display = isShape ? 'flex' : 'none';
-  document.querySelector('[data-action="delete"]').style.display = 'flex';
-}
+  document.getElementById('elementEditor').style.display = 'block';
+  document.getElementById('noElementSelected').style.display = 'none';
+  const fontSizeInput = document.getElementById('fontSizeInput');
+  if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+  const fontFamilySelect = document.getElementById('fontFamilySelect');
+  if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+  const colorInput = document.getElementById('colorPickerInput');
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
@@ -583,18 +601,6 @@ document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
         // Disable editing (back to drag mode)
         selectedElement.blur();
       }
-    }
-    if (action === 'rotate' && selectedElement.classList.contains('shape-element')) {
-      selectedElement.dataset.rotation = (parseInt(selectedElement.dataset.rotation) + 15) % 360;
-      selectedElement.querySelector('svg .shape-path')
-        .setAttribute('transform', `rotate(${selectedElement.dataset.rotation}, 50, 50)`);
-    }
-
-    if (action === 'change' && selectedElement.classList.contains('shape-element')) {
-      const choice = prompt('Choose shape: circle, polygon, star', selectedElement.dataset.shape);
-      if (!choice) return;
-      selectedElement.dataset.shape = choice.toLowerCase();
-      // re-render shape (call a helper you already wrote)
     }
  });
 });
