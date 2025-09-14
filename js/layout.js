@@ -930,9 +930,9 @@ document.getElementById('addSubtitleBtn').addEventListener('click', () => addTex
 document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
 document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
 
-document.getElementById('addCircleBtn').addEventListener('click', () => addCircleElement('circle'));
-document.getElementById('addPolygonBtn').addEventListener('click', () => addPolygonElement('polygon'));
-document.getElementById('addStarBtn').addEventListener('click', () => addStarElement('star'));
+document.getElementById('addCircleBtn').addEventListener('click', () => addShapeElement('circle'));
+document.getElementById('addPolygonBtn').addEventListener('click', () => addShapeElement('polygon'));
+document.getElementById('addStarBtn').addEventListener('click', () => addShapeElement('star'));
 
 /*const deleteBtn = document.getElementById('deleteElementBtn');
 if (deleteBtn) {
