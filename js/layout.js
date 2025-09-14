@@ -168,7 +168,7 @@ function removePage(index) {
 function duplicatePage(index) {
   const originalPage = pages[index];
   const clone = originalPage.cloneNode(true);
-  const clonedElements = clone.querySelectorAll('.text-element');
+  const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
   });
@@ -472,7 +472,7 @@ function selectElement(element) {
     selectedElement.classList.remove('selected');
   }
   selectedElement = element;
-  document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
   const toolbar = document.getElementById('elementToolbar');
   const rect = element.getBoundingClientRect();
@@ -571,7 +571,7 @@ document.addEventListener('click', (e) => {
     return;
   }
 
-  if (e.target.closest('.text-element')) {
+  if (e.target.closest('.text-element, .shape-element')) {
     // Show the toolbar when a text-element is clicked
     toolbar.style.display = 'flex'; // use flex if it contains multiple icons
     // Position the toolbar under the clicked element
@@ -704,7 +704,7 @@ function saveLayout() {
     date: new Date().toISOString(),
     pages: pages.map(page => {
       // Extract all elements on the page
-      const elements = Array.from(page.querySelectorAll('.text-element')).map(el => {
+      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
         return {
           type: el.classList.contains('image') ? 'image' : 'text',
           content: el.innerText,
