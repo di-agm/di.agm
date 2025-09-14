@@ -929,9 +929,12 @@ document.getElementById('addTitleBtn').addEventListener('click', () => addTextEl
 document.getElementById('addSubtitleBtn').addEventListener('click', () => addTextElement('subtitle'));
 document.getElementById('addParagraphBtn').addEventListener('click', () => addTextElement('paragraph'));
 document.getElementById('addImageBtn').addEventListener('click', () => addTextElement('image'));
-document.getElementById('addShapeBtn').addEventListener('click', () => addShapeElement('circle'));
 
-const deleteBtn = document.getElementById('deleteElementBtn');
+document.getElementById('addCircleBtn').addEventListener('click', () => addCircleElement('circle'));
+document.getElementById('addPolygonBtn').addEventListener('click', () => addPolygonElement('polygon'));
+document.getElementById('addStarBtn').addEventListener('click', () => addStarElement('star'));
+
+/*const deleteBtn = document.getElementById('deleteElementBtn');
 if (deleteBtn) {
   deleteBtn.addEventListener('click', () => {
     if (selectedElement && selectedElement.parentNode) {
@@ -939,7 +942,7 @@ if (deleteBtn) {
       deselectElement();
     }
   });
-}
+}*/
 
 // Color picker handlers
 const fontColorInput = document.getElementById('fontColorInput');
