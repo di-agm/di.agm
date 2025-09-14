@@ -387,7 +387,7 @@ function addTextElement(type) {
   selectElement(element);
 }
 
- function addShapeElement(shapeType = 'circle') {
+function addShapeElement(type) {
   if (!pages[currentPageIndex]) return;
 
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
@@ -397,113 +397,68 @@ function addTextElement(type) {
   element.style.top = '50px';
   element.style.left = '50px';
   element.style.position = 'absolute';
-  element.style.width = '120px';
-  element.style.height = '120px';
-  element.style.display = 'flex';
-  element.style.flexDirection = 'column';
-  element.style.alignItems = 'center';
-  element.style.justifyContent = 'flex-start';
+  element.style.width = '100px';
+  element.style.height = '100px';
 
-  // defaults
-  element.dataset.shape = shapeType;
-  element.dataset.sides = 5; // polygon
-  element.dataset.peaks = 5; // star
+  // Create an SVG to hold the shape
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", "100%");
+  svg.setAttribute("viewBox", "0 0 100 100");
 
-  // ---- Toolbar ----
-  const toolbar = document.createElement('div');
-  toolbar.style.display = 'flex';
-  toolbar.style.gap = '4px';
-  toolbar.style.margin = '2px';
-  toolbar.style.zIndex = '10';
+  let shape;
 
-  const changeBtn = document.createElement('button');
-  changeBtn.textContent = '✎'; // change shape
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = '🗑'; // delete
+  switch(type) {
+    case 'circle':
+      shape = document.createElementNS(svgNS, "circle");
+      shape.setAttribute("cx", "50");
+      shape.setAttribute("cy", "50");
+      shape.setAttribute("r", "40");
+      shape.setAttribute("fill", "#ddd");
+      break;
 
-  toolbar.appendChild(changeBtn);
-  toolbar.appendChild(deleteBtn);
-  element.appendChild(toolbar);
-
-  // ---- Render Shape ----
-  function renderShape() {
-    const type = element.dataset.shape;
-    const sides = parseInt(element.dataset.sides);
-    const peaks = parseInt(element.dataset.peaks);
-
-    // clear previous shape
-    element.querySelectorAll('svg').forEach(s => s.remove());
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-    svg.setAttribute('viewBox', '0 0 100 100');
-
-    let shape;
-
-    if (type === 'circle') {
-      shape = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      shape.setAttribute('cx', '50');
-      shape.setAttribute('cy', '50');
-      shape.setAttribute('r', '40');
-      shape.setAttribute('fill', '#d0e0ff');
-    } else if (type === 'polygon') {
-      let points = [];
+    case 'polygon': {
+      let sides = parseInt(prompt("Enter number of sides:", "5"));
+      if (isNaN(sides) || sides < 3) sides = 5; // default
+      const points = [];
       for (let i = 0; i < sides; i++) {
-        const angle = 2 * Math.PI * i / sides;
+        const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
         const x = 50 + 40 * Math.cos(angle);
         const y = 50 + 40 * Math.sin(angle);
         points.push(`${x},${y}`);
       }
-      shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      shape.setAttribute('points', points.join(' '));
-      shape.setAttribute('fill', '#ffd0d0');
-    } else if (type === 'star') {
-      let points = [];
-      for (let i = 0; i < peaks * 2; i++) {
-        const r = i % 2 === 0 ? 40 : 20;
-        const angle = Math.PI * i / peaks;
+      shape = document.createElementNS(svgNS, "polygon");
+      shape.setAttribute("points", points.join(" "));
+      shape.setAttribute("fill", "#ddd");
+      break;
+    }
+
+    case 'star': {
+      let peaks = parseInt(prompt("Enter number of peaks:", "5"));
+      if (isNaN(peaks) || peaks < 3) peaks = 5; // default
+      const points = [];
+      const outerRadius = 40;
+      const innerRadius = 20;
+      for (let i = 0; i < 2 * peaks; i++) {
+        const angle = (Math.PI * i) / peaks - Math.PI / 2;
+        const r = i % 2 === 0 ? outerRadius : innerRadius;
         const x = 50 + r * Math.cos(angle);
         const y = 50 + r * Math.sin(angle);
         points.push(`${x},${y}`);
       }
-      shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      shape.setAttribute('points', points.join(' '));
-      shape.setAttribute('fill', '#d0ffd0');
+      shape = document.createElementNS(svgNS, "polygon");
+      shape.setAttribute("points", points.join(" "));
+      shape.setAttribute("fill", "#ddd");
+      break;
     }
+  }
 
+  if (shape) {
     svg.appendChild(shape);
     element.appendChild(svg);
   }
 
-  renderShape();
-
-  // ---- Toolbar Actions ----
-  changeBtn.addEventListener('click', () => {
-    const choice = prompt('Choose shape: circle, polygon, star', element.dataset.shape);
-    if (!choice) return;
-
-    const type = choice.toLowerCase();
-    if (['circle', 'polygon', 'star'].includes(type)) {
-      element.dataset.shape = type;
-
-      if (type === 'polygon') {
-        const sides = prompt('Number of sides?', element.dataset.sides);
-        if (sides) element.dataset.sides = sides;
-      } else if (type === 'star') {
-        const peaks = prompt('Number of peaks?', element.dataset.peaks);
-        if (peaks) element.dataset.peaks = peaks;
-      }
-
-      renderShape();
-    }
-  });
-
-  deleteBtn.addEventListener('click', () => {
-    element.remove();
-  });
-
-  // resizable + draggable
   element.style.resize = 'both';
   element.style.overflow = 'hidden';
 
