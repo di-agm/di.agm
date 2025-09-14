@@ -52,28 +52,6 @@ const paperSizes = {
   tabloid: { widthIN: 11, heightIN: 17 }
 };
 
-/*selector.addEventListener("change", (e) => {
-  if (e.target.value === "custom") {
-    document.getElementById("customSizeInputs").style.display = "block";
-  } else {
-    document.getElementById("customSizeInputs").style.display = "none";
-    updateRectSize(e.target.value);
-  }
-});
-
-document.getElementById("applyCustomSize").addEventListener("click", () => {
-  const w = parseFloat(document.getElementById("customWidth").value);
-  const h = parseFloat(document.getElementById("customHeight").value);
-  const unit = document.getElementById("customUnit").value;
-  if (!isNaN(w) && !isNaN(h)) {
-    addCustomPaperSize("custom", w, h, unit);
-    updateRectSize("custom");
-  }
-});
-
-function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }*/
-
 const maxWidthPx = 360;
 
 function updateRectSize(key) {
@@ -168,7 +146,7 @@ function removePage(index) {
 function duplicatePage(index) {
   const originalPage = pages[index];
   const clone = originalPage.cloneNode(true);
-  const clonedElements = clone.querySelectorAll('.text-element');
+  const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
   });
@@ -242,17 +220,6 @@ function togglePageNumbers() {
 document.getElementById('toggleRulersBtn').addEventListener('click', toggleRulers);
 document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
 document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
-
-/*const units = ["px", "pt", "mm", "cm", "in"];
-function convertToPx(value, unit) {
-  switch (unit) {
-    case "px": return value;
-    case "pt": return value * 96 / 72;  // 1pt = 1/72 in
-    case "mm": return value * 3.78;
-    case "cm": return value * 37.8;
-    case "in": return value * 96;
-  }
-}*/
 
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
@@ -472,7 +439,7 @@ function selectElement(element) {
     selectedElement.classList.remove('selected');
   }
   selectedElement = element;
-  document.querySelectorAll('.text-element').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
   const toolbar = document.getElementById('elementToolbar');
   const rect = element.getBoundingClientRect();
@@ -571,7 +538,7 @@ document.addEventListener('click', (e) => {
     return;
   }
 
-  if (e.target.closest('.text-element')) {
+  if (e.target.closest('.text-element, .shape-element')) {
     // Show the toolbar when a text-element is clicked
     toolbar.style.display = 'flex'; // use flex if it contains multiple icons
     // Position the toolbar under the clicked element
@@ -704,7 +671,7 @@ function saveLayout() {
     date: new Date().toISOString(),
     pages: pages.map(page => {
       // Extract all elements on the page
-      const elements = Array.from(page.querySelectorAll('.text-element')).map(el => {
+      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
         return {
           type: el.classList.contains('image') ? 'image' : 'text',
           content: el.innerText,
@@ -933,17 +900,7 @@ document.getElementById('addImageBtn').addEventListener('click', () => addTextEl
 document.getElementById('addCircleBtn').addEventListener('click', () => addShapeElement('circle'));
 document.getElementById('addPolygonBtn').addEventListener('click', () => addShapeElement('polygon'));
 document.getElementById('addStarBtn').addEventListener('click', () => addShapeElement('star'));
-
-/*const deleteBtn = document.getElementById('deleteElementBtn');
-if (deleteBtn) {
-  deleteBtn.addEventListener('click', () => {
-    if (selectedElement && selectedElement.parentNode) {
-      selectedElement.parentNode.removeChild(selectedElement);
-      deselectElement();
-    }
-  });
-}*/
-
+shape.setAttribute("fill", "red");
 // Color picker handlers
 const fontColorInput = document.getElementById('fontColorInput');
 
