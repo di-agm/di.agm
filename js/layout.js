@@ -2,6 +2,7 @@ let pages = [];
 let currentPageIndex = 0;
 let isPortrait = true;
 let selectedElement = null;
+let selectedShape = null;
 let savedLayouts = [];
 let rulersVisible = false;
 let currentRulerUnit = "px"; // px, pt, mm, cm, in
@@ -387,7 +388,7 @@ function addTextElement(type) {
   selectElement(element);
 }
 
-function addShapeElement(shapeType = 'circle') {
+/*function addShapeElement(shapeType = 'circle') {
   if (!pages[currentPageIndex]) return;
 
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
@@ -506,6 +507,22 @@ function addShapeElement(shapeType = 'circle') {
   pageContent.appendChild(element);
   makeElementDraggable(element);
   selectElement(element);
+}*/
+
+function selectShape(shapeElement) {
+  selectedShape = shapeElement;
+
+  // position toolbar next to the shape
+  const rect = shapeElement.getBoundingClientRect();
+  const toolbar = document.getElementById('shapeToolbar');
+  toolbar.style.left = `${rect.right + 10}px`; // 10px offset
+  toolbar.style.top = `${rect.top}px`;
+  toolbar.style.display = 'flex';
+}
+
+function deselectShape() {
+  selectedShape = null;
+  document.getElementById('shapeToolbar').style.display = 'none';
 }
 
 function selectElement(element) {
@@ -951,6 +968,19 @@ function loadSavedLayouts() {
     }
   }
 }
+
+document.getElementById('btnChange').addEventListener('click', () => {
+  if (!selectedShape) return;
+  const choice = prompt('Choose shape: circle, polygon, star', selectedShape.dataset.shape);
+  if (!choice) return;
+  // your change shape logic here
+});
+
+document.getElementById('btnRotate').addEventListener('click', () => {
+  if (!selectedShape) return;
+  selectedShape.dataset.rotation = (parseInt(selectedShape.dataset.rotation) + 15) % 360;
+  renderShape(selectedShape);
+});
 
 // Event Listeners
 selector.addEventListener('change', (e) => {
