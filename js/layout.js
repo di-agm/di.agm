@@ -833,7 +833,7 @@ function updateSavedLayoutsList() {
 
 // Handle click outside elements to deselect
 document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element');
+  const clickedElement = e.target.closest('.text-element, .shape-element');
   const toolbar = document.getElementById('elementToolbar');
 
   if (clickedElement) {
