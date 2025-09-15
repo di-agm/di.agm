@@ -474,60 +474,29 @@ function selectElement(element) {
   selectedElement = element;
   document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
+  const toolbar = document.getElementById('elementToolbar');
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
-  //const toolbar = document.getElementById('elementToolbar');
-  // Decide which toolbar/editor to show
-  const isText = element.classList.contains('text-element');
-  const toolbar = document.getElementById(isText ? 'textToolbar' : 'shapeToolbar');
-  const editor = document.getElementById(isText ? 'textEditor' : 'shapeEditor');
-  const noElement = document.getElementById('noElementSelected');
-  
   toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
   toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
   toolbar.style.display = 'flex';
-  /*document.getElementById('elementEditor').style.display = 'block';
+  document.getElementById('elementEditor').style.display = 'block';
   document.getElementById('noElementSelected').style.display = 'none';
   const fontSizeInput = document.getElementById('fontSizeInput');
   if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
   const fontFamilySelect = document.getElementById('fontFamilySelect');
   if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
   const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';*/
-  // Show correct editor
-  editor.style.display = 'block';
-  noElement.style.display = 'none';
-
-  // Example: only text elements have font controls
-  if (isText) {
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    if (fontSizeInput) fontSizeInput.value =
-      parseInt(window.getComputedStyle(selectedElement).fontSize);
-  }
-}
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
 function deselectElement() {
-  /*if (selectedElement) {
+  if (selectedElement) {
     selectedElement.classList.remove('selected');
     selectedElement = null;
     document.getElementById('elementEditor').style.display = 'none';
     document.getElementById('noElementSelected').style.display = 'block';
   }
-  document.getElementById('elementToolbar').style.display = 'none';*/
-  if (selectedElement) {
-    selectedElement.classList.remove('selected');
-    selectedElement = null;
-  }
-  // Hide both toolbars/editors
-  ['textToolbar','shapeToolbar'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  ['textEditor','shapeEditor'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  document.getElementById('noElementSelected').style.display = 'block';
+  document.getElementById('elementToolbar').style.display = 'none';
 }
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
