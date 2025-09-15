@@ -1,21 +1,23 @@
-label{display:inline-block;margin:6px 0;font-weight:600}
-input[type="number"], input[type="text"], select {padding:6px;border-radius:6px;border:1px solid #ccc;margin-right:8px}
-button{padding:8px 12px;border-radius:8px;border:0;background:#0366d6;color:white;cursor:pointer;margin:6px 6px 6px 0}
-button.ghost{background:#eee;color:#111}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-.activities{margin-top:12px;border:1px dashed #bbb;padding:8px;border-radius:8px;background:#fafafa}
-.activity{display:flex;gap:8px;align-items:center;padding:6px;border-bottom:1px solid #eee}
-.activity:last-child{border-bottom:0}
-.small{font-size:0.9em;color:#444}
-.grid-wrap{overflow:auto;margin-top:18px}
-table.tt{border-collapse:collapse;width:100%;min-width:700px}
-table.tt th, table.tt td{border:1px solid #ddd;padding:6px;text-align:center;vertical-align:middle}
-table.tt th{background:#f4f6f8;font-weight:700}
-.controls{margin-top:12px}
-.danger{background:#c0392b}
-.muted{color:#666;font-size:0.9em}
-.inline-input{width:120px}
-.inline-num{width:90px}
-.activity .flex{display:flex;gap:8px;align-items:center}
-.csv-btn{background:#16a34a}
-.error{color:#c0392b;font-weight:700}
+body{
+  align: left;
+}
+
+table { 
+  border-collapse: collapse; 
+  width: 100%; 
+  margin-top: 20px; 
+}
+
+th, td { 
+  border: 1px solid #000; 
+  padding: 8px; 
+  text-align: left; 
+}
+
+th { 
+  background-color: #f2f2f2; 
+}
+
+input, button { 
+  margin: 5px; 
+}
