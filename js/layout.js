@@ -474,29 +474,41 @@ function selectElement(element) {
   selectedElement = element;
   document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
-  const toolbar = document.getElementById('elementToolbar');
-  const rect = element.getBoundingClientRect();
-  const containerRect = document.body.getBoundingClientRect();
-  toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
-  toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-  toolbar.style.display = 'flex';
-  document.getElementById('elementEditor').style.display = 'block';
-  document.getElementById('noElementSelected').style.display = 'none';
-  const fontSizeInput = document.getElementById('fontSizeInput');
-  if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-  const fontFamilySelect = document.getElementById('fontFamilySelect');
-  if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-  const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
+  }
 
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
     selectedElement = null;
-    document.getElementById('elementEditor').style.display = 'none';
     document.getElementById('noElementSelected').style.display = 'block';
   }
-  document.getElementById('elementToolbar').style.display = 'none';
+}
+
+function Toolbar({ position, controls }) {
+  return (
+    <div className="toolbar" style={{ top: position.y, left: position.x }}>
+      {controls.map((Control, i) => (
+        <Control key={i} />
+      ))}
+    </div>
+  );
+}
+
+function Editor() {
+  const [selected, setSelected] = useState(null);
+
+  let controls = [];
+  if (selected?.type === "text") controls = textControls;
+  if (selected?.type === "shape") controls = shapeControls;
+
+  return (
+    <div>
+      <Canvas onSelect={setSelected} />
+      {selected && (
+        <Toolbar position={selected.position} controls={controls} />
+      )}
+    </div>
+  );
 }
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
