@@ -567,32 +567,6 @@ document.querySelectorAll('.toolbar-btn').forEach(btn => {
   });
 });
 
-// Generic button logic
-document.querySelectorAll('.toolbar-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation(); // prevent deselecting element
-    if (!selectedElement) return;
-
-    const action = btn.dataset.action;
-
-    if (action === 'delete') {
-      selectedElement.remove();
-      deselectElement();
-    }
-    if (action === 'edit') {
-      const isEditing = selectedElement.contentEditable === "true";
-      selectedElement.contentEditable = !isEditing;
-      if (!isEditing) selectedElement.focus();
-      else selectedElement.blur();
-    }
-    if (action === 'align') {
-      const alignments = ['left', 'center', 'right', 'justify'];
-      let current = selectedElement.style.textAlign || 'left';
-      selectedElement.style.textAlign = alignments[(alignments.indexOf(current)+1) % alignments.length];
-    }
-  });
-});
-
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
