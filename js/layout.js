@@ -471,16 +471,60 @@ function selectElement(element) {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
   }
+  document.querySelectorAll('.text-element, .shape-element')
+    .forEach(el => el.classList.remove('selected'));
+
   selectedElement = element;
-  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
-  }
+
+  updateToolbarAndEditor();
+}
 
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
     selectedElement = null;
-    document.getElementById('noElementSelected').style.display = 'block';
+  }
+  updateToolbarAndEditor();
+}
+
+function updateToolbarAndEditor() {
+  const toolbar = document.getElementById('elementToolbar');
+  const editor = document.getElementById('elementEditor');
+  const noElement = document.getElementById('noElementSelected');
+
+  if (!selectedElement) {
+    // Hide everything if nothing is selected
+    toolbar.style.display = 'none';
+    editor.style.display = 'none';
+    noElement.style.display = 'block';
+    return;
+  }
+
+  // Show toolbar
+  const rect = selectedElement.getBoundingClientRect();
+  toolbar.style.position = 'absolute';
+  toolbar.style.left = `${window.scrollX + rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+  toolbar.style.top = `${window.scrollY + rect.bottom + 5}px`;
+  toolbar.style.display = 'flex';
+
+  // Show editor if it's text
+  if (selectedElement.classList.contains('text-element')) {
+    editor.style.display = 'block';
+    noElement.style.display = 'none';
+
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+
+    const fontFamilySelect = document.getElementById('fontFamilySelect');
+    if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+
+    const colorInput = document.getElementById('colorPickerInput');
+    if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+  } else {
+    // Shapes don’t need the text editor
+    editor.style.display = 'none';
+    noElement.style.display = 'block';
   }
 }
 
