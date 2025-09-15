@@ -1,400 +1,406 @@
-// Variables globales
-let scheduleMatrix = [];
-let activities = [];
-let blocks = [];
-let daysOfWeek = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+/* ---------- Utilities ---------- */
+function gcd(a,b){ a=Math.abs(a)|0; b=Math.abs(b)|0; while(b){ let t=a%b; a=b; b=t; } return a; }
+function gcdArray(arr){ if(!arr.length) return 0; return arr.reduce((a,b)=>gcd(a,b)); }
+function minutesFromHM(hm){ if(!hm) return null; let [h,m]=hm.split(':').map(Number); if(isNaN(h)||isNaN(m)) return null; return h*60+m; }
+function formatHM(mins){ if(mins==null) return ''; mins = ((mins%1440)+1440)%1440; let h=Math.floor(mins/60), m=mins%60; return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
 
-// Funciones de utilidad
-function evaluateExpression(expression) {
-    try {
-        // Limpiar la expresión y evaluar operaciones básicas
-        const cleanExpression = expression.replace(/[^0-9+\-*/\(\)\s]/g, '');
-        return Function('"use strict"; return (' + cleanExpression + ')')();
-    } catch (e) {
-        return parseInt(expression) || 0;
-    }
+/* ---------- Data & DOM ---------- */
+let activities = []; // objects: {id, name, totalMin (nullable), perSessionMin (nullable), sessions (nullable), freqDays (1..), cycles (bool)}
+let idCounter = 1;
+
+const activitiesList = document.getElementById('activitiesList');
+const addActivityBtn = document.getElementById('addActivityBtn');
+const generateBtn = document.getElementById('generateBtn');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+const timetableContainer = document.getElementById('timetableContainer');
+const status = document.getElementById('status');
+const errorBox = document.getElementById('errorBox');
+
+function newActivityRow(data){
+  let id = data?.id ?? idCounter++;
+  let act = {
+    id,
+    name: data?.name ?? 'New activity',
+    totalMin: data?.totalMin ?? null,
+    perSessionMin: data?.perSessionMin ?? null,
+    sessions: data?.sessions ?? null,
+    freqDays: data?.freqDays ?? 1,
+    cycles: !!data?.cycles
+  };
+  activities.push(act);
+  renderActivities();
 }
 
-function convertTimeToMinutes(timeStr) {
-    const [hours, minutes] = timeStr.split(':').map(num => parseInt(num));
-    return hours * 60 + minutes;
-}
-
-function convertMinutesToTime(minutes) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-}
-
-function gcd(a, b) {
-    while (b !== 0) {
-        const temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a;
-}
-
-function calculateGCD(numbers) {
-    if (numbers.length === 0) return 1;
-    let result = numbers[0];
-    for (let i = 1; i < numbers.length; i++) {
-        result = gcd(result, numbers[i]);
-    }
-    return result;
-}
-
-function trim(str) {
-    return str.trim();
-}
-
-// Funciones para agregar actividades y bloques
-function addActivity() {
-    const container = document.getElementById('activitiesContainer');
-    const activityIndex = activities.length;
-    
-    const activityDiv = document.createElement('div');
-    activityDiv.className = 'activity-item';
-    activityDiv.innerHTML = `
-        <div class="inline-group">
-            <div>
-                <label>Nombre de la actividad:</label>
-                <input type="text" id="activityName${activityIndex}" placeholder="Nombre de la actividad">
-            </div>
-            <div>
-                <button type="button" class="remove-btn" onclick="removeActivity(${activityIndex})">Eliminar</button>
-            </div>
+function renderActivities(){
+  activitiesList.innerHTML = '';
+  activities.forEach(a => {
+    const row = document.createElement('div');
+    row.className = 'activity';
+    row.dataset.id = a.id;
+    row.innerHTML = `
+      <div style="flex:1">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="act-name" type="text" value="${escapeHtml(a.name)}" style="min-width:180px">
+          <label class="small">Total time (min):</label>
+          <input class="act-total inline-num" type="number" min="0" value="${a.totalMin ?? ''}">
+          <label class="small">Per session (min):</label>
+          <input class="act-per inline-num" type="number" min="1" value="${a.perSessionMin ?? ''}">
+          <label class="small">#sessions:</label>
+          <input class="act-sess inline-num" type="number" min="1" value="${a.sessions ?? ''}">
         </div>
-        <div class="form-group">
-            <label>Duración total:</label>
-            <input type="text" id="activityDuration${activityIndex}" placeholder="Ej: 120 o 60*2">
+        <div class="flex" style="margin-top:6px">
+          <label class="small">Once every (days):</label>
+          <input class="act-freq inline-num" type="number" min="1" value="${a.freqDays}">
+          <label class="small">Cycles (repeat spaced by freq?):</label>
+          <input class="act-cycles" type="checkbox" ${a.cycles ? 'checked':''}>
+          <span class="small" style="margin-left:12px">Each activity is scheduled in units of its per-session duration.</span>
         </div>
-        <div class="form-group">
-            <label>Duración diaria:</label>
-            <input type="text" id="activityDailyDuration${activityIndex}" placeholder="Ej: 60 o 30*2">
-        </div>
-        <div class="form-group">
-            <label>Tipo de inicio:</label>
-            <select id="activityStartType${activityIndex}">
-                <option value="1">Desde el primer horario disponible</option>
-                <option value="2">Después de la actividad anterior</option>
-            </select>
-        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button class="editBtn ghost">Save Edits</button>
+        <button class="deleteBtn danger">Delete</button>
+      </div>
     `;
-    
-    container.appendChild(activityDiv);
-    activities.push({ index: activityIndex });
+    // attach handlers
+    const nameInput = row.querySelector('.act-name');
+    const totalInput = row.querySelector('.act-total');
+    const perInput = row.querySelector('.act-per');
+    const sessInput = row.querySelector('.act-sess');
+    const freqInput = row.querySelector('.act-freq');
+    const cyclesInput = row.querySelector('.act-cycles');
+    const saveBtn = row.querySelector('.editBtn');
+    const delBtn = row.querySelector('.deleteBtn');
+
+    saveBtn.addEventListener('click', ()=>{
+      const act = activities.find(x=>x.id==a.id);
+      act.name = nameInput.value.trim() || 'Untitled';
+      act.totalMin = parseNullableNumber(totalInput.value);
+      act.perSessionMin = parseNullableNumber(perInput.value);
+      act.sessions = parseNullableNumber(sessInput.value);
+      act.freqDays = Math.max(1, parseInt(freqInput.value) || 1);
+      act.cycles = cyclesInput.checked;
+      // Recompute missing fields if possible:
+      computeActivityDerived(act);
+      renderActivities();
+      status.textContent = 'Activity saved.';
+      setTimeout(()=>status.textContent='','2000');
+    });
+
+    delBtn.addEventListener('click', ()=>{
+      activities = activities.filter(x=>x.id!==a.id);
+      renderActivities();
+    });
+
+    // Live update for per/total/sessions to auto-calc missing if user leaves field empty on blur:
+    [totalInput, perInput, sessInput].forEach(inp=>{
+      inp.addEventListener('blur', ()=>{
+        const act = activities.find(x=>x.id==a.id);
+        act.name = nameInput.value.trim() || 'Untitled';
+        act.totalMin = parseNullableNumber(totalInput.value);
+        act.perSessionMin = parseNullableNumber(perInput.value);
+        act.sessions = parseNullableNumber(sessInput.value);
+        computeActivityDerived(act);
+        renderActivities();
+      });
+    });
+
+    activitiesList.appendChild(row);
+  });
+  if(activities.length===0){
+    activitiesList.innerHTML = '<div class="small muted" style="padding:8px">No activities yet. Click "Add activity" to start.</div>';
+  }
 }
 
-function removeActivity(index) {
-    activities = activities.filter(activity => activity.index !== index);
-    document.querySelector(`#activitiesContainer .activity-item:nth-child(${index + 1})`).remove();
+function computeActivityDerived(act){
+  // If two of the three values present, compute the third.
+  // totalMin, perSessionMin, sessions
+  if(isFiniteNumber(act.perSessionMin) && isFiniteNumber(act.sessions)){
+    act.totalMin = act.perSessionMin * act.sessions;
+  } else if(isFiniteNumber(act.totalMin) && isFiniteNumber(act.sessions)){
+    if(act.sessions>0) act.perSessionMin = Math.round(act.totalMin / act.sessions);
+  } else if(isFiniteNumber(act.totalMin) && isFiniteNumber(act.perSessionMin)){
+    if(act.perSessionMin>0) act.sessions = Math.max(1, Math.round(act.totalMin / act.perSessionMin));
+  } else {
+    // not enough info; leave as is
+  }
 }
 
-function addBlock() {
-    const container = document.getElementById('blocksContainer');
-    const blockIndex = blocks.length;
-    
-    const blockDiv = document.createElement('div');
-    blockDiv.className = 'block-item';
-    blockDiv.innerHTML = `
-        <div class="inline-group">
-            <div>
-                <label>Día (1=Lunes, 7=Domingo):</label>
-                <select id="blockDay${blockIndex}">
-                    <option value="1">Lunes</option>
-                    <option value="2">Martes</option>
-                    <option value="3">Miércoles</option>
-                    <option value="4">Jueves</option>
-                    <option value="5">Viernes</option>
-                    <option value="6">Sábado</option>
-                    <option value="7">Domingo</option>
-                </select>
-            </div>
-            <div>
-                <button type="button" class="remove-btn" onclick="removeBlock(${blockIndex})">Eliminar</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Hora de inicio y fin (HH:MM - HH:MM):</label>
-            <input type="text" id="blockTime${blockIndex}" placeholder="Ej: 12:00 - 13:00">
-        </div>
-    `;
-    
-    container.appendChild(blockDiv);
-    blocks.push({ index: blockIndex });
+function parseNullableNumber(v){
+  if(v===null || v===undefined) return null;
+  v = v.toString().trim();
+  if(v==='') return null;
+  let n = Number(v);
+  return isFinite(n)?n:null;
 }
+function isFiniteNumber(v){ return typeof v==='number' && isFinite(v) && !isNaN(v); }
+function escapeHtml(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 
-function removeBlock(index) {
-    blocks = blocks.filter(block => block.index !== index);
-    document.querySelector(`#blocksContainer .block-item:nth-child(${index + 1})`).remove();
-}
+/* ---------- Buttons ---------- */
+addActivityBtn.addEventListener('click', ()=> newActivityRow());
+generateBtn.addEventListener('click', generateTimetable);
+exportCsvBtn.addEventListener('click', exportCsv);
 
-// Función principal para generar el horario
-function generateSchedule() {
-    try {
-        // Leer configuración básica
-        const numDays = evaluateExpression(document.getElementById('numDays').value);
-        const timeRange = document.getElementById('timeRange').value;
-        const startDay = parseInt(document.getElementById('startDay').value) - 1; // Ajustar a 0-6
-        
-        // Validar rango de tiempo
-        const timeRangeParts = timeRange.split('-');
-        if (timeRangeParts.length !== 2) {
-            throw new Error('Formato de hora incorrecto. Use HH:MM - HH:MM');
-        }
-        
-        const startTime = convertTimeToMinutes(trim(timeRangeParts[0]));
-        const endTime = convertTimeToMinutes(trim(timeRangeParts[1]));
-        
-        if (endTime <= startTime) {
-            throw new Error('La hora de fin debe ser después de la hora de inicio');
-        }
-        
-        const totalMinutes = endTime - startTime;
-        
-        // Leer actividades
-        const activityData = [];
-        const dailyDurations = [];
-        
-        for (let i = 0; i < activities.length; i++) {
-            const nameElement = document.getElementById(`activityName${activities[i].index}`);
-            const durationElement = document.getElementById(`activityDuration${activities[i].index}`);
-            const dailyDurationElement = document.getElementById(`activityDailyDuration${activities[i].index}`);
-            const startTypeElement = document.getElementById(`activityStartType${activities[i].index}`);
-            
-            if (!nameElement || !durationElement || !dailyDurationElement || !startTypeElement) continue;
-            
-            const name = nameElement.value;
-            const duration = evaluateExpression(durationElement.value);
-            const dailyDuration = evaluateExpression(dailyDurationElement.value);
-            const startType = parseInt(startTypeElement.value);
-            
-            if (name && duration > 0 && dailyDuration > 0) {
-                activityData.push({ name, duration, dailyDuration, startType });
-                dailyDurations.push(dailyDuration);
-            }
-        }
-        
-        // Leer bloques no accesibles
-        const blockData = [];
-        
-        for (let i = 0; i < blocks.length; i++) {
-            const dayElement = document.getElementById(`blockDay${blocks[i].index}`);
-            const timeElement = document.getElementById(`blockTime${blocks[i].index}`);
-            
-            if (!dayElement || !timeElement) continue;
-            
-            const day = parseInt(dayElement.value) - 1; // Ajustar a 0-6
-            const timeStr = timeElement.value;
-            
-            if (timeStr) {
-                const timeParts = timeStr.split('-');
-                if (timeParts.length === 2) {
-                    const blockStart = convertTimeToMinutes(trim(timeParts[0]));
-                    const blockEnd = convertTimeToMinutes(trim(timeParts[1]));
-                    
-                    if (blockEnd > blockStart) {
-                        // Ajustar día según día de inicio
-                        const adjustedDay = (day - startDay + 7) % 7;
-                        blockData.push({ day: adjustedDay, start: blockStart, end: blockEnd });
-                        dailyDurations.push(blockEnd - blockStart);
-                    }
-                }
-            }
-        }
-        
-        // Calcular intervalo de minutos
-        const intervalMinutes = calculateGCD(dailyDurations) || 30;
-        
-        // Calcular número de filas
-        const numRows = Math.floor(totalMinutes / intervalMinutes) + 1;
-        const cols = numDays + 2;
-        
-        // Crear matriz
-        scheduleMatrix = Array(numRows).fill().map(() => Array(cols).fill(''));
-        
-        // Llenar primera fila con encabezados
-        scheduleMatrix[0][0] = 'Inicio';
-        scheduleMatrix[0][1] = 'Final';
-        
-        for (let j = 2; j < cols; j++) {
-            scheduleMatrix[0][j] = daysOfWeek[(startDay + (j - 2)) % 7];
-        }
-        
-        // Llenar columnas de tiempo
-        let currentTime = startTime;
-        for (let i = 1; i < numRows; i++) {
-            scheduleMatrix[i][0] = convertMinutesToTime(currentTime);
-            
-            const nextTime = currentTime + intervalMinutes;
-            scheduleMatrix[i][1] = convertMinutesToTime(Math.min(nextTime, endTime));
-            
-            currentTime = nextTime;
-            if (currentTime >= endTime) break;
-        }
-        
-        // Marcar bloques no accesibles
-        for (let i = 1; i < numRows; i++) {
-            for (let j = 2; j < cols; j++) {
-                const dayIndex = (j - 2);
-                const currentMinutes = startTime + (i - 1) * intervalMinutes;
-                
-                for (const block of blockData) {
-                    if (dayIndex === block.day && 
-                        currentMinutes >= block.start && 
-                        currentMinutes < block.end) {
-                        scheduleMatrix[i][j] = 'N/A';
-                    }
-                }
-                
-                if (!scheduleMatrix[i][j]) {
-                    scheduleMatrix[i][j] = ' ';
-                }
-            }
-        }
-        
-        // Asignar actividades
-        let lastOccupiedColumn = 2;
-        
-        for (let actIndex = 0; actIndex < activityData.length; actIndex++) {
-            const activity = activityData[actIndex];
-            let remainingDuration = activity.duration;
-            let daysCounted = 0;
-            
-            let startColumn = 2;
-            if (activity.startType === 2 && actIndex > 0) {
-                startColumn = lastOccupiedColumn + 1;
-            }
-            
-            for (let col = startColumn; col < cols && daysCounted < numDays; col++) {
-                let minutesAssignedToday = 0;
-                let activityAssigned = false;
-                
-                for (let row = 1; row < numRows && minutesAssignedToday < activity.dailyDuration; row++) {
-                    if (scheduleMatrix[row][col] === ' ' && remainingDuration > 0) {
-                        const currentTime = startTime + (row - 1) * intervalMinutes;
-                        
-                        // Verificar si está en un bloque no accesible
-                        let isBlocked = false;
-                        const dayIndex = col - 2;
-                        
-                        for (const block of blockData) {
-                            if (dayIndex === block.day && 
-                                currentTime >= block.start && 
-                                currentTime < block.end) {
-                                isBlocked = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!isBlocked) {
-                            const availableMinutes = Math.min(
-                                activity.dailyDuration - minutesAssignedToday, 
-                                intervalMinutes
-                            );
-                            
-                            scheduleMatrix[row][col] = activity.name;
-                            minutesAssignedToday += availableMinutes;
-                            remainingDuration -= availableMinutes;
-                            activityAssigned = true;
-                            
-                            if (remainingDuration <= 0) break;
-                        }
-                    }
-                }
-                
-                if (activityAssigned) {
-                    daysCounted++;
-                    lastOccupiedColumn = col;
-                }
-                
-                if (remainingDuration <= 0) break;
-            }
-            
-            if (remainingDuration > 0) {
-                console.warn(`No se pudo completar la actividad: ${activity.name}`);
-            }
-        }
-        
-        // Mostrar resultado
-        displaySchedule();
-        
-    } catch (error) {
-        alert('Error: ' + error.message);
+/* init with 2 sample activities for convenience */
+newActivityRow({name:'Activity A', totalMin:120, perSessionMin:30, sessions:4, freqDays:1, cycles:true});
+newActivityRow({name:'Activity B', totalMin:90, perSessionMin:45, sessions:2, freqDays:2, cycles:false});
+
+/* ---------- Scheduling logic ---------- */
+function generateTimetable(){
+  errorBox.style.display='none';
+  timetableContainer.innerHTML = '';
+  exportCsvBtn.style.display='none';
+  status.textContent='';
+
+  // read config:
+  const days = Math.max(1, parseInt(document.getElementById('numDays').value)||0);
+  const startWeekday = parseInt(document.getElementById('startWeekday').value) || 0;
+  const startTimeHM = document.getElementById('timeStart').value;
+  const endTimeHM = document.getElementById('timeEnd').value;
+  const startMin = minutesFromHM(startTimeHM);
+  const endMin = minutesFromHM(endTimeHM);
+
+  if(startMin==null || endMin==null || endMin<=startMin){
+    showError('Invalid start/end times. End must be after start.');
+    return;
+  }
+
+  if(activities.length===0){
+    showError('Add at least one activity.');
+    return;
+  }
+
+  // compute derived fields and validate activities
+  for(let a of activities){
+    computeActivityDerived(a);
+  }
+
+  // per-session durations needed
+  const perSessionList = [];
+  for(let a of activities){
+    if(!isFiniteNumber(a.perSessionMin) || a.perSessionMin <= 0){
+      showError('Each activity needs a valid per-session duration (in minutes). Fill per session OR total and #sessions to compute it.');
+      return;
     }
-}
+    perSessionList.push(Math.round(a.perSessionMin));
+  }
 
-function displaySchedule() {
-    const tableContainer = document.getElementById('scheduleTable');
-    const exportBtn = document.getElementById('exportBtn');
-    
-    if (scheduleMatrix.length === 0) {
-        tableContainer.innerHTML = '<p>No hay horario generado</p>';
-        exportBtn.classList.add('hidden');
-        return;
-    }
-    
-    let tableHTML = '<table class="schedule-table">';
-    
-    for (let i = 0; i < scheduleMatrix.length; i++) {
-        tableHTML += '<tr>';
-        
-        for (let j = 0; j < scheduleMatrix[i].length; j++) {
-            const cell = scheduleMatrix[i][j];
-            let cellClass = '';
-            
-            if (i === 0) {
-                cellClass = 'time-cell';
-            } else if (j < 2) {
-                cellClass = 'time-cell';
-            } else if (cell === 'N/A') {
-                cellClass = 'na-cell';
-            } else if (cell !== ' ' && cell !== '') {
-                cellClass = 'activity-cell';
-            }
-            
-            const tag = i === 0 ? 'th' : 'td';
-            tableHTML += `<${tag} class="${cellClass}">${cell || ''}</${tag}>`;
+  // compute MCD (GCD)
+  const cellMin = gcdArray(perSessionList);
+  if(cellMin <= 0){
+    showError('Could not compute cell size. Ensure activities have valid per-session durations.');
+    return;
+  }
+
+  // compute number of slots per day
+  const minutesPerDay = endMin - startMin;
+  const slotsPerDay = Math.floor(minutesPerDay / cellMin);
+  if(slotsPerDay <= 0){
+    showError('Time window too small for the cell size. Increase the day length or reduce per-session durations.');
+    return;
+  }
+
+  // Build empty schedule structure: schedule[dayIndex][slotIndex] = null or {activityId, parts}
+  const schedule = Array.from({length:days}, ()=>Array(slotsPerDay).fill(null));
+  const dayLabels = Array.from({length:days}, (_,i)=> weekdayName((startWeekday+i)%7) + ' (Day ' + (i+1) + ')');
+
+  // For each activity, compute exact sessions count (must be integer)
+  const activitySessions = activities.map(a=>{
+    const sess = isFiniteNumber(a.sessions) ? Math.max(1, Math.round(a.sessions)) : Math.max(1, Math.round((a.totalMin||a.perSessionMin)/a.perSessionMin));
+    return {id:a.id, name:a.name, perSession: Math.round(a.perSessionMin), sessions:sess, freqDays:Math.max(1, a.freqDays||1), cycles:!!a.cycles};
+  });
+
+  // Sort activities maybe by perSession desc to place big blocks first (better packing)
+  activitySessions.sort((A,B)=>B.perSession - A.perSession);
+
+  // Helper: find first day index >= start that is allowed for activity's frequency pattern.
+  // Interpret freqDays as spacing between sessions. We'll schedule sessions on indices:
+  // if cycles=true: we place them on start offsets: baseDay, baseDay+freq, baseDay+2*freq, ... until sessions filled or beyond end.
+  // If cycles=false: we place sessions on allowed days (those where (dayIndex-startOffset) % freq === 0) but pack multiple sessions on same allowed day if possible.
+  // We'll take baseDay for each activity to be the earliest dayIndex where we can place (we choose 0).
+  const placementFailures = [];
+
+  // We'll consider startOffset = 0 for all activities for simplicity (i.e., first possible day is day 0).
+  for(const act of activitySessions){
+    const blockSlots = Math.ceil(act.perSession / cellMin); // number of cells needed per session
+    let remaining = act.sessions;
+    if(act.cycles){
+      // Spread by freqDays: attempt to place at dayIndices 0, freq, 2*freq, ...
+      for(let k=0; k<days && remaining>0; k++){
+        let dayIndex = k * act.freqDays; 
+        if(dayIndex >= days) break;
+        // try to find contiguous block on this day
+        const placed = placeBlockOnDay(schedule, dayIndex, blockSlots, act);
+        if(placed) remaining--;
+      }
+      // if still remaining, try to place on any allowed day ignoring freq (fallback)
+      if(remaining>0){
+        for(let d=0; d<days && remaining>0; d++){
+          const placed = placeBlockOnDay(schedule, d, blockSlots, act);
+          if(placed) remaining--;
         }
-        
-        tableHTML += '</tr>';
+      }
+    } else {
+      // Non-cycles: allowed days are those where dayIndex % freqDays == 0 (we use offset 0)
+      // We will attempt to place as many sessions as possible on each allowed day (pack into day).
+      for(let d=0; d<days && remaining>0; d++){
+        if((d % act.freqDays) !== 0) continue;
+        // try to place repeatedly on this day
+        while(remaining>0){
+          const placed = placeBlockOnDay(schedule, d, blockSlots, act);
+          if(placed) remaining--;
+          else break;
+        }
+      }
+      // fallback to any day if remaining
+      if(remaining>0){
+        for(let d=0; d<days && remaining>0; d++){
+          const placed = placeBlockOnDay(schedule, d, blockSlots, act);
+          if(placed) remaining--;
+        }
+      }
     }
-    
-    tableHTML += '</table>';
-    tableContainer.innerHTML = tableHTML;
-    exportBtn.classList.remove('hidden');
+    if(remaining>0){
+      placementFailures.push({activity:act.name, left:remaining});
+    }
+  }
+
+  // Build display grid and CSV data from schedule
+  const slots = [];
+  for(let s=0;s<slotsPerDay;s++) slots.push({startMin: startMin + s*cellMin, endMin: startMin + (s+1)*cellMin});
+
+  // render table
+  const table = document.createElement('table');
+  table.className='tt';
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  headRow.appendChild(Object.assign(document.createElement('th'),{textContent:'Time'}));
+  for(let d=0; d<days; d++){
+    headRow.appendChild(Object.assign(document.createElement('th'),{textContent: dayLabels[d]}));
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+
+  // For rowspan rendering, track seen flags for each day/slot
+  const seen = Array.from({length:days}, ()=>Array(slotsPerDay).fill(false));
+
+  for(let s=0;s<slotsPerDay;s++){
+    const tr = document.createElement('tr');
+    tr.appendChild(Object.assign(document.createElement('th'),{textContent: formatHM(slots[s].startMin) + ' - ' + formatHM(slots[s].endMin)}));
+    for(let d=0; d<days; d++){
+      if(seen[d][s]) continue;
+      const cell = schedule[d][s];
+      if(!cell){
+        const td = document.createElement('td');
+        td.textContent='';
+        tr.appendChild(td);
+        continue;
+      }
+      // determine how many consecutive slots this assignment covers starting at s
+      let span = 1;
+      while(s+span < slotsPerDay && schedule[d][s+span] && schedule[d][s+span].activityId === cell.activityId) span++;
+      // mark seen
+      for(let k=0;k<span;k++) seen[d][s+k]=true;
+      const td = document.createElement('td');
+      td.rowSpan = span;
+      td.innerHTML = `<strong>${escapeHtml(cell.name)}</strong><div class="small">${formatHM(slots[s].startMin)} - ${formatHM(slots[s+span-1].endMin)}</div>`;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+
+  timetableContainer.appendChild(Object.assign(document.createElement('div'),{innerHTML:`<div class="small">Cell duration: <strong>${cellMin} minutes</strong>. Slots per day: ${slotsPerDay}. Start: ${formatHM(startMin)} End: ${formatHM(endMin)}</div>`}));
+  timetableContainer.appendChild(table);
+
+  // Prepare CSV rows by scanning schedule for start-of-block cells
+  const csvRows = [];
+  for(let d=0; d<days; d++){
+    for(let s=0; s<slotsPerDay; s++){
+      const cell = schedule[d][s];
+      if(!cell) continue;
+      // start-of-block if either s===0 or previous slot is different
+      if(s===0 || !schedule[d][s-1] || schedule[d][s-1].activityId !== cell.activityId){
+        // find length
+        let len=1; while(s+len<slotsPerDay && schedule[d][s+len] && schedule[d][s+len].activityId===cell.activityId) len++;
+        csvRows.push({
+          dayIndex: d,
+          dayLabel: dayLabels[d],
+          start: formatHM(slots[s].startMin),
+          end: formatHM(slots[s+len-1].endMin),
+          activity: cell.name
+        });
+      }
+    }
+  }
+
+  // On placement failures show message
+  if(placementFailures.length>0){
+    const msgs = placementFailures.map(p=>`${p.left} session(s) of "${p.activity}" couldn't be scheduled (not enough space)`).join('; ');
+    status.textContent = 'Some sessions could not be scheduled: ' + msgs;
+  } else {
+    status.textContent = 'Timetable generated.';
+  }
+
+  exportCsvBtn.style.display = csvRows.length? 'inline-block' : 'none';
+  exportCsvBtn.dataset.csv = JSON.stringify(csvRows);
+  // store for CSV
+  exportCsvBtn._csvRows = csvRows;
 }
 
-function exportToCSV() {
-    if (scheduleMatrix.length === 0) {
-        alert('No hay horario para exportar');
-        return;
+/* Place a contiguous block of 'size' slots on given day if possible. Returns true if placed (and writes into schedule). */
+function placeBlockOnDay(schedule, dayIndex, size, act){
+  if(dayIndex <0 || dayIndex >= schedule.length) return false;
+  const row = schedule[dayIndex];
+  // find contiguous zero slots of length size
+  for(let i=0;i<=row.length-size;i++){
+    let ok = true;
+    for(let j=0;j<size;j++){ if(row[i+j] !== null) { ok=false; break; } }
+    if(ok){
+      for(let j=0;j<size;j++){
+        row[i+j] = {activityId: act.id, name: act.name};
+      }
+      return true;
     }
-    
-    let csvContent = '';
-    
-    for (let i = 0; i < scheduleMatrix.length; i++) {
-        const row = scheduleMatrix[i].map(cell => `"${cell || ''}"`).join(',');
-        csvContent += row + '\n';
-    }
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'horarios.csv');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+  }
+  return false;
 }
 
-// Inicializar con una actividad y un bloque por defecto
-document.addEventListener('DOMContentLoaded', function() {
-    addActivity();
-    addBlock();
-});
+function weekdayName(n){
+  return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n%7];
+}
+
+/* ---------- CSV export ---------- */
+function exportCsv(){
+  const rows = exportCsvBtn._csvRows || [];
+  if(!rows.length){ alert('No data to export.'); return; }
+  const header = ['Day','DayLabel','Start','End','Activity'];
+  const lines = [header.join(',')];
+  for(const r of rows){
+    lines.push([r.dayIndex, csvEscape(r.dayLabel), r.start, r.end, csvEscape(r.activity)].join(','));
+  }
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'timetable.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- Helpers ---------- */
+function csvEscape(s){
+  if(s==null) return '';
+  s = String(s).replace(/"/g,'""');
+  if(s.includes(',') || s.includes('"') || s.includes('\n')) return `"${s}"`;
+  return s;
+}
+function showError(msg){
+  errorBox.style.display='block';
+  errorBox.textContent = msg;
+  status.textContent='';
+}
+
+/* ---------- initial render ---------- */
+renderActivities();
