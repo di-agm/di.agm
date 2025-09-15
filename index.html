@@ -267,26 +267,14 @@
   <div class="center-container"><!-- Page will be inserted here by JS --></div>
 </div>
     
-    <div id="textToolbar" style="
-      position: absolute;
-      display: none;
-      gap: 8px;
-      align: center;
-      z-index: 1000;
-    ">
-      <div class="toolbar-button" id="btnEdit">✎</div>
-      <div class="toolbar-button" id="btnDelete">✖</div>
-      <div class="toolbar-button" id="btnAlign">≡</button>
+    <div id="textToolbar" style="position:absolute; display:none; gap:8px; z-index:1000;">
+      <div class="toolbar-btn" data-action="edit">✎</div>
+      <div class="toolbar-btn" data-action="delete">✖</div>
+      <div class="toolbar-btn" data-action="align">≡</div>
     </div>
-
-    <div id="shapeToolbar" style="
-      position: absolute;
-      display: none;
-      gap: 8px;
-      align: center;
-      z-index: 1000;
-    ">
-      <div class="toolbar-button" id="btnDelete">✖</div>
+    
+    <div id="shapeToolbar" style="position:absolute; display:none; gap:8px; z-index:1000;">
+      <div class="toolbar-btn" data-action="delete">✖</div>
     </div>
 
     <div id="tt" style="display:none;">
