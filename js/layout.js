@@ -550,6 +550,57 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Handle click outside elements to deselect
+document.addEventListener('click', (e) => {
+  const clickedElement = e.target.closest('.text-element, .shape-element');
+  const toolbar = document.getElementById('elementToolbar');
+
+  if (clickedElement) {
+    // If the same element is already selected → keep selected
+    if (selectedElement === clickedElement) {
+      return;
+    }
+    // Use the main selectElement function
+    selectElement(clickedElement);
+  } else if (
+    !e.target.closest('#elementEditor') &&
+    !e.target.closest('#elementToolbar') &&
+    !e.target.closest('.sidebar-btn')
+  ) {
+    // Clicked outside → deselect
+    deselectElement();
+  }
+});
+
+document.getElementById('btnDelete').addEventListener('click', () => {
+  if (selectedElement) {
+    selectedElement.remove();
+    document.getElementById('elementToolbar').style.display = 'none';
+  }
+});
+
+document.getElementById('btnEdit').addEventListener('click', () => {
+  if (!selectedElement) return;
+  // Toggle edit mode
+  const isEditing = selectedElement.contentEditable === "true";
+  selectedElement.contentEditable = !isEditing;
+  if (!isEditing) {
+    selectedElement.focus(); // go into edit mode
+  } else {
+    selectedElement.blur();  // exit edit mode
+  }
+});
+
+document.getElementById('btnAlign').addEventListener('click', () => {
+  if (!selectedElement) return;
+
+  // Cycle through alignment options
+  const alignments = ['left', 'center', 'right', 'justify'];
+  let current = selectedElement.style.textAlign || 'left';
+  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
+  selectedElement.style.textAlign = alignments[nextIndex];
+});
+
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
   el.addEventListener('mousedown', (e) => {
@@ -830,57 +881,6 @@ function updateSavedLayoutsList() {
     container.appendChild(item);
   });
 }
-
-// Handle click outside elements to deselect
-document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
-  const toolbar = document.getElementById('elementToolbar');
-
-  if (clickedElement) {
-    // If the same element is already selected → keep selected
-    if (selectedElement === clickedElement) {
-      return;
-    }
-    // Use the main selectElement function
-    selectElement(clickedElement);
-  } else if (
-    !e.target.closest('#elementEditor') &&
-    !e.target.closest('#elementToolbar') &&
-    !e.target.closest('.sidebar-btn')
-  ) {
-    // Clicked outside → deselect
-    deselectElement();
-  }
-});
-
-document.getElementById('btnDelete').addEventListener('click', () => {
-  if (selectedElement) {
-    selectedElement.remove();
-    document.getElementById('elementToolbar').style.display = 'none';
-  }
-});
-
-document.getElementById('btnEdit').addEventListener('click', () => {
-  if (!selectedElement) return;
-  // Toggle edit mode
-  const isEditing = selectedElement.contentEditable === "true";
-  selectedElement.contentEditable = !isEditing;
-  if (!isEditing) {
-    selectedElement.focus(); // go into edit mode
-  } else {
-    selectedElement.blur();  // exit edit mode
-  }
-});
-
-document.getElementById('btnAlign').addEventListener('click', () => {
-  if (!selectedElement) return;
-
-  // Cycle through alignment options
-  const alignments = ['left', 'center', 'right', 'justify'];
-  let current = selectedElement.style.textAlign || 'left';
-  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
-  selectedElement.style.textAlign = alignments[nextIndex];
-});
 
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
