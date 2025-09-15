@@ -468,16 +468,29 @@ function addShapeElement(type) {
 }
 
 function selectElement(element) {
-  if (selectedElement) {
-    selectedElement.classList.remove('selected');
-  }
-  document.querySelectorAll('.text-element, .shape-element')
-    .forEach(el => el.classList.remove('selected'));
+  if (selectedElement) selectedElement.classList.remove('selected');
 
   selectedElement = element;
-  selectedElement.classList.add('selected');
+  element.classList.add('selected');
 
-  updateToolbarAndEditor();
+  // Hide both toolbars first
+  document.getElementById('textToolbar').style.display = 'none';
+  document.getElementById('shapeToolbar').style.display = 'none';
+
+  // Choose which toolbar to show
+  let toolbar;
+  if (element.classList.contains('text-element')) {
+    toolbar = document.getElementById('textToolbar');
+  } else if (element.classList.contains('shape-element')) {
+    toolbar = document.getElementById('shapeToolbar');
+  }
+
+  if (toolbar) {
+    const rect = element.getBoundingClientRect();
+    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+    toolbar.style.top = `${rect.bottom + 5}px`;
+    toolbar.style.display = 'flex';
+  }
 }
 
 function deselectElement() {
@@ -528,32 +541,57 @@ function updateToolbarAndEditor() {
   }
 }
 
-function Toolbar({ position, controls }) {
-  return (
-    <div className="toolbar" style={{ top: position.y, left: position.x }}>
-      {controls.map((Control, i) => (
-        <Control key={i} />
-      ))}
-    </div>
-  );
-}
+// Generic button logic
+document.querySelectorAll('.toolbar-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation(); // prevent deselecting element
+    if (!selectedElement) return;
 
-function Editor() {
-  const [selected, setSelected] = useState(null);
+    const action = btn.dataset.action;
 
-  let controls = [];
-  if (selected?.type === "text") controls = textControls;
-  if (selected?.type === "shape") controls = shapeControls;
+    if (action === 'delete') {
+      selectedElement.remove();
+      deselectElement();
+    }
+    if (action === 'edit') {
+      const isEditing = selectedElement.contentEditable === "true";
+      selectedElement.contentEditable = !isEditing;
+      if (!isEditing) selectedElement.focus();
+      else selectedElement.blur();
+    }
+    if (action === 'align') {
+      const alignments = ['left', 'center', 'right', 'justify'];
+      let current = selectedElement.style.textAlign || 'left';
+      selectedElement.style.textAlign = alignments[(alignments.indexOf(current)+1) % alignments.length];
+    }
+  });
+});
 
-  return (
-    <div>
-      <Canvas onSelect={setSelected} />
-      {selected && (
-        <Toolbar position={selected.position} controls={controls} />
-      )}
-    </div>
-  );
-}
+// Generic button logic
+document.querySelectorAll('.toolbar-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation(); // prevent deselecting element
+    if (!selectedElement) return;
+
+    const action = btn.dataset.action;
+
+    if (action === 'delete') {
+      selectedElement.remove();
+      deselectElement();
+    }
+    if (action === 'edit') {
+      const isEditing = selectedElement.contentEditable === "true";
+      selectedElement.contentEditable = !isEditing;
+      if (!isEditing) selectedElement.focus();
+      else selectedElement.blur();
+    }
+    if (action === 'align') {
+      const alignments = ['left', 'center', 'right', 'justify'];
+      let current = selectedElement.style.textAlign || 'left';
+      selectedElement.style.textAlign = alignments[(alignments.indexOf(current)+1) % alignments.length];
+    }
+  });
+});
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
