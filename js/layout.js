@@ -52,7 +52,7 @@ const paperSizes = {
   tabloid: { widthIN: 11, heightIN: 17 }
 };
 
-selector.addEventListener("change", (e) => {
+/*selector.addEventListener("change", (e) => {
   if (e.target.value === "custom") {
     document.getElementById("customSizeInputs").style.display = "block";
   } else {
@@ -72,7 +72,7 @@ document.getElementById("applyCustomSize").addEventListener("click", () => {
 });
 
 function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }
+function inToPx(inches) { return inches * 96; }*/
 
 const maxWidthPx = 360;
 
@@ -467,7 +467,7 @@ function addShapeElement(type) {
   selectElement(element);
 }
 
-function selectElement(element) {
+/*function selectElement(element) {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
   }
@@ -487,7 +487,40 @@ function selectElement(element) {
   const fontFamilySelect = document.getElementById('fontFamilySelect');
   if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
   const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}*/
+function selectElement(element) {
+  if (selectedElement) {
+    selectedElement.classList.remove('selected');
+  }
+  selectedElement = element;
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
+  selectedElement.classList.add('selected');
+
+  const toolbar = document.getElementById('elementToolbar');
+  const rect = element.getBoundingClientRect();
+  const containerRect = document.body.getBoundingClientRect();
+  toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+  toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+  toolbar.style.display = 'flex';
+
+  // Hide all editors first
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'none';
+
+  if (element.classList.contains('text-element')) {
+    document.getElementById('textEditor').style.display = 'block';
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+    const fontFamilySelect = document.getElementById('fontFamilySelect');
+    if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+    const colorInput = document.getElementById('colorPickerInput');
+    if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+  } else if (element.classList.contains('shape-element')) {
+    document.getElementById('shapeEditor').style.display = 'block';
+    // You can populate shape-specific controls here, like fill color or stroke
+  }
+}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
