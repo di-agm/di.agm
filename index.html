@@ -266,19 +266,27 @@
 
   <div class="center-container"><!-- Page will be inserted here by JS --></div>
 </div>
-
-    <div id="noElementSelected">Select an element to edit</div>
-
-    <div id="textEditor" style="display:none;">
-      <label>Font Size <input id="fontSizeInput" type="number"></label>
-      <label>Font Family <select id="fontFamilySelect">...</select></label>
-      <label>Text Color <input id="colorPickerInput" type="color"></label>
-    </div>
     
-    <div id="shapeEditor" style="display:none;">
-      <label>Fill Color <input id="shapeFillInput" type="color"></label>
-      <label>Border Color <input id="shapeStrokeInput" type="color"></label>
-      <label>Border Width <input id="shapeStrokeWidth" type="number"></label>
+    <div id="elementToolbar" style="
+      position: absolute;
+      display: none;
+      gap: 8px;
+      align: center;
+      z-index: 1000;
+    ">
+      <div class="toolbar-button" id="btnEdit">✎</div>
+      <div class="toolbar-button" id="btnDelete">✖</div>
+      <div class="toolbar-button" id="btnAlign">≡</button>
+    </div>
+
+    <div id="ShapeToolbar" style="
+      position: absolute;
+      display: none;
+      gap: 8px;
+      align: center;
+      z-index: 1000;
+    ">
+      <div class="toolbar-button" id="btnDelete">✖</div>
     </div>
 
     <div id="tt" style="display:none;">
