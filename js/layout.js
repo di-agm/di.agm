@@ -882,6 +882,34 @@ document.getElementById('btnAlign').addEventListener('click', () => {
   selectedElement.style.textAlign = alignments[nextIndex];
 });
 
+document.getElementById('btnRotate').addEventListener('click', () => {
+  if (!selectedElement) return;
+
+  let rotating = true;
+  const editor = document.getElementById('editor');
+
+  editor.style.cursor = 'crosshair';
+
+  function onMouseMove(e) {
+    if (!rotating) return;
+    const rect = selectedElement.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+    selectedElement.style.transform = `rotate(${angle}deg)`;
+  }
+
+  function onMouseUp() {
+    rotating = false;
+    editor.style.cursor = 'default';
+    editor.removeEventListener('mousemove', onMouseMove);
+    editor.removeEventListener('mouseup', onMouseUp);
+  }
+
+  editor.addEventListener('mousemove', onMouseMove);
+  editor.addEventListener('mouseup', onMouseUp);
+});
+
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
   const saved = localStorage.getItem('paperSizeSelectorLayouts');
