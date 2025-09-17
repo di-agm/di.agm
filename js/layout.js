@@ -468,28 +468,65 @@ function addShapeElement(type) {
 }
 
 function selectElement(element) {
-  if (selectedElement) selectedElement.classList.remove('selected');
-
-  selectedElement = element;
-  element.classList.add('selected');
-
-  // Hide both toolbars first
-  document.getElementById('textToolbar').style.display = 'none';
-  document.getElementById('shapeToolbar').style.display = 'none';
-
-  // Choose which toolbar to show
-  let toolbar;
-  if (element.classList.contains('text-element')) {
-    toolbar = document.getElementById('textToolbar');
-  } else if (element.classList.contains('shape-element')) {
-    toolbar = document.getElementById('shapeToolbar');
+  if (selectedElement) {
+    selectedElement.classList.remove('selected');
   }
+  selectedElement = element;
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
+  selectedElement.classList.add('selected');
+  const toolbar = document.getElementById('elementToolbar');
+  const rect = element.getBoundingClientRect();
+  const containerRect = document.body.getBoundingClientRect();
+  toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+  toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+  toolbar.style.display = 'flex';
+  document.getElementById('elementEditor').style.display = 'block';
+  document.getElementById('noElementSelected').style.display = 'none';
+  const fontSizeInput = document.getElementById('fontSizeInput');
+  if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+  const fontFamilySelect = document.getElementById('fontFamilySelect');
+  if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
+  const colorInput = document.getElementById('colorPickerInput');
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
-  if (toolbar) {
-    const rect = element.getBoundingClientRect();
-    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
-    toolbar.style.top = `${rect.bottom + 5}px`;
-    toolbar.style.display = 'flex';
+function makeElementDraggable(el) {
+  let offsetX = 0, offsetY = 0, isDragging = false;
+  el.addEventListener('mousedown', (e) => {
+      // If the element is resizable and the user clicked on the resize handle, skip dragging
+      if (getComputedStyle(el).resize !== "none") {
+        const rect = el.getBoundingClientRect();
+        const resizeHandleSize = 16; // px size for the corner region
+    
+        // bottom-right corner = resize zone
+        if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
+          return; // let the browser handle resizing
+        }
+      }
+    
+      e.preventDefault();
+      isDragging = true;
+      const rect = el.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+
+  function onMouseMove(e) {
+    if (!isDragging) return;
+    const container = el.parentElement;
+    const containerRect = container.getBoundingClientRect();
+    let newLeft = e.clientX - containerRect.left - offsetX;
+    let newTop = e.clientY - containerRect.top - offsetY;
+    newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
+    newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
+    el.style.left = newLeft + 'px';
+    el.style.top = newTop + 'px';
+  }
+  function onMouseUp() {
+    isDragging = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
   }
 }
 
@@ -497,75 +534,11 @@ function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
     selectedElement = null;
+    document.getElementById('elementEditor').style.display = 'none';
+    document.getElementById('noElementSelected').style.display = 'block';
   }
-  updateToolbarAndEditor();
+  document.getElementById('elementToolbar').style.display = 'none';
 }
-
-function updateToolbarAndEditor() {
-  const toolbar = document.getElementById('elementToolbar');
-  const editor = document.getElementById('elementEditor');
-  const noElement = document.getElementById('noElementSelected');
-
-  if (!selectedElement) {
-    // Hide everything if nothing is selected
-    toolbar.style.display = 'none';
-    editor.style.display = 'none';
-    noElement.style.display = 'block';
-    return;
-  }
-
-  // Show toolbar
-  const rect = selectedElement.getBoundingClientRect();
-  toolbar.style.position = 'absolute';
-  toolbar.style.left = `${window.scrollX + rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-  toolbar.style.top = `${window.scrollY + rect.bottom + 5}px`;
-  toolbar.style.display = 'flex';
-
-  // Show editor if it's text
-  if (selectedElement.classList.contains('text-element')) {
-    editor.style.display = 'block';
-    noElement.style.display = 'none';
-
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-
-    const fontFamilySelect = document.getElementById('fontFamilySelect');
-    if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-
-    const colorInput = document.getElementById('colorPickerInput');
-    if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
-  } else {
-    // Shapes don’t need the text editor
-    editor.style.display = 'none';
-    noElement.style.display = 'block';
-  }
-}
-
-// Generic button logic
-document.querySelectorAll('.toolbar-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation(); // prevent deselecting element
-    if (!selectedElement) return;
-
-    const action = btn.dataset.action;
-
-    if (action === 'delete') {
-      selectedElement.remove();
-      deselectElement();
-    }
-    if (action === 'edit') {
-      const isEditing = selectedElement.contentEditable === "true";
-      selectedElement.contentEditable = !isEditing;
-      if (!isEditing) selectedElement.focus();
-      else selectedElement.blur();
-    }
-    if (action === 'align') {
-      const alignments = ['left', 'center', 'right', 'justify'];
-      let current = selectedElement.style.textAlign || 'left';
-      selectedElement.style.textAlign = alignments[(alignments.indexOf(current)+1) % alignments.length];
-    }
-  });
-});
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
@@ -617,98 +590,6 @@ document.addEventListener('click', (e) => {
     }
   }
 });
-
-// Handle click outside elements to deselect
-document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
-  const toolbar = document.getElementById('elementToolbar');
-
-  if (clickedElement) {
-    // If the same element is already selected → keep selected
-    if (selectedElement === clickedElement) {
-      return;
-    }
-    // Use the main selectElement function
-    selectElement(clickedElement);
-  } else if (
-    !e.target.closest('#elementEditor') &&
-    !e.target.closest('#elementToolbar') &&
-    !e.target.closest('.sidebar-btn')
-  ) {
-    // Clicked outside → deselect
-    deselectElement();
-  }
-});
-
-document.getElementById('btnDelete').addEventListener('click', () => {
-  if (selectedElement) {
-    selectedElement.remove();
-    document.getElementById('elementToolbar').style.display = 'none';
-  }
-});
-
-document.getElementById('btnEdit').addEventListener('click', () => {
-  if (!selectedElement) return;
-  // Toggle edit mode
-  const isEditing = selectedElement.contentEditable === "true";
-  selectedElement.contentEditable = !isEditing;
-  if (!isEditing) {
-    selectedElement.focus(); // go into edit mode
-  } else {
-    selectedElement.blur();  // exit edit mode
-  }
-});
-
-document.getElementById('btnAlign').addEventListener('click', () => {
-  if (!selectedElement) return;
-
-  // Cycle through alignment options
-  const alignments = ['left', 'center', 'right', 'justify'];
-  let current = selectedElement.style.textAlign || 'left';
-  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
-  selectedElement.style.textAlign = alignments[nextIndex];
-});
-
-function makeElementDraggable(el) {
-  let offsetX = 0, offsetY = 0, isDragging = false;
-  el.addEventListener('mousedown', (e) => {
-      // If the element is resizable and the user clicked on the resize handle, skip dragging
-      if (getComputedStyle(el).resize !== "none") {
-        const rect = el.getBoundingClientRect();
-        const resizeHandleSize = 16; // px size for the corner region
-    
-        // bottom-right corner = resize zone
-        if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
-          return; // let the browser handle resizing
-        }
-      }
-    
-      e.preventDefault();
-      isDragging = true;
-      const rect = el.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
-
-  function onMouseMove(e) {
-    if (!isDragging) return;
-    const container = el.parentElement;
-    const containerRect = container.getBoundingClientRect();
-    let newLeft = e.clientX - containerRect.left - offsetX;
-    let newTop = e.clientY - containerRect.top - offsetY;
-    newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
-    newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
-    el.style.left = newLeft + 'px';
-    el.style.top = newTop + 'px';
-  }
-  function onMouseUp() {
-    isDragging = false;
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
-  }
-}
 
 // Toggle sidebar functions
 function toggleLeftSidebar() {
@@ -949,6 +830,57 @@ function updateSavedLayoutsList() {
     container.appendChild(item);
   });
 }
+
+// Handle click outside elements to deselect
+document.addEventListener('click', (e) => {
+  const clickedElement = e.target.closest('.text-element, .shape-element');
+  const toolbar = document.getElementById('elementToolbar');
+
+  if (clickedElement) {
+    // If the same element is already selected → keep selected
+    if (selectedElement === clickedElement) {
+      return;
+    }
+    // Use the main selectElement function
+    selectElement(clickedElement);
+  } else if (
+    !e.target.closest('#elementEditor') &&
+    !e.target.closest('#elementToolbar') &&
+    !e.target.closest('.sidebar-btn')
+  ) {
+    // Clicked outside → deselect
+    deselectElement();
+  }
+});
+
+document.getElementById('btnDelete').addEventListener('click', () => {
+  if (selectedElement) {
+    selectedElement.remove();
+    document.getElementById('elementToolbar').style.display = 'none';
+  }
+});
+
+document.getElementById('btnEdit').addEventListener('click', () => {
+  if (!selectedElement) return;
+  // Toggle edit mode
+  const isEditing = selectedElement.contentEditable === "true";
+  selectedElement.contentEditable = !isEditing;
+  if (!isEditing) {
+    selectedElement.focus(); // go into edit mode
+  } else {
+    selectedElement.blur();  // exit edit mode
+  }
+});
+
+document.getElementById('btnAlign').addEventListener('click', () => {
+  if (!selectedElement) return;
+
+  // Cycle through alignment options
+  const alignments = ['left', 'center', 'right', 'justify'];
+  let current = selectedElement.style.textAlign || 'left';
+  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
+  selectedElement.style.textAlign = alignments[nextIndex];
+});
 
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
