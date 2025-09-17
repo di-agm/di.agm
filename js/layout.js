@@ -71,8 +71,8 @@ document.getElementById("applyCustomSize").addEventListener("click", () => {
   }
 });
 
-/*function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }*/
+function mmToPx(mm) { return mm * 3.78; }
+function inToPx(inches) { return inches * 96; }
 
 const maxWidthPx = 360;
 
@@ -101,9 +101,9 @@ function updateRectSize(key) {
 }
 
 if (rulersVisible) drawRulers();
-/*window.addEventListener("resize", () => {
+window.addEventListener("resize", () => {
   if (rulersVisible) drawRulers();
-});*/
+});
   
   const page = pages[currentPageIndex];
 
@@ -243,7 +243,7 @@ document.getElementById('toggleRulersBtn').addEventListener('click', toggleRuler
 document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
 document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
 
-/*const units = ["px", "pt", "mm", "cm", "in"];
+const units = ["px", "pt", "mm", "cm", "in"];
 function convertToPx(value, unit) {
   switch (unit) {
     case "px": return value;
@@ -252,7 +252,7 @@ function convertToPx(value, unit) {
     case "cm": return value * 37.8;
     case "in": return value * 96;
   }
-}*/
+}
 
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
@@ -487,8 +487,7 @@ function selectElement(element) {
   const fontFamilySelect = document.getElementById('fontFamilySelect');
   if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
   const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
-}
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
@@ -539,38 +538,6 @@ function deselectElement() {
     document.getElementById('noElementSelected').style.display = 'block';
   }
   document.getElementById('elementToolbar').style.display = 'none';
-}
-
-function showToolbarFor(element) {
-  const type = element.dataset.type; // "text", "shape", "image", etc.
-
-  document.getElementById("btnDelete").style.display = "inline-block"; // always shown
-
-  if (type === "text") {
-    btnEdit.style.display = "inline-block";
-    btnAlign.style.display = "inline-block";
-  } else if (type === "shape") {
-    btnEdit.style.display = "none"; // shapes don’t edit text
-    btnAlign.style.display = "inline-block"; // maybe align works for both
-  } else if (type === "image") {
-    btnEdit.style.display = "inline-block"; // maybe "replace image"
-    btnAlign.style.display = "none";
-  }
-}
-
-function openEditorFor(element) {
-  const editor = document.getElementById("elementEditor");
-  editor.innerHTML = ""; // clear old content
-
-  const type = element.dataset.type;
-  if (type === "text") {
-    editor.innerHTML = textEditorHTML; 
-  } else if (type === "shape") {
-    editor.innerHTML = shapeEditorHTML;
-  } else if (type === "image") {
-    editor.innerHTML = imageEditorHTML;
-  }
-  editor.style.display = "block";
 }
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
@@ -913,34 +880,6 @@ document.getElementById('btnAlign').addEventListener('click', () => {
   let current = selectedElement.style.textAlign || 'left';
   let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
   selectedElement.style.textAlign = alignments[nextIndex];
-});
-
-document.getElementById('btnRotate').addEventListener('click', () => {
-  if (!selectedElement) return;
-
-  let rotating = true;
-  const editor = document.getElementById('editor');
-
-  editor.style.cursor = 'crosshair';
-
-  function onMouseMove(e) {
-    if (!rotating) return;
-    const rect = selectedElement.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
-    selectedElement.style.transform = `rotate(${angle}deg)`;
-  }
-
-  function onMouseUp() {
-    rotating = false;
-    editor.style.cursor = 'default';
-    editor.removeEventListener('mousemove', onMouseMove);
-    editor.removeEventListener('mouseup', onMouseUp);
-  }
-
-  editor.addEventListener('mousemove', onMouseMove);
-  editor.addEventListener('mouseup', onMouseUp);
 });
 
 // Load saved layouts from localStorage
