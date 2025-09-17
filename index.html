@@ -135,8 +135,19 @@
         <option value="a4">A4 (210 × 297 mm)</option>
         <option value="letter">Letter (8.5 × 11 in)</option>
         <option value="tabloid">Tabloid (11 × 17 in)</option>
-        <!--<option value="custom">Custom Size...</option>-->
+        <option value="custom">Custom Size...</option>
       </select>
+        <div id="customSizeInputs" style="display:none; margin-top:5px;">
+          <input type="number" id="customWidth" placeholder="Width">
+          <input type="number" id="customHeight" placeholder="Height">
+          <select id="customUnit">
+            <option value="px">px</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="in">in</option>
+          </select>
+          <button id="applyCustomSize">Apply</button>
+        </div>
       <div style="margin-top: 10px;"></div>
       <button class="sidebar-btn full-width" id="orientationBtn">↺</button>
     </div>
@@ -166,7 +177,7 @@
     
     <div class="sidebar-section">
       <h3>Element Style</h3>
-      <div id="elementEditor" style="display: none;">
+      <div id="textEditor" style="display: none;">
         <h4>Text Color</h4>
         <div class="color-picker-container">
           <label for="fontColorInput">Font color:</label>
@@ -256,67 +267,58 @@
   <div class="center-container"><!-- Page will be inserted here by JS --></div>
 </div>
     
-    <div id="elementToolbar" style="
-      position: absolute;
-      display: none;
-      gap: 8px;
-      align: center;
-      z-index: 1000;
-    ">
-      <div class="toolbar-button" id="btnEdit">✎</div>
-      <div class="toolbar-button" id="btnDelete">✖</div>
-      <div class="toolbar-button" id="btnAlign">≡</div>
-      <div class="toolbar-button" id="btnRotate">🗘</button>
+    <div id="textToolbar" style="position:absolute; display:none; gap:8px; z-index:1000;">
+      <div class="toolbar-btn" data-action="edit">✎</div>
+      <div class="toolbar-btn" data-action="delete">✖</div>
+      <div class="toolbar-btn" data-action="align">≡</div>
+    </div>
+    
+    <div id="shapeToolbar" style="position:absolute; display:none; gap:8px; z-index:1000;">
+      <div class="toolbar-btn" data-action="delete">✖</div>
     </div>
 
     <div id="tt" style="display:none;">
-    <div class="container">
-        <h1>Generador de Horarios</h1>
-        
-        <!-- Configuración básica -->
-        <div class="form-group">
-            <label for="numDays">Número de días:</label>
-            <input type="text" id="numDays" placeholder="Ej: 7 o 5+2">
-        </div>
-        
-        <div class="form-group">
-            <label for="timeRange">Hora de inicio y fin (HH:MM - HH:MM):</label>
-            <input type="text" id="timeRange" placeholder="Ej: 08:00 - 18:00">
-        </div>
-        
-        <div class="form-group">
-            <label for="startDay">Día de inicio (1=Lunes, 7=Domingo):</label>
-            <select id="startDay">
-                <option value="1">Lunes</option>
-                <option value="2">Martes</option>
-                <option value="3">Miércoles</option>
-                <option value="4">Jueves</option>
-                <option value="5">Viernes</option>
-                <option value="6">Sábado</option>
-                <option value="7">Domingo</option>
-            </select>
-        </div>
-        
-        <!-- Actividades -->
-        <h3>Actividades</h3>
-        <div id="activitiesContainer"></div>
-        <button type="button" class="add-btn" onclick="addActivity()">Agregar Actividad</button>
-        
-        <!-- Bloques no accesibles -->
-        <h3>Bloques No Accesibles</h3>
-        <div id="blocksContainer"></div>
-        <button type="button" class="add-btn" onclick="addBlock()">Agregar Bloque</button>
-        
-        <!-- Botón generar -->
-        <button type="button" onclick="generateSchedule()">Generar Horario</button>
+  <h1>Timetable Maker</h1>
+  <p class="muted">Configure timetable range and add activities. Each activity can be edited or deleted anytime. When ready click <strong>Generate Timetable</strong>.</p>
+
+  <div style="border:1px solid #eee;padding:12px;border-radius:8px;background:#fff">
+    <div class="row">
+      <label>Number of days:</label>
+      <input id="numDays" type="number" min="1" value="7" class="inline-num">
+      <label>Start weekday:</label>
+      <select id="startWeekday">
+        <option value="0">Sunday</option>
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5">Friday</option>
+        <option value="6">Saturday</option>
+      </select>
+      <label>Start time (HH:MM):</label>
+      <input id="timeStart" type="time" value="09:00">
+      <label>End time (HH:MM):</label>
+      <input id="timeEnd" type="time" value="17:00">
     </div>
-    
-    <!-- Resultado -->
-    <div class="container" id="scheduleResult">
-        <h2>Horario Generado</h2>
-        <div id="scheduleTable"></div>
-        <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
+    <div class="row">
+      <div class="small">Times are interpreted on each day independently (no timezone handling).</div>
     </div>
+  </div>
+
+  <h3>Activities</h3>
+  <div class="activities" id="activitiesList">
+    <!-- activity rows inserted here -->
+  </div>
+
+  <div class="controls">
+    <button id="addActivityBtn">+ Add activity</button>
+    <button id="generateBtn">Generate Timetable</button>
+    <button id="exportCsvBtn" class="csv-btn ghost" style="display:none">Export CSV</button>
+    <span id="status" class="muted" style="margin-left:12px"></span>
+  </div>
+
+  <div id="errorBox" class="error" style="display:none;margin-top:8px"></div>
+  <div id="timetableContainer" class="grid-wrap"></div>
 </div>
     
     <script src="js/windows.js" defer></script>
