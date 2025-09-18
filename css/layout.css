@@ -83,8 +83,8 @@ button {
   transition: background-color 0.2s;
 }
 
-button: hover {
-  color: transparent;
+button:hover {
+  background-color: transparent;
 }
 
 #orientationBtn {
