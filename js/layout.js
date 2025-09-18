@@ -489,7 +489,6 @@ function selectElement(element) {
   // Hide both editors first
   document.getElementById("textEditor").style.display = "none";
   document.getElementById("shapeEditor").style.display = "none";
-  document.getElementById("noElementSelected").style.display = "none";
 
   if (element.classList.contains("text-element")) {
     document.getElementById("textEditor").style.display = "block";
