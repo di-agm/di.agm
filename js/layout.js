@@ -548,7 +548,6 @@ function deselectElement() {
   document.getElementById("elementToolbar").style.display = "none";
   document.getElementById("textEditor").style.display = "none";
   document.getElementById("shapeEditor").style.display = "none";
-  document.getElementById("noElementSelected").style.display = "block";
 }
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
