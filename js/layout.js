@@ -384,6 +384,7 @@ function addTextElement(type) {
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
+  makeRotatable(newElement);
   selectElement(element);
 }
 
@@ -464,6 +465,7 @@ function addShapeElement(type) {
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
+  makeRotatable(element);
   selectElement(element);
 }
 
@@ -882,33 +884,41 @@ document.getElementById('btnAlign').addEventListener('click', () => {
   selectedElement.style.textAlign = alignments[nextIndex];
 });
 
-document.getElementById('btnRotate').addEventListener('click', () => {
-  if (!selectedElement) return;
+function makeRotatable(el) {
+  let rotating = false;
 
-  let rotating = true;
-  const editor = document.getElementById('editor');
+  el.addEventListener('mousedown', (e) => {
+    if (!e.altKey) return; // tip: require holding Alt (or Shift) so normal drag still works
 
-  editor.style.cursor = 'crosshair';
+    e.preventDefault();
+    rotating = true;
 
-  function onMouseMove(e) {
-    if (!rotating) return;
-    const rect = selectedElement.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
-    selectedElement.style.transform = `rotate(${angle}deg)`;
-  }
 
-  function onMouseUp() {
-    rotating = false;
-    editor.style.cursor = 'default';
-    editor.removeEventListener('mousemove', onMouseMove);
-    editor.removeEventListener('mouseup', onMouseUp);
-  }
+    function onMouseMove(ev) {
+      if (!rotating) return;
 
-  editor.addEventListener('mousemove', onMouseMove);
-  editor.addEventListener('mouseup', onMouseUp);
-});
+      const dx = ev.clientX - centerX;
+      const dy = ev.clientY - centerY;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      // preserve other transforms
+      const existing = el.style.transform.replace(/rotate\([^)]*\)/, '');
+      el.style.transform = `${existing} rotate(${angle}deg)`;
+    }
+
+    function onMouseUp() {
+      rotating = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+}
 
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
