@@ -582,29 +582,34 @@ document.querySelectorAll("#textToolbar .toolbar-btn").forEach(btn => {
 });
 
 document.addEventListener('click', (e) => {
-  const toolbar = document.getElementById('elementToolbar');
-  if (!toolbar) {
-    console.error('Toolbar element not found');
-    return;
-  }
+  const clickedElement = e.target.closest('.text-element, .shape-element');
 
-  if (e.target.closest('.text-element, .shape-element')) {
-    // Show the toolbar when a text-element is clicked
-    toolbar.style.display = 'flex'; // use flex if it contains multiple icons
-    // Position the toolbar under the clicked element
-    const rect = e.target.getBoundingClientRect();
-    toolbar.style.position = 'absolute';
-    toolbar.style.top = window.scrollY + rect.bottom + 'px';
-    toolbar.style.left = window.scrollX + rect.left + 'px';
-  } 
-  else if (!e.target.closest('#elementEditor') &&
-           !e.target.closest('#elementToolbar') &&
-           !e.target.closest('.sidebar-btn')) {
-    // Hide the toolbar when clicking outside
-    toolbar.style.display = 'none';
-    if (typeof deselectElement === 'function') {
-      deselectElement();
+  // Hide all toolbars first
+  const allToolbars = [document.getElementById('textToolbar'), document.getElementById('shapeToolbar')];
+  allToolbars.forEach(tb => tb.style.display = 'none');
+
+  if (clickedElement) {
+    // Select the element
+    if (selectedElement !== clickedElement) {
+      selectElement(clickedElement);
     }
+
+    // Show the right toolbar
+    const toolbar = clickedElement.classList.contains('text-element') 
+      ? document.getElementById('textToolbar') 
+      : document.getElementById('shapeToolbar');
+
+    const rect = clickedElement.getBoundingClientRect();
+    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+    toolbar.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    toolbar.style.display = 'flex';
+  } else if (
+    !e.target.closest('#textEditor') &&
+    !e.target.closest('#shapeEditor') &&
+    !e.target.closest('.sidebar-btn')
+  ) {
+    // Deselect if clicked outside
+    deselectElement();
   }
 });
 
@@ -847,28 +852,6 @@ function updateSavedLayoutsList() {
     container.appendChild(item);
   });
 }
-
-// Handle click outside elements to deselect
-document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
-  const toolbar = document.getElementById('elementToolbar');
-
-  if (clickedElement) {
-    // If the same element is already selected → keep selected
-    if (selectedElement === clickedElement) {
-      return;
-    }
-    // Use the main selectElement function
-    selectElement(clickedElement);
-  } else if (
-    !e.target.closest('#elementEditor') &&
-    !e.target.closest('#elementToolbar') &&
-    !e.target.closest('.sidebar-btn')
-  ) {
-    // Clicked outside → deselect
-    deselectElement();
-  }
-});
 
 document.getElementById('btnDelete').addEventListener('click', () => {
   if (selectedElement) {
