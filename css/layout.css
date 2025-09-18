@@ -83,6 +83,10 @@ button {
   transition: background-color 0.2s;
 }
 
+button: hover {
+  color: transparent;
+}
+
 #orientationBtn {
   padding: 10px 10px;
   font-size: 30px;
@@ -490,16 +494,4 @@ button {
   display: flex;
   flex-direction: row;  /* buttons in a row */
   gap: 5px;                 /* Spacing between buttons */
-}
-
-.toolbar-button {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%; /* makes it a circle */
-  background-color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white; /* icon or text color */
-  cursor: pointer;
 }
