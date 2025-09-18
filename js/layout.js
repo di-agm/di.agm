@@ -479,7 +479,9 @@ function selectElement(element) {
   );
   selectedElement.classList.add("selected");
 
-  const toolbar = document.getElementById("elementToolbar");
+  document.getElementById("textToolbar").style.display = "none";
+  document.getElementById("shapeToolbar").style.display = "none";
+
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
   toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
@@ -491,11 +493,15 @@ function selectElement(element) {
   document.getElementById("shapeEditor").style.display = "none";
 
   if (element.classList.contains("text-element")) {
-    document.getElementById("textEditor").style.display = "block";
-    // set text editor inputs (font size, color, etc)
+    const toolbar = document.getElementById("textToolbar");
+    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+    toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+    toolbar.style.display = "flex";
   } else if (element.classList.contains("shape-element")) {
-    document.getElementById("shapeEditor").style.display = "block";
-    // set shape editor inputs (border, fill, etc)
+    const toolbar = document.getElementById("shapeToolbar");
+    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+    toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+    toolbar.style.display = "flex";
   }
 }
 
@@ -545,12 +551,13 @@ function deselectElement() {
     selectedElement.classList.remove("selected");
     selectedElement = null;
   }
-  document.getElementById("elementToolbar").style.display = "none";
+  document.getElementById("textToolbar").style.display = "none";
+  document.getElementById("shapeToolbar").style.display = "none";
   document.getElementById("textEditor").style.display = "none";
   document.getElementById("shapeEditor").style.display = "none";
 }
 
-document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+document.querySelectorAll("#textToolbar .toolbar-btn").forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     if (!selectedElement) return;
