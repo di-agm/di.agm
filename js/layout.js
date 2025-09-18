@@ -471,25 +471,34 @@ function addShapeElement(type) {
 
 function selectElement(element) {
   if (selectedElement) {
-    selectedElement.classList.remove('selected');
+    selectedElement.classList.remove("selected");
   }
   selectedElement = element;
-  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
-  selectedElement.classList.add('selected');
-  const toolbar = document.getElementById('elementToolbar');
+  document.querySelectorAll(".text-element, .shape-element").forEach(el => 
+    el.classList.remove("selected")
+  );
+  selectedElement.classList.add("selected");
+
+  const toolbar = document.getElementById("elementToolbar");
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
   toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
   toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-  toolbar.style.display = 'flex';
-  document.getElementById('elementEditor').style.display = 'block';
-  document.getElementById('noElementSelected').style.display = 'none';
-  const fontSizeInput = document.getElementById('fontSizeInput');
-  if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-  const fontFamilySelect = document.getElementById('fontFamilySelect');
-  if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-  const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
+  toolbar.style.display = "flex";
+
+  // Hide both editors first
+  document.getElementById("textEditor").style.display = "none";
+  document.getElementById("shapeEditor").style.display = "none";
+  document.getElementById("noElementSelected").style.display = "none";
+
+  if (element.classList.contains("text-element")) {
+    document.getElementById("textEditor").style.display = "block";
+    // set text editor inputs (font size, color, etc)
+  } else if (element.classList.contains("shape-element")) {
+    document.getElementById("shapeEditor").style.display = "block";
+    // set shape editor inputs (border, fill, etc)
+  }
+}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
@@ -534,12 +543,13 @@ function makeElementDraggable(el) {
 
 function deselectElement() {
   if (selectedElement) {
-    selectedElement.classList.remove('selected');
+    selectedElement.classList.remove("selected");
     selectedElement = null;
-    document.getElementById('elementEditor').style.display = 'none';
-    document.getElementById('noElementSelected').style.display = 'block';
   }
-  document.getElementById('elementToolbar').style.display = 'none';
+  document.getElementById("elementToolbar").style.display = "none";
+  document.getElementById("textEditor").style.display = "none";
+  document.getElementById("shapeEditor").style.display = "none";
+  document.getElementById("noElementSelected").style.display = "block";
 }
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
