@@ -177,7 +177,7 @@
     
     <div class="sidebar-section">
       <h3>Element Style</h3>
-      <div id="textEditor" style="display: none;">
+      <div id="elementEditor" style="display: none;">
         <h4>Text Color</h4>
         <div class="color-picker-container">
           <label for="fontColorInput">Font color:</label>
@@ -214,14 +214,7 @@
         Select an element to edit
       </div>
     </div>
-      
-    <div id="shapeEditor" style="display:none;">
-      <h4>Shape Editor</h4>
-        <label>Fill Color: <input type="color" id="shapeFillInput"></label><br>
-        <label>Border Color: <input type="color" id="shapeBorderInput"></label><br>
-        <label>Border Width: <input type="number" id="shapeBorderWidth" min="0"></label>
-    </div>
-
+    
     <div class="sidebar-section">
       <h3>Pages</h3>
       <div class="sidebar-buttons">
@@ -274,7 +267,7 @@
   <div class="center-container"><!-- Page will be inserted here by JS --></div>
 </div>
     
-    <div id="textToolbar" style="
+    <div id="elementToolbar" style="
       position: absolute;
       display: none;
       gap: 8px;
@@ -285,17 +278,6 @@
       <button id="btnDelete">✖</button>
       <button id="btnRotate">🗘</button>
       <button id="btnAlign">≡</button>
-    </div>
-
-    <div id="shapeToolbar" style="
-      position: absolute;
-      display: none;
-      gap: 8px;
-      align: center;
-      z-index: 1000;
-    ">
-      <button id="btnDelete">✖</button>
-      <button id="btnRotate">🗘</button>
     </div>
 
     <div id="tt" style="display:none;">
