@@ -1054,7 +1054,7 @@ document.getElementById('importLayoutBtn').addEventListener('click', () => {
   // For simplicity, we'll just show a message
   alert('File import would be implemented here with a file picker dialog');
 });
-
+document.getElementById("layout").style.display = "block";
 // Initialize with first page and load saved layouts
 addPage();
 loadSavedLayouts();
