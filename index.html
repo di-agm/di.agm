@@ -177,7 +177,7 @@
     
     <div class="sidebar-section">
       <h3>Element Style</h3>
-      <div id="textEditor" style="display: none;">
+      <div id="elementEditor" style="display: none;">
         <h4>Text Color</h4>
         <div class="color-picker-container">
           <label for="fontColorInput">Font color:</label>
@@ -214,34 +214,25 @@
         Select an element to edit
       </div>
     </div>
-
-    <div class="sidebar-section">
-      <h3>Element Style</h3>
-      <div id="shapeEditor" style="display: none;">
-        <h4>Shape Color</h4>
-        <div class="color-picker-container">
-          <label for="fontColorInput">Shape color:</label>
-        </div>
-    </div>
     
     <div class="sidebar-section">
       <h3>Pages</h3>
       <div class="sidebar-buttons">
-        <button id="prevPageBtn">⮜</button>
-        <button id="nextPageBtn">⮞</button>
-        <button id="addPageBtn">✚</button>
-        <button id="removePageBtn">🗑</button>
-        <button id="duplicatePageBtn">⎘</button>
+        <button class="sidebar-btn" id="prevPageBtn">⮜</button>
+        <button class="sidebar-btn" id="nextPageBtn">⮞</button>
+        <button class="sidebar-btn full-width" id="addPageBtn">✚</button>
+        <button class="sidebar-btn" id="removePageBtn">🗑</button>
+        <button class="sidebar-btn" id="duplicatePageBtn">⎘</button>
       </div>
     </div>
     
     <div class="sidebar-section">
       <h3>Export</h3>
       <div class="sidebar-buttons">
-        <button id="exportPngBtn">PNG</button>
-        <button id="exportJpgBtn">JPG</button>
-        <button id="exportPdfBtn">PDF</button>
-        <button id="saveLayoutBtn">💾</button>
+        <button class="sidebar-btn" id="exportPngBtn">PNG</button>
+        <button class="sidebar-btn" id="exportJpgBtn">JPG</button>
+        <button class="sidebar-btn" id="exportPdfBtn">PDF</button>
+        <button class="sidebar-btn full-width" id="saveLayoutBtn">💾</button>
           <p></p>
       </div>
     </div>
@@ -267,8 +258,8 @@
       <h3>Save Layout</h3>
       <input type="text" id="layoutNameInput" placeholder="Layout name">
       <div class="modal-buttons">
-        <button id="cancelSaveBtn">Cancel</button>
-        <button id="confirmSaveBtn">Save</button>
+        <button class="sidebar-btn" id="cancelSaveBtn">Cancel</button>
+        <button class="sidebar-btn" id="confirmSaveBtn">Save</button>
       </div>
     </div>
   </div>
@@ -276,30 +267,17 @@
   <div class="center-container"><!-- Page will be inserted here by JS --></div>
 </div>
     
-    <div id="textToolbar" style="
+    <div id="elementToolbar" style="
       position: absolute;
       display: none;
       gap: 8px;
-      justify-content: center;
-      align-items: center;
+      align: center;
       z-index: 1000;
     ">
       <button id="btnEdit">✎</button>
       <button id="btnDelete">✖</button>
       <button id="btnRotate">🗘</button>
       <button id="btnAlign">≡</button>
-    </div>
-
-    <div id="shapeToolbar" style="
-      position: absolute;
-      display: none;
-      gap: 8px;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    ">
-      <button id="btnDelete">✖</button>
-      <button id="btnRotate">🗘</button>
     </div>
 
     <div id="tt" style="display:none;">
