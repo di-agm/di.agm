@@ -474,22 +474,31 @@ function selectElement(element) {
     selectedElement.classList.remove('selected');
   }
   selectedElement = element;
-  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.text-element, .shape-element')
+    .forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
-  const toolbar = document.getElementById('elementToolbar');
+
+  // Hide both by default
+  document.getElementById('textToolbar').style.display = 'none';
+  document.getElementById('shapeToolbar').style.display = 'none';
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+
   const rect = element.getBoundingClientRect();
-  const containerRect = document.body.getBoundingClientRect();
-  toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
-  toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-  toolbar.style.display = 'flex';
-  document.getElementById('elementEditor').style.display = 'block';
-  document.getElementById('noElementSelected').style.display = 'none';
-  const fontSizeInput = document.getElementById('fontSizeInput');
-  if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-  const fontFamilySelect = document.getElementById('fontFamilySelect');
-  if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-  const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
+  if (element.classList.contains('text-element')) {
+    const toolbar = document.getElementById('textToolbar');
+    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+    toolbar.style.top = `${rect.bottom + 5}px`;
+    toolbar.style.display = 'flex';
+    document.getElementById('textEditor').style.display = 'block';
+  } else if (element.classList.contains('shape-element')) {
+    const toolbar = document.getElementById('shapeToolbar');
+    toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
+    toolbar.style.top = `${rect.bottom + 5}px`;
+    toolbar.style.display = 'flex';
+    document.getElementById('shapeEditor').style.display = 'block';
+  }
+}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
@@ -536,10 +545,23 @@ function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
     selectedElement = null;
-    document.getElementById('elementEditor').style.display = 'none';
-    document.getElementById('noElementSelected').style.display = 'block';
   }
-  document.getElementById('elementToolbar').style.display = 'none';
+
+  // hide all toolbars
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+  if (textToolbar) textToolbar.style.display = 'none';
+  if (shapeToolbar) shapeToolbar.style.display = 'none';
+
+  // hide all editors
+  const textEditor = document.getElementById('textEditor');
+  const shapeEditor = document.getElementById('shapeEditor');
+  if (textEditor) textEditor.style.display = 'none';
+  if (shapeEditor) shapeEditor.style.display = 'none';
+
+  // optional: show a placeholder panel
+  const noElementSelected = document.getElementById('noElementSelected');
+  if (noElementSelected) noElementSelected.style.display = 'block';
 }
 
 document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
