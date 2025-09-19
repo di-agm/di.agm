@@ -56,31 +56,6 @@ html, body {
   transition: width 0.4s ease, height 0.4s ease;
 }
 
-.rect.page {
-  position: relative;
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.15);
-  user-select: none;
-  transition: width 0.4s ease, height 0.4s ease;
-  width: 320px;
-  height: 452px; /* A4 ratio initially */
-  overflow: hidden;
-}
-
-.rect.page .page-content {
-  /* any content-specific styles go here */
-}
-
-.page-number {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  color: #777;
-  font-size: 12px;
-  font-weight: 600;
-  z-index: 10;
-}
-
 #leftControls {
   position: fixed;
   left: 20px;
@@ -96,9 +71,7 @@ html, body {
 }
 
 button {
-  height: 50px;
-  width: 50px;
-  align: center;
+  padding: 2px 2px;
   font-size: 16px;
   border-radius: 50%;
   border: none;
@@ -109,7 +82,7 @@ button {
 }
 
 button:hover {
-  background-color: transparent;
+  opacity: 0.2;
 }
 
 #orientationBtn {
@@ -519,4 +492,16 @@ button:hover {
   display: flex;
   flex-direction: row;  /* buttons in a row */
   gap: 5px;                 /* Spacing between buttons */
+}
+
+.toolbar-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; /* makes it a circle */
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white; /* icon or text color */
+  cursor: pointer;
 }
