@@ -682,42 +682,21 @@ function hideModal() {
   document.getElementById('saveLayoutModal').style.display = 'none';
 }
 
-function saveLayout() {
-  const name = document.getElementById('layoutNameInput').value.trim();
-  if (!name) return;
-  
-  // Create a serializable representation of pages
-  const layoutData = {
-    name,
-    date: new Date().toISOString(),
-    pages: pages.map(page => {
-      // Extract all elements on the page
-      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
-        return {
-          type: el.classList.contains('image') ? 'image' : 'text',
-          content: el.innerText,
-          style: {
-            top: el.style.top,
-            left: el.style.left,
-            width: el.style.width,
-            height: el.style.height,
-            fontSize: el.style.fontSize,
-            fontWeight: el.style.fontWeight,
-            fontFamily: el.style.fontFamily,
-            color: el.style.color,
-            backgroundColor: el.style.backgroundColor
-          }
-        };
-      });
-      
-      return {
-        width: page.style.width,
-        height: page.style.height,
-        elements
-      };
-    })
-  };
-  
+const layoutData = {
+  name,
+  date: new Date().toISOString(),
+  pages: pages.map(page => ({
+    width: page.style.width,
+    height: page.style.height,
+    elements: Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => ({
+      type: el.classList.contains('text-element') ? 'text' : 'shape',
+      content: el.innerText,
+      classes: el.className.split(' '),       // Save class list
+      style: { top: el.style.top, left: el.style.left } // only dynamic
+    }))
+  }))
+};
+
   // Add to saved layouts
   savedLayouts.push(layoutData);
   
