@@ -114,6 +114,7 @@ button:hover {
 
 .shape-element {
   position: absolute;
+  background-color: #000000;
   top: 50px;
   left: 50px;
   width: 120px;
@@ -232,12 +233,17 @@ button:hover {
   background: rgba(255,255,255,0);
   min-width: 100px;
   min-height: 30px;
-  padding: 2px;
+  padding: 0px;
   border-radius: 4px;
   cursor: move;
   color: black;
   z-index: 5;
   transition: border 0.2s;
+  resize: both;
+  overflow: auto;
+  font-size: 14px;
+  font-weight: normal;
+  font-family: Arial, sans-serif;
 }
 
 .text-element .resizer {
@@ -259,6 +265,9 @@ button:hover {
 .text-element:focus {
   cursor: text;  /* change cursor to text when editing */
 }
+
+.text-element.title { font-size: 24px; font-weight: bold; }
+.text-element.subtitle { font-size: 18px; font-weight: bold; }
 
 /* Hamburger menu styles */
 .hamburger-menu {
