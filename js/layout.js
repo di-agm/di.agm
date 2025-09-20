@@ -384,7 +384,7 @@ function addTextElement(type) {
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
-  makeRotatable(newElement);
+  makeRotatable(element);
   selectElement(element);
 }
 
@@ -416,7 +416,7 @@ function addShapeElement(type) {
       shape.setAttribute("cx", "50");
       shape.setAttribute("cy", "50");
       shape.setAttribute("r", "40");
-      shape.setAttribute("fill", "#ddd");
+      shape.setAttribute("fill", "#777");
       break;
 
     case 'polygon': {
@@ -431,7 +431,7 @@ function addShapeElement(type) {
       }
       shape = document.createElementNS(svgNS, "polygon");
       shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#ddd");
+      shape.setAttribute("fill", "#777");
       break;
     }
 
@@ -450,7 +450,7 @@ function addShapeElement(type) {
       }
       shape = document.createElementNS(svgNS, "polygon");
       shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#ddd");
+      shape.setAttribute("fill", "#777");
       break;
     }
   }
@@ -476,14 +476,26 @@ function selectElement(element) {
   selectedElement = element;
   document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
   selectedElement.classList.add('selected');
-  const toolbar = document.getElementById('elementToolbar');
+  
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+  
+  if (element.classList.contains('text-element')) {
+  textToolbar.style.display = 'flex';
+  shapeToolbar.style.display = 'none';
+  } else if (element.classList.contains('shape-element')) {
+  shapeToolbar.style.display = 'flex';
+  textToolbar.style.display = 'none';
+  }
+  
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
+  const toolbar = element.classList.contains('text-element') ? textToolbar : shapeToolbar;
   toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
   toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-  toolbar.style.display = 'flex';
   document.getElementById('elementEditor').style.display = 'block';
   document.getElementById('noElementSelected').style.display = 'none';
+  
   const fontSizeInput = document.getElementById('fontSizeInput');
   if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
   const fontFamilySelect = document.getElementById('fontFamilySelect');
@@ -539,10 +551,11 @@ function deselectElement() {
     document.getElementById('elementEditor').style.display = 'none';
     document.getElementById('noElementSelected').style.display = 'block';
   }
-  document.getElementById('elementToolbar').style.display = 'none';
+  document.getElementById('textToolbar').style.display = 'none';
+  document.getElementById('shapeToolbar').style.display = 'none';
 }
 
-document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+document.querySelectorAll('#textToolbar .toolbar-btn, #shapeToolbar .toolbar-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     if (!selectedElement) return;
@@ -551,42 +564,43 @@ document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
       selectedElement.remove();
       deselectElement();
     }
-    if (action === 'edit') {
-      // Toggle edit mode
+    if (action === 'edit' && selectedElement.classList.contains('text-element')) {
       const isEditing = selectedElement.contentEditable === "true";
       selectedElement.contentEditable = !isEditing;
       if (!isEditing) {
-        // Enable editing
         selectedElement.focus();
       } else {
-        // Disable editing (back to drag mode)
         selectedElement.blur();
       }
     }
- });
+  });
 });
 
 document.addEventListener('click', (e) => {
-  const toolbar = document.getElementById('elementToolbar');
-  if (!toolbar) {
-    console.error('Toolbar element not found');
-    return;
-  }
-
-  if (e.target.closest('.text-element, .shape-element')) {
-    // Show the toolbar when a text-element is clicked
-    toolbar.style.display = 'flex'; // use flex if it contains multiple icons
-    // Position the toolbar under the clicked element
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+  if (!textToolbar || !shapeToolbar) return;
+  
+  if (e.target.closest('.text-element')) {
+    textToolbar.style.display = 'flex';
+    shapeToolbar.style.display = 'none';
     const rect = e.target.getBoundingClientRect();
-    toolbar.style.position = 'absolute';
-    toolbar.style.top = window.scrollY + rect.bottom + 'px';
-    toolbar.style.left = window.scrollX + rect.left + 'px';
-  } 
-  else if (!e.target.closest('#elementEditor') &&
-           !e.target.closest('#elementToolbar') &&
-           !e.target.closest('.sidebar-btn')) {
-    // Hide the toolbar when clicking outside
-    toolbar.style.display = 'none';
+    textToolbar.style.position = 'absolute';
+    textToolbar.style.top = window.scrollY + rect.bottom + 'px';
+    textToolbar.style.left = window.scrollX + rect.left + 'px';
+  } else if (e.target.closest('.shape-element')) {
+    shapeToolbar.style.display = 'flex';
+    textToolbar.style.display = 'none';
+    const rect = e.target.getBoundingClientRect();
+    shapeToolbar.style.position = 'absolute';
+    shapeToolbar.style.top = window.scrollY + rect.bottom + 'px';
+    shapeToolbar.style.left = window.scrollX + rect.left + 'px';
+  } else if (!e.target.closest('#elementEditor') &&
+             !e.target.closest('#textToolbar') &&
+             !e.target.closest('#shapeToolbar') &&
+             !e.target.closest('.sidebar-btn')) {
+    textToolbar.style.display = 'none';
+    shapeToolbar.style.display = 'none';
     if (typeof deselectElement === 'function') {
       deselectElement();
     }
