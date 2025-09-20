@@ -4,7 +4,7 @@ let isPortrait = true;
 let selectedElement = null;
 let savedLayouts = [];
 let rulersVisible = false;
-//let currentRulerUnit = "px"; // px, pt, mm, cm, in
+let currentRulerUnit = "px"; // px, pt, mm, cm, in
 let marginsVisible = false;
 let pageNumbersVisible = true;
 let zoomLevel = 1;
@@ -52,7 +52,7 @@ const paperSizes = {
   tabloid: { widthIN: 11, heightIN: 17 }
 };
 
-/*selector.addEventListener("change", (e) => {
+selector.addEventListener("change", (e) => {
   if (e.target.value === "custom") {
     document.getElementById("customSizeInputs").style.display = "block";
   } else {
@@ -72,7 +72,7 @@ document.getElementById("applyCustomSize").addEventListener("click", () => {
 });
 
 function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }*/
+function inToPx(inches) { return inches * 96; }
 
 const maxWidthPx = 360;
 
@@ -243,7 +243,7 @@ document.getElementById('toggleRulersBtn').addEventListener('click', toggleRuler
 document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
 document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
 
-/*const units = ["px", "pt", "mm", "cm", "in"];
+const units = ["px", "pt", "mm", "cm", "in"];
 function convertToPx(value, unit) {
   switch (unit) {
     case "px": return value;
@@ -252,7 +252,7 @@ function convertToPx(value, unit) {
     case "cm": return value * 37.8;
     case "in": return value * 96;
   }
-}*/
+}
 
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
