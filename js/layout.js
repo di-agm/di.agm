@@ -14,13 +14,27 @@ let startX, startY, scrollLeft, scrollTop;
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
-
+  page.style.position = 'relative';
+  page.style.background = '#ffffff';
+  page.style.boxShadow = '0 8px 20px rgba(2,6,23,0.15)';
+  page.style.userSelect = 'none';
+  page.style.transition = 'width 0.4s ease, height 0.4s ease';
+  page.style.width = '320px';
+  page.style.height = '452px'; // A4 ratio initially
+  page.style.overflow = 'hidden';
+  
   const content = document.createElement('div');
   content.className = 'page-content';
   page.appendChild(content);
-
+  
   const pageNumberLabel = document.createElement('div');
-  pageNumberLabel.className = 'page-number-label';
+  pageNumberLabel.style.position = 'absolute';
+  pageNumberLabel.style.bottom = '8px';
+  pageNumberLabel.style.right = '12px';
+  pageNumberLabel.style.color = '#666';
+  pageNumberLabel.style.fontSize = '12px';
+  pageNumberLabel.style.fontWeight = '600';
+  pageNumberLabel.style.zIndex = '10';
   pageNumberLabel.textContent = pageNumber;
   page.appendChild(pageNumberLabel);
 
@@ -682,21 +696,42 @@ function hideModal() {
   document.getElementById('saveLayoutModal').style.display = 'none';
 }
 
-const layoutData = {
-  name,
-  date: new Date().toISOString(),
-  pages: pages.map(page => ({
-    width: page.style.width,
-    height: page.style.height,
-    elements: Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => ({
-      type: el.classList.contains('text-element') ? 'text' : 'shape',
-      content: el.innerText,
-      classes: el.className.split(' '),       // Save class list
-      style: { top: el.style.top, left: el.style.left } // only dynamic
-    }))
-  }))
-};
-
+function saveLayout() {
+  const name = document.getElementById('layoutNameInput').value.trim();
+  if (!name) return;
+  
+  // Create a serializable representation of pages
+  const layoutData = {
+    name,
+    date: new Date().toISOString(),
+    pages: pages.map(page => {
+      // Extract all elements on the page
+      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
+        return {
+          type: el.classList.contains('image') ? 'image' : 'text',
+          content: el.innerText,
+          style: {
+            top: el.style.top,
+            left: el.style.left,
+            width: el.style.width,
+            height: el.style.height,
+            fontSize: el.style.fontSize,
+            fontWeight: el.style.fontWeight,
+            fontFamily: el.style.fontFamily,
+            color: el.style.color,
+            backgroundColor: el.style.backgroundColor
+          }
+        };
+      });
+      
+      return {
+        width: page.style.width,
+        height: page.style.height,
+        elements
+      };
+    })
+  };
+  
   // Add to saved layouts
   savedLayouts.push(layoutData);
   
