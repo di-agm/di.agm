@@ -384,7 +384,7 @@ function addTextElement(type) {
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
-  makeRotatable(newElement);
+  makeRotatable(element);
   selectElement(element);
 }
 
