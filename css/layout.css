@@ -186,7 +186,7 @@ button:hover {
 /* Tick marks */
 .ruler .tick {
   position: absolute;
-  background: #666;
+  background: #777;
 }
 
 .ruler.horizontal .tick {
