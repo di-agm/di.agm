@@ -326,12 +326,12 @@ function toggleRulers() {
   drawRulers();
 }
 
-function cycleRulerUnit() {
+/*function cycleRulerUnit() {
   let idx = units.indexOf(currentRulerUnit);
   currentRulerUnit = units[(idx + 1) % units.length];
   document.getElementById("rulerUnitBtn").textContent = "Unit: " + currentRulerUnit;
   if (rulersVisible) drawRulers();
-}
+}*/
 
 // Re-draw rulers when page changes
 const oldShowPage = showPage;
@@ -489,7 +489,8 @@ function selectElement(element) {
   const fontFamilySelect = document.getElementById('fontFamilySelect');
   if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
   const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';}
+  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+}
 
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
@@ -567,6 +568,42 @@ function alignElement() {
   let current = selectedElement.style.textAlign || 'left';
   let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
   selectedElement.style.textAlign = alignments[nextIndex];
+}
+
+function makeRotatable(el) {
+  let rotating = false;
+
+  el.addEventListener('mousedown', (e) => {
+    if (!e.altKey) return; // tip: require holding Alt (or Shift) so normal drag still works
+
+    e.preventDefault();
+    rotating = true;
+
+    const rect = el.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    function onMouseMove(ev) {
+      if (!rotating) return;
+
+      const dx = ev.clientX - centerX;
+      const dy = ev.clientY - centerY;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      // preserve other transforms
+      const existing = el.style.transform.replace(/rotate\([^)]*\)/, '');
+      el.style.transform = `${existing} rotate(${angle}deg)`;
+    }
+
+    function onMouseUp() {
+      rotating = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 }
 
 // Toolbar button listeners
@@ -856,41 +893,6 @@ function updateSavedLayoutsList() {
   });
 }
 
-function makeRotatable(el) {
-  let rotating = false;
-
-  el.addEventListener('mousedown', (e) => {
-    if (!e.altKey) return; // tip: require holding Alt (or Shift) so normal drag still works
-
-    e.preventDefault();
-    rotating = true;
-
-    const rect = el.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    function onMouseMove(ev) {
-      if (!rotating) return;
-
-      const dx = ev.clientX - centerX;
-      const dy = ev.clientY - centerY;
-      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-      // preserve other transforms
-      const existing = el.style.transform.replace(/rotate\([^)]*\)/, '');
-      el.style.transform = `${existing} rotate(${angle}deg)`;
-    }
-
-    function onMouseUp() {
-      rotating = false;
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    }
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  });
-}
 
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
