@@ -465,22 +465,20 @@ function addShapeElement(type) {
 }
 
 function selectElement(element) {
-  if (selectedElement) {
-    selectedElement.classList.remove('selected');
-  }
-  selectedElement = element;
-
   // Clear previous selection
   document.querySelectorAll('.text-element, .shape-element').forEach(el =>
     el.classList.remove('selected')
   );
+
+  // Update selectedElement
+  selectedElement = element;
   selectedElement.classList.add('selected');
 
-  //Editors
+  // Hide all editors and toolbars by default
   document.getElementById('textEditor').style.display = 'none';
   document.getElementById('shapeEditor').style.display = 'none';
   document.getElementById('noElementSelected').style.display = 'none';
-  // Toolbars
+
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
   textToolbar.style.display = 'none';
@@ -490,6 +488,7 @@ function selectElement(element) {
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
   let toolbar;
+
   if (element.classList.contains('text-element')) {
     toolbar = textToolbar;
     document.getElementById('textEditor').style.display = 'block';
@@ -507,6 +506,7 @@ function selectElement(element) {
     if (colorInput) {
       colorInput.value = selectedElement.style.color || '#000000';
     }
+
   } else if (element.classList.contains('shape-element')) {
     toolbar = shapeToolbar;
     document.getElementById('shapeEditor').style.display = 'block';
@@ -516,27 +516,6 @@ function selectElement(element) {
     toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
     toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
     toolbar.style.display = 'flex';
-  }
-
-  // Show editor panel
-  document.getElementById('textEditor').style.display = 'block';
-  document.getElementById('shapeEditor').style.display = 'block';
-  document.getElementById('noElementSelected').style.display = 'none';
-
-  // Only update text controls if this is a text element
-  if (element.classList.contains('text-element')) {
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    if (fontSizeInput) {
-      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-    }
-    const fontFamilySelect = document.getElementById('fontFamilySelect');
-    if (fontFamilySelect) {
-      fontFamilySelect.value = selectedElement.style.fontFamily || '';
-    }
-    const colorInput = document.getElementById('colorPickerInput');
-    if (colorInput) {
-      colorInput.value = selectedElement.style.color || '#000000';
-    }
   }
 }
 
