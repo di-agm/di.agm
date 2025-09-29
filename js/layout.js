@@ -52,7 +52,7 @@ const paperSizes = {
   tabloid: { widthIN: 11, heightIN: 17 }
 };
 
-selector.addEventListener("change", (e) => {
+/*selector.addEventListener("change", (e) => {
   if (e.target.value === "custom") {
     document.getElementById("customSizeInputs").style.display = "block";
   } else {
@@ -72,7 +72,7 @@ document.getElementById("applyCustomSize").addEventListener("click", () => {
 });
 
 function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }
+function inToPx(inches) { return inches * 96; }*/
 
 const maxWidthPx = 360;
 
@@ -238,12 +238,7 @@ function togglePageNumbers() {
   });
 }
 
-// Button handlers
-document.getElementById('toggleRulersBtn').addEventListener('click', toggleRulers);
-document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
-document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
-
-const units = ["px", "pt", "mm", "cm", "in"];
+/*const units = ["px", "pt", "mm", "cm", "in"];
 function convertToPx(value, unit) {
   switch (unit) {
     case "px": return value;
@@ -252,7 +247,7 @@ function convertToPx(value, unit) {
     case "cm": return value * 37.8;
     case "in": return value * 96;
   }
-}
+}*/
 
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
@@ -481,6 +476,10 @@ function selectElement(element) {
   );
   selectedElement.classList.add('selected');
 
+  //Editors
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'none';
   // Toolbars
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
@@ -493,8 +492,24 @@ function selectElement(element) {
   let toolbar;
   if (element.classList.contains('text-element')) {
     toolbar = textToolbar;
+    document.getElementById('textEditor').style.display = 'block';
+
+    // update text controls
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) {
+      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+    }
+    const fontFamilySelect = document.getElementById('fontFamilySelect');
+    if (fontFamilySelect) {
+      fontFamilySelect.value = selectedElement.style.fontFamily || '';
+    }
+    const colorInput = document.getElementById('colorPickerInput');
+    if (colorInput) {
+      colorInput.value = selectedElement.style.color || '#000000';
+    }
   } else if (element.classList.contains('shape-element')) {
     toolbar = shapeToolbar;
+    document.getElementById('shapeEditor').style.display = 'block';
   }
 
   if (toolbar) {
@@ -504,7 +519,8 @@ function selectElement(element) {
   }
 
   // Show editor panel
-  document.getElementById('elementEditor').style.display = 'block';
+  document.getElementById('textEditor').style.display = 'block';
+  document.getElementById('shapeEditor').style.display = 'block';
   document.getElementById('noElementSelected').style.display = 'none';
 
   // Only update text controls if this is a text element
@@ -645,7 +661,8 @@ document.addEventListener('click', (e) => {
     }
     showToolbar(clickedElement);
   } else if (
-    !e.target.closest('#elementEditor') &&
+    !e.target.closest('#textEditor') &&
+    !e.target.closest('#shapeEditor') &&
     !e.target.closest('#textToolbar') &&
     !e.target.closest('#shapeToolbar') &&
     !e.target.closest('.sidebar-btn')
@@ -701,10 +718,11 @@ function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
     selectedElement = null;
-    document.getElementById('elementEditor').style.display = 'none';
-    document.getElementById('noElementSelected').style.display = 'block';
   }
-  document.getElementById('elementToolbar').style.display = 'none';
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'block';
+  document.getElementById('textToolbar, shapeToolbar').style.display = 'none';
 }
 
 // Toggle sidebar functions
@@ -1043,6 +1061,11 @@ document.getElementById('fontFileInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) loadCustomFont(file);
 });
+
+// Button handlers
+document.getElementById('toggleRulersBtn').addEventListener('click', toggleRulers);
+document.getElementById('toggleMarginsBtn').addEventListener('click', toggleMargins);
+document.getElementById('togglePageNumbersBtn').addEventListener('click', togglePageNumbers);
 
 // Export handlers
 document.getElementById('exportPngBtn').addEventListener('click', () => exportAsImage('png'));
