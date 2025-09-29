@@ -692,17 +692,6 @@ function makeRotatable(el) {
   });
 }
 
-// Toolbar button listeners
-document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const action = btn.dataset.action;
-    if (action === 'delete') deleteElement();
-    if (action === 'edit') toggleEdit();
-    if (action === 'align') alignElement();
-  });
-});
-
 // Direct button hooks
 document.getElementById('btnDelete').addEventListener('click', deleteElement);
 document.getElementById('btnEdit').addEventListener('click', toggleEdit);
