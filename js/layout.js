@@ -610,9 +610,12 @@ function showToolbar(targetElement) {
 function deleteElement() {
   if (selectedElement) {
     selectedElement.remove();
-    deselectElement();
+    selectedElement = null;
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('textEditor').style.display = 'none';
+    document.getElementById('shapeEditor').style.display = 'none';
+    document.getElementById('noElementSelected').style.display = 'block';
   }
 }
 
