@@ -703,27 +703,6 @@ document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
   });
 });
 
-// Handle clicks on elements and outside
-document.addEventListener('click', (e) => {
-  const toolbar = document.getElementById('elementToolbar');
-  if (!toolbar) return;
-
-  const clickedElement = e.target.closest('.text-element, .shape-element');
-  if (clickedElement) {
-    if (selectedElement !== clickedElement) {
-      selectElement(clickedElement);
-    }
-    showToolbar(clickedElement);
-  } else if (
-    !e.target.closest('#elementEditor') &&
-    !e.target.closest('#elementToolbar') &&
-    !e.target.closest('.sidebar-btn')
-  ) {
-    toolbar.style.display = 'none';
-    deselectElement();
-  }
-});
-
 // Direct button hooks
 document.getElementById('btnDelete').addEventListener('click', deleteElement);
 document.getElementById('btnEdit').addEventListener('click', toggleEdit);
