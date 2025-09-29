@@ -568,6 +568,7 @@ function makeElementDraggable(el) {
 function showToolbar(targetElement) {
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
+  if (!textToolbar || !shapeToolbar) return;
 
   // Hide both first
   textToolbar.style.display = 'none';
@@ -594,7 +595,8 @@ function deleteElement() {
   if (selectedElement) {
     selectedElement.remove();
     deselectElement();
-    document.getElementById('textToolbar, shapeToolbar').style.display = 'none';
+    document.getElementById('textToolbar').style.display = 'none';
+    document.getElementById('shapeToolbar').style.display = 'none';
   }
 }
 
@@ -616,6 +618,43 @@ function alignElement() {
   let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
   selectedElement.style.textAlign = alignments[nextIndex];
 }
+
+// Toolbar button listeners
+['textToolbar', 'shapeToolbar'].forEach(toolbarId => {
+  const toolbar = document.getElementById(toolbarId);
+  if (!toolbar) return;
+
+  toolbar.querySelectorAll('.toolbar-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      if (action === 'delete') deleteElement();
+      if (action === 'edit') toggleEdit();
+      if (action === 'align') alignElement();
+    });
+  });
+});
+
+// Handle clicks on elements and outside
+document.addEventListener('click', (e) => {
+  const clickedElement = e.target.closest('.text-element, .shape-element');
+
+  if (clickedElement) {
+    if (selectedElement !== clickedElement) {
+      selectElement(clickedElement);
+    }
+    showToolbar(clickedElement);
+  } else if (
+    !e.target.closest('#elementEditor') &&
+    !e.target.closest('#textToolbar') &&
+    !e.target.closest('#shapeToolbar') &&
+    !e.target.closest('.sidebar-btn')
+  ) {
+    document.getElementById('textToolbar').style.display = 'none';
+    document.getElementById('shapeToolbar').style.display = 'none';
+    deselectElement();
+  }
+});
 
 function makeRotatable(el) {
   let rotating = false;
