@@ -532,6 +532,80 @@ function makeElementDraggable(el) {
   }
 }
 
+function showToolbar(targetElement) {
+  const toolbar = document.getElementById('elementToolbar');
+  if (!toolbar) return;
+  toolbar.style.display = 'flex';
+  const rect = targetElement.getBoundingClientRect();
+  toolbar.style.position = 'absolute';
+  toolbar.style.top = window.scrollY + rect.bottom + 'px';
+  toolbar.style.left = window.scrollX + rect.left + 'px';
+}
+
+function deleteElement() {
+  if (selectedElement) {
+    selectedElement.remove();
+    deselectElement();
+    document.getElementById('elementToolbar').style.display = 'none';
+  }
+}
+
+function toggleEdit() {
+  if (!selectedElement) return;
+  const isEditing = selectedElement.contentEditable === "true";
+  selectedElement.contentEditable = !isEditing;
+  if (!isEditing) {
+    selectedElement.focus();
+  } else {
+    selectedElement.blur();
+  }
+}
+
+function alignElement() {
+  if (!selectedElement) return;
+  const alignments = ['left', 'center', 'right', 'justify'];
+  let current = selectedElement.style.textAlign || 'left';
+  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
+  selectedElement.style.textAlign = alignments[nextIndex];
+}
+
+// Toolbar button listeners
+document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const action = btn.dataset.action;
+    if (action === 'delete') deleteElement();
+    if (action === 'edit') toggleEdit();
+    if (action === 'align') alignElement();
+  });
+});
+
+// Handle clicks on elements and outside
+document.addEventListener('click', (e) => {
+  const toolbar = document.getElementById('elementToolbar');
+  if (!toolbar) return;
+
+  const clickedElement = e.target.closest('.text-element, .shape-element');
+  if (clickedElement) {
+    if (selectedElement !== clickedElement) {
+      selectElement(clickedElement);
+    }
+    showToolbar(clickedElement);
+  } else if (
+    !e.target.closest('#elementEditor') &&
+    !e.target.closest('#elementToolbar') &&
+    !e.target.closest('.sidebar-btn')
+  ) {
+    toolbar.style.display = 'none';
+    deselectElement();
+  }
+});
+
+// Direct button hooks
+document.getElementById('btnDelete').addEventListener('click', deleteElement);
+document.getElementById('btnEdit').addEventListener('click', toggleEdit);
+document.getElementById('btnAlign').addEventListener('click', alignElement);
+
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
@@ -541,57 +615,6 @@ function deselectElement() {
   }
   document.getElementById('elementToolbar').style.display = 'none';
 }
-
-document.querySelectorAll('#elementToolbar .toolbar-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!selectedElement) return;
-    const action = btn.dataset.action;
-    if (action === 'delete') {
-      selectedElement.remove();
-      deselectElement();
-    }
-    if (action === 'edit') {
-      // Toggle edit mode
-      const isEditing = selectedElement.contentEditable === "true";
-      selectedElement.contentEditable = !isEditing;
-      if (!isEditing) {
-        // Enable editing
-        selectedElement.focus();
-      } else {
-        // Disable editing (back to drag mode)
-        selectedElement.blur();
-      }
-    }
- });
-});
-
-document.addEventListener('click', (e) => {
-  const toolbar = document.getElementById('elementToolbar');
-  if (!toolbar) {
-    console.error('Toolbar element not found');
-    return;
-  }
-
-  if (e.target.closest('.text-element, .shape-element')) {
-    // Show the toolbar when a text-element is clicked
-    toolbar.style.display = 'flex'; // use flex if it contains multiple icons
-    // Position the toolbar under the clicked element
-    const rect = e.target.getBoundingClientRect();
-    toolbar.style.position = 'absolute';
-    toolbar.style.top = window.scrollY + rect.bottom + 'px';
-    toolbar.style.left = window.scrollX + rect.left + 'px';
-  } 
-  else if (!e.target.closest('#elementEditor') &&
-           !e.target.closest('#elementToolbar') &&
-           !e.target.closest('.sidebar-btn')) {
-    // Hide the toolbar when clicking outside
-    toolbar.style.display = 'none';
-    if (typeof deselectElement === 'function') {
-      deselectElement();
-    }
-  }
-});
 
 // Toggle sidebar functions
 function toggleLeftSidebar() {
@@ -832,57 +855,6 @@ function updateSavedLayoutsList() {
     container.appendChild(item);
   });
 }
-
-// Handle click outside elements to deselect
-document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
-  const toolbar = document.getElementById('elementToolbar');
-
-  if (clickedElement) {
-    // If the same element is already selected → keep selected
-    if (selectedElement === clickedElement) {
-      return;
-    }
-    // Use the main selectElement function
-    selectElement(clickedElement);
-  } else if (
-    !e.target.closest('#elementEditor') &&
-    !e.target.closest('#elementToolbar') &&
-    !e.target.closest('.sidebar-btn')
-  ) {
-    // Clicked outside → deselect
-    deselectElement();
-  }
-});
-
-document.getElementById('btnDelete').addEventListener('click', () => {
-  if (selectedElement) {
-    selectedElement.remove();
-    document.getElementById('elementToolbar').style.display = 'none';
-  }
-});
-
-document.getElementById('btnEdit').addEventListener('click', () => {
-  if (!selectedElement) return;
-  // Toggle edit mode
-  const isEditing = selectedElement.contentEditable === "true";
-  selectedElement.contentEditable = !isEditing;
-  if (!isEditing) {
-    selectedElement.focus(); // go into edit mode
-  } else {
-    selectedElement.blur();  // exit edit mode
-  }
-});
-
-document.getElementById('btnAlign').addEventListener('click', () => {
-  if (!selectedElement) return;
-
-  // Cycle through alignment options
-  const alignments = ['left', 'center', 'right', 'justify'];
-  let current = selectedElement.style.textAlign || 'left';
-  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
-  selectedElement.style.textAlign = alignments[nextIndex];
-});
 
 function makeRotatable(el) {
   let rotating = false;
