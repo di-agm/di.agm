@@ -594,7 +594,7 @@ function deleteElement() {
   if (selectedElement) {
     selectedElement.remove();
     deselectElement();
-    document.getElementById('elementToolbar').style.display = 'none';
+    document.getElementById('textToolbar, shapeToolbar').style.display = 'none';
   }
 }
 
