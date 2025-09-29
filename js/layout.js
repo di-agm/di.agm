@@ -474,22 +474,54 @@ function selectElement(element) {
     selectedElement.classList.remove('selected');
   }
   selectedElement = element;
-  document.querySelectorAll('.text-element, .shape-element').forEach(el => el.classList.remove('selected'));
+
+  // Clear previous selection
+  document.querySelectorAll('.text-element, .shape-element').forEach(el =>
+    el.classList.remove('selected')
+  );
   selectedElement.classList.add('selected');
-  const toolbar = document.getElementById('elementToolbar');
+
+  // Toolbars
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+  textToolbar.style.display = 'none';
+  shapeToolbar.style.display = 'none';
+
+  // Position toolbar under the element
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
-  toolbar.style.left = `${rect.left + rect.width/2 - toolbar.offsetWidth/2}px`;
-  toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-  toolbar.style.display = 'flex';
+  let toolbar;
+  if (element.classList.contains('text-element')) {
+    toolbar = textToolbar;
+  } else if (element.classList.contains('shape-element')) {
+    toolbar = shapeToolbar;
+  }
+
+  if (toolbar) {
+    toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+    toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+    toolbar.style.display = 'flex';
+  }
+
+  // Show editor panel
   document.getElementById('elementEditor').style.display = 'block';
   document.getElementById('noElementSelected').style.display = 'none';
-  const fontSizeInput = document.getElementById('fontSizeInput');
-  if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-  const fontFamilySelect = document.getElementById('fontFamilySelect');
-  if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-  const colorInput = document.getElementById('colorPickerInput');
-  if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
+
+  // Only update text controls if this is a text element
+  if (element.classList.contains('text-element')) {
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) {
+      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+    }
+    const fontFamilySelect = document.getElementById('fontFamilySelect');
+    if (fontFamilySelect) {
+      fontFamilySelect.value = selectedElement.style.fontFamily || '';
+    }
+    const colorInput = document.getElementById('colorPickerInput');
+    if (colorInput) {
+      colorInput.value = selectedElement.style.color || '#000000';
+    }
+  }
 }
 
 function makeElementDraggable(el) {
