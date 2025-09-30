@@ -704,7 +704,8 @@ function deselectElement() {
   document.getElementById('textEditor').style.display = 'none';
   document.getElementById('shapeEditor').style.display = 'none';
   document.getElementById('noElementSelected').style.display = 'block';
-  document.getElementById('textToolbar, shapeToolbar').style.display = 'none';
+  document.getElementById('textToolbar').style.display = 'none';
+  document.getElementById('shapeToolbar').style.display = 'none';
 }
 
 // Toggle sidebar functions
