@@ -52,28 +52,6 @@ const paperSizes = {
   tabloid: { widthIN: 11, heightIN: 17 }
 };
 
-/*selector.addEventListener("change", (e) => {
-  if (e.target.value === "custom") {
-    document.getElementById("customSizeInputs").style.display = "block";
-  } else {
-    document.getElementById("customSizeInputs").style.display = "none";
-    updateRectSize(e.target.value);
-  }
-});
-
-document.getElementById("applyCustomSize").addEventListener("click", () => {
-  const w = parseFloat(document.getElementById("customWidth").value);
-  const h = parseFloat(document.getElementById("customHeight").value);
-  const unit = document.getElementById("customUnit").value;
-  if (!isNaN(w) && !isNaN(h)) {
-    addCustomPaperSize("custom", w, h, unit);
-    updateRectSize("custom");
-  }
-});
-
-function mmToPx(mm) { return mm * 3.78; }
-function inToPx(inches) { return inches * 96; }*/
-
 const maxWidthPx = 360;
 
 function updateRectSize(key) {
@@ -238,17 +216,6 @@ function togglePageNumbers() {
   });
 }
 
-/*const units = ["px", "pt", "mm", "cm", "in"];
-function convertToPx(value, unit) {
-  switch (unit) {
-    case "px": return value;
-    case "pt": return value * 96 / 72;  // 1pt = 1/72 in
-    case "mm": return value * 3.78;
-    case "cm": return value * 37.8;
-    case "in": return value * 96;
-  }
-}*/
-
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
   if (!rulersVisible) return;
@@ -320,13 +287,6 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   drawRulers();
 }
-
-/*function cycleRulerUnit() {
-  let idx = units.indexOf(currentRulerUnit);
-  currentRulerUnit = units[(idx + 1) % units.length];
-  document.getElementById("rulerUnitBtn").textContent = "Unit: " + currentRulerUnit;
-  if (rulersVisible) drawRulers();
-}*/
 
 // Re-draw rulers when page changes
 const oldShowPage = showPage;
@@ -415,8 +375,8 @@ function addShapeElement(type) {
       break;
 
     case 'polygon': {
-      let sides = parseInt(prompt("Enter number of sides:", "5"));
-      if (isNaN(sides) || sides < 3) sides = 5; // default
+      let sides = parseInt(prompt("Enter number of sides:", "7"));
+      if (isNaN(sides) || sides < 3) sides = 7; // default
       const points = [];
       for (let i = 0; i < sides; i++) {
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
@@ -431,8 +391,8 @@ function addShapeElement(type) {
     }
 
     case 'star': {
-      let peaks = parseInt(prompt("Enter number of peaks:", "5"));
-      if (isNaN(peaks) || peaks < 3) peaks = 5; // default
+      let peaks = parseInt(prompt("Enter number of peaks:", "7"));
+      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
       const points = [];
       const outerRadius = 40;
       const innerRadius = 20;
@@ -958,7 +918,6 @@ function updateSavedLayoutsList() {
   });
 }
 
-
 // Load saved layouts from localStorage
 function loadSavedLayouts() {
   const saved = localStorage.getItem('paperSizeSelectorLayouts');
@@ -1026,7 +985,7 @@ const fontSizeInput = document.getElementById('fontSizeInput');
 fontSizeInput.addEventListener('input', () => {
   if (selectedElement) {
     let size = parseInt(fontSizeInput.value, 10);
-    if (!isNaN(size) && size >= 1 && size <= 100) {
+    if (!isNaN(size) && size >= 1 && size <= 1000) {
       selectedElement.style.fontSize = size + 'px';
     }
   }
