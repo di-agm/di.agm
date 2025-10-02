@@ -1107,10 +1107,8 @@ function applyShapeStyle(element = selectedElement) {
         svgShape.setAttribute('cx', element.offsetWidth / 2);
         svgShape.setAttribute('cy', element.offsetHeight / 2);
     } else {
-        // For polygons/stars, transform to center and scale
-        const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) / 100;
-        svgShape.parentElement.style.transform = `scale(${scaleFactor})`;
-        svgShape.parentElement.style.transformOrigin = '0 0';
+        svgShape.parentElement.style.transform = ''; 
+        svgShape.parentElement.style.transformOrigin = '';
     }
 }
 
