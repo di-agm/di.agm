@@ -447,6 +447,9 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
+  // NOTE: REMOVED element.style.resize = 'both'; to prevent the default box around the shape.
+  element.style.overflow = 'hidden';
+
   pageContent.appendChild(element);
   makeElementDraggable(element);
   makeRotatable(element);
@@ -1107,8 +1110,10 @@ function applyShapeStyle(element = selectedElement) {
         svgShape.setAttribute('cx', element.offsetWidth / 2);
         svgShape.setAttribute('cy', element.offsetHeight / 2);
     } else {
-        svgShape.parentElement.style.transform = ''; 
-        svgShape.parentElement.style.transformOrigin = '';
+        // For polygons/stars, transform to center and scale
+        const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) / 100;
+        svgShape.parentElement.style.transform = `scale(${scaleFactor})`;
+        svgShape.parentElement.style.transformOrigin = '0 0';
     }
 }
 
