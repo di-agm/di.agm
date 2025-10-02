@@ -761,8 +761,8 @@ function exportAsPDF() {
 
   html2canvas(page).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
-      orientation: 'portrait',
       unit: 'px',
       format: [canvas.width, canvas.height]
     });
