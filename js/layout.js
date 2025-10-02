@@ -10,20 +10,6 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
-// --- Helper functions for Unit Conversion (Placeholder, need actual implementation) ---
-function mmToPx(mm) {
-  // Assuming 96 DPI for simplicity (1in = 96px, 1in = 25.4mm)
-  return (mm * 96) / 25.4;
-}
-function inToPx(inch) {
-  return inch * 96;
-}
-function convertToPx(value, unit) {
-  // Placeholder logic, assuming pixels for now
-  return value; 
-}
-const currentRulerUnit = 'px'; // Assuming default unit
-
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
