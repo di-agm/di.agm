@@ -651,10 +651,10 @@ function makeRotatable(el) {
   });
 }
 
-// Direct button hooks
+/*/ Direct button hooks
 document.getElementById('btnDelete').addEventListener('click', deleteElement);
 document.getElementById('btnEdit').addEventListener('click', toggleEdit);
-document.getElementById('btnAlign').addEventListener('click', alignElement);
+document.getElementById('btnAlign').addEventListener('click', alignElement);*/
 
 function deselectElement() {
   if (selectedElement) {
