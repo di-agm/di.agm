@@ -447,9 +447,6 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
-  // NOTE: REMOVED element.style.resize = 'both'; to prevent the default box around the shape.
-  element.style.overflow = 'hidden';
-
   pageContent.appendChild(element);
   makeElementDraggable(element);
   makeRotatable(element);
