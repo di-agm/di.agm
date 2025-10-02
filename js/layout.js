@@ -4,7 +4,6 @@ let isPortrait = true;
 let selectedElement = null;
 let savedLayouts = [];
 let rulersVisible = false;
-let currentRulerUnit = "px"; // px, pt, mm, cm, in
 let marginsVisible = false;
 let pageNumbersVisible = true;
 let zoomLevel = 1;
@@ -868,6 +867,89 @@ function loadLayout(layoutIndex) {
   }
 }
 
+window.onload = function() {
+    // --- DOM References ---
+    const targetShape = document.getElementById('targetShape');
+    
+    // Fill Controls
+    const fillColorInput = document.getElementById('shape-fill-color');
+    const fillOpacityInput = document.getElementById('shape-fill-opacity');
+    const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
+
+    // Border Controls
+    const borderColorInput = document.getElementById('shape-border-color');
+    const borderOpacityInput = document.getElementById('shape-border-opacity');
+    const borderOpacityValueSpan = document.getElementById('border-opacity-value');
+    const borderWidthInput = document.getElementById('shape-border-width');
+
+    // --- Utility Function ---
+    function hexToRgbA(hex, alpha) {
+        let r = 0, g = 0, b = 0;
+        // 3 digits
+        if (hex.length == 4) {
+            r = parseInt(hex[1] + hex[1], 16);
+            g = parseInt(hex[2] + hex[2], 16);
+            b = parseInt(hex[3] + hex[3], 16);
+        } 
+        // 6 digits
+        else if (hex.length == 7) {
+            r = parseInt(hex.substring(1, 3), 16);
+            g = parseInt(hex.substring(3, 5), 16);
+            b = parseInt(hex.substring(5, 7), 16);
+        }
+        
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // --- Main Update Function ---
+    /**
+     * Reads all control values and applies the resulting style to the target shape.
+     */
+    function updateShapeStyle() {
+        // 1. Get current values from controls
+        const fillColorHex = fillColorInput.value;
+        const fillOpacity = parseFloat(fillOpacityInput.value);
+        
+        const borderColorHex = borderColorInput.value;
+        const borderOpacity = parseFloat(borderOpacityInput.value);
+        const borderWidth = Math.max(0, parseInt(borderWidthInput.value)); // Ensure width is not negative
+
+        // 2. Calculate RGBA colors
+        const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
+        const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
+
+        // 3. Update the target shape's style
+        targetShape.style.backgroundColor = fillRgba;
+        
+        // Remove the dashed placeholder border
+        targetShape.classList.remove('border-dashed', 'border-gray-400'); 
+        
+        // Apply the new border style
+        targetShape.style.border = `${borderWidth}px solid ${borderRgba}`;
+        
+        // 4. Update display spans for opacity values
+        fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
+        borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
+    }
+
+    // --- Event Listeners ---
+    
+    // Attach the update function to the 'input' event for real-time changes
+    fillColorInput.addEventListener('input', updateShapeStyle);
+    fillOpacityInput.addEventListener('input', updateShapeStyle);
+
+    borderColorInput.addEventListener('input', updateShapeStyle);
+    borderOpacityInput.addEventListener('input', updateShapeStyle);
+    borderWidthInput.addEventListener('input', updateShapeStyle);
+    
+    // Optional: If the number input changes, ensure it triggers the update too
+    borderWidthInput.addEventListener('change', updateShapeStyle);
+
+    // --- Initial Setup ---
+    // Apply the default values once the script loads to set the initial style
+    updateShapeStyle(); 
+};
+
 function updateSavedLayoutsList() {
   const container = document.getElementById('savedLayouts');
   container.innerHTML = '';
@@ -924,47 +1006,6 @@ function loadSavedLayouts() {
       console.error('Error loading saved layouts', e);
     }
   }
-}
-
-const fillColorInput = document.getElementById('shape-fill-color');
-const fillOpacityInput = document.getElementById('shape-fill-opacity');
-const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
-
-fillColorInput.addEventListener('input', updateShapeFill);
-fillOpacityInput.addEventListener('input', updateShapeFill);
-
-function updateShapeFill() {
-    if (!selectedElement || (selectedElement.dataset.type !== 'rect' && selectedElement.dataset.type !== 'circle')) return;
-    
-    const hex = fillColorInput.value;
-    const alpha = parseFloat(fillOpacityInput.value);
-    
-    selectedElement.style.backgroundColor = hexAlphaToRgba(hex, alpha);
-    fillOpacityValueSpan.textContent = alpha.toFixed(2);
-}
-
-const borderColorInput = document.getElementById('shape-border-color');
-const borderOpacityInput = document.getElementById('shape-border-opacity');
-const borderOpacityValueSpan = document.getElementById('border-opacity-value');
-const borderWidthInput = document.getElementById('shape-border-width');
-
-borderColorInput.addEventListener('input', updateShapeBorder);
-borderOpacityInput.addEventListener('input', updateShapeBorder);
-borderWidthInput.addEventListener('input', updateShapeBorder);
-
-function updateShapeBorder() {
-    if (!selectedElement || (selectedElement.dataset.type !== 'rect' && selectedElement.dataset.type !== 'circle')) return;
-
-    const hex = borderColorInput.value;
-    const alpha = parseFloat(borderOpacityInput.value);
-    const width = parseFloat(borderWidthInput.value);
-
-    // Apply color and opacity
-    const rgbaColor = hexAlphaToRgba(hex, alpha);
-    
-    // Construct the full border style string
-    selectedElement.style.border = `${width}px solid ${rgbaColor}`;
-    borderOpacityValueSpan.textContent = alpha.toFixed(2);
 }
 
 // Event Listeners
