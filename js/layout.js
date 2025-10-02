@@ -10,6 +10,20 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
+// --- Helper functions for Unit Conversion (Placeholder, need actual implementation) ---
+function mmToPx(mm) {
+  // Assuming 96 DPI for simplicity (1in = 96px, 1in = 25.4mm)
+  return (mm * 96) / 25.4;
+}
+function inToPx(inch) {
+  return inch * 96;
+}
+function convertToPx(value, unit) {
+  // Placeholder logic, assuming pixels for now
+  return value; 
+}
+const currentRulerUnit = 'px'; // Assuming default unit
+
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
@@ -433,7 +447,7 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
-  element.style.resize = 'both';
+  // NOTE: REMOVED element.style.resize = 'both'; to prevent the default box around the shape.
   element.style.overflow = 'hidden';
 
   pageContent.appendChild(element);
@@ -449,13 +463,25 @@ function addShapeElement(type) {
 
 function selectElement(element) {
   // Clear previous selection
-  document.querySelectorAll('.text-element, .shape-element').forEach(el =>
-    el.classList.remove('selected')
-  );
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => {
+    el.classList.remove('selected');
+    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
+    if (el.classList.contains('shape-element')) {
+        el.style.boxShadow = 'none';
+        el.style.border = 'none';
+    }
+  });
 
   // Update selectedElement
   selectedElement = element;
   selectedElement.classList.add('selected');
+
+  // APPLY A SUBTLE GLOW/SHADOW TO THE SELECTED SHAPE INSTEAD OF A THICK BORDER
+  if (selectedElement.classList.contains('shape-element')) {
+    selectedElement.style.boxShadow = '0 0 0 2px #3b82f6, 0 0 0 5px rgba(59, 130, 246, 0.5)'; // Blue glow
+    selectedElement.style.border = 'none'; // Ensure no box border
+  }
+
 
   // Hide all editors and toolbars by default
   document.getElementById('textEditor').style.display = 'none';
@@ -688,6 +714,11 @@ function makeRotatable(el) {
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
+    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
+    if (selectedElement.classList.contains('shape-element')) {
+        selectedElement.style.boxShadow = 'none';
+        selectedElement.style.border = 'none';
+    }
     selectedElement = null;
   }
   document.getElementById('textEditor').style.display = 'none';
@@ -1012,13 +1043,13 @@ function loadLayout(layoutIndex) {
 }
 
 // ====================================================================
-// NEW SHAPE EDITOR LOGIC START
+// SHAPE EDITOR LOGIC START
 // ====================================================================
 
 // Flag to ensure listeners are only added once
 let shapeEditorListenersInitialized = false;
 
-// --- Utility Function from previous response ---
+// --- Utility Function ---
 /**
  * Converts a HEX color code to an RGBA string.
  * @param {string} hex - The hex color code (e.g., "#RRGGBB").
@@ -1184,7 +1215,7 @@ function initShapeEditor() {
 }
 
 // ====================================================================
-// NEW SHAPE EDITOR LOGIC END
+// SHAPE EDITOR LOGIC END
 // ====================================================================
 
 
