@@ -651,11 +651,6 @@ function makeRotatable(el) {
   });
 }
 
-/*/ Direct button hooks
-document.getElementById('btnDelete').addEventListener('click', deleteElement);
-document.getElementById('btnEdit').addEventListener('click', toggleEdit);
-document.getElementById('btnAlign').addEventListener('click', alignElement);*/
-
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
@@ -929,6 +924,47 @@ function loadSavedLayouts() {
       console.error('Error loading saved layouts', e);
     }
   }
+}
+
+const fillColorInput = document.getElementById('shape-fill-color');
+const fillOpacityInput = document.getElementById('shape-fill-opacity');
+const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
+
+fillColorInput.addEventListener('input', updateShapeFill);
+fillOpacityInput.addEventListener('input', updateShapeFill);
+
+function updateShapeFill() {
+    if (!selectedElement || (selectedElement.dataset.type !== 'rect' && selectedElement.dataset.type !== 'circle')) return;
+    
+    const hex = fillColorInput.value;
+    const alpha = parseFloat(fillOpacityInput.value);
+    
+    selectedElement.style.backgroundColor = hexAlphaToRgba(hex, alpha);
+    fillOpacityValueSpan.textContent = alpha.toFixed(2);
+}
+
+const borderColorInput = document.getElementById('shape-border-color');
+const borderOpacityInput = document.getElementById('shape-border-opacity');
+const borderOpacityValueSpan = document.getElementById('border-opacity-value');
+const borderWidthInput = document.getElementById('shape-border-width');
+
+borderColorInput.addEventListener('input', updateShapeBorder);
+borderOpacityInput.addEventListener('input', updateShapeBorder);
+borderWidthInput.addEventListener('input', updateShapeBorder);
+
+function updateShapeBorder() {
+    if (!selectedElement || (selectedElement.dataset.type !== 'rect' && selectedElement.dataset.type !== 'circle')) return;
+
+    const hex = borderColorInput.value;
+    const alpha = parseFloat(borderOpacityInput.value);
+    const width = parseFloat(borderWidthInput.value);
+
+    // Apply color and opacity
+    const rgbaColor = hexAlphaToRgba(hex, alpha);
+    
+    // Construct the full border style string
+    selectedElement.style.border = `${width}px solid ${rgbaColor}`;
+    borderOpacityValueSpan.textContent = alpha.toFixed(2);
 }
 
 // Event Listeners
