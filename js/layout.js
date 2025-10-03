@@ -12,28 +12,14 @@ let startX, startY, scrollLeft, scrollTop;
 
 function createPage(pageNumber) {
   const page = document.createElement('div');
-  page.className = 'rect';
-  page.style.position = 'relative';
-  page.style.background = '#ffffff';
-  page.style.boxShadow = '0 8px 20px rgba(2,6,23,0.15)';
-  page.style.userSelect = 'none';
-  page.style.transition = 'width 0.4s ease, height 0.4s ease';
-  page.style.width = '794px';
-  page.style.height = '1123px'; // A4 ratio initially
-  page.style.overflow = 'hidden';
+  page.className = 'rect page-a4-initial'; 
   
   const content = document.createElement('div');
   content.className = 'page-content';
   page.appendChild(content);
   
   const pageNumberLabel = document.createElement('div');
-  pageNumberLabel.style.position = 'absolute';
-  pageNumberLabel.style.bottom = '8px';
-  pageNumberLabel.style.right = '12px';
-  pageNumberLabel.style.color = '#666';
-  pageNumberLabel.style.fontSize = '12px';
-  pageNumberLabel.style.fontWeight = '600';
-  pageNumberLabel.style.zIndex = '10';
+  pageNumberLabel.className = 'page-number-label';
   pageNumberLabel.textContent = pageNumber;
   page.appendChild(pageNumberLabel);
 
