@@ -385,8 +385,11 @@ function addShapeElement(type) {
       let sides = parseInt(prompt("Enter number of sides:", "7"));
       if (isNaN(sides) || sides < 3) sides = 7; // default
       const points = [];
+      const outerRadius = 20;
+      const innerRadius = 40;
       for (let i = 0; i < sides; i++) {
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
+        const r = i % 2 === 0 ? outerRadius : innerRadius;
         const x = 50 + r * Math.cos(angle);
         const y = 50 + r * Math.sin(angle);
         points.push(`${x},${y}`);
