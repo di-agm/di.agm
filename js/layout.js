@@ -211,16 +211,28 @@ function toggleMargins() {
   });
 }
 
-function togglePageNumbers() {
-  pageNumbersVisible = !pageNumbersVisible;
-  pages.forEach(page => {
-    const pageNumberLabel = page.querySelector('div:last-child');
-    if (pageNumberLabel) {
-      pageNumberLabel.style.display = pageNumbersVisible ? 'block' : 'none';
-    }
-  });
-}
+// layout.js
 
+function togglePageNumbers() {
+    pageNumbersVisible = !pageNumbersVisible; // Toggle the state
+
+    const toggleBtn = document.getElementById('togglePageNumbersBtn');
+    if (toggleBtn) {
+        toggleBtn.textContent = pageNumbersVisible ? 'Hide Page Numbers' : 'Show Page Numbers';
+        toggleBtn.classList.toggle('active', pageNumbersVisible);
+    }
+    
+    pages.forEach(page => {
+        // Get the page-content container
+        const pageContent = page.querySelector('.page-content');
+        if (!pageContent) return;
+        const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
+
+        if (pageNumberLabel) {
+            pageNumberLabel.style.display = pageNumbersVisible ? 'block' : 'none';
+        } 
+    });
+}
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
   if (!rulersVisible) return;
