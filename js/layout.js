@@ -387,8 +387,8 @@ function addShapeElement(type) {
       const points = [];
       for (let i = 0; i < sides; i++) {
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        const x = r * Math.cos(angle);
-        const y = r * Math.sin(angle);
+        const x = 50 + r * Math.cos(angle);
+        const y = 50 + r * Math.sin(angle);
         points.push(`${x},${y}`);
       }
       shape = document.createElementNS(svgNS, "polygon");
@@ -408,8 +408,8 @@ function addShapeElement(type) {
       for (let i = 0; i < 2 * peaks; i++) {
         const angle = (Math.PI * i) / peaks - Math.PI / 2;
         const r = i % 2 === 0 ? outerRadius : innerRadius;
-        const x = r * Math.cos(angle);
-        const y = r * Math.sin(angle);
+        const x = 50 + r * Math.cos(angle);
+        const y = 50 + r * Math.sin(angle);
         points.push(`${x},${y}`);
       }
       shape = document.createElementNS(svgNS, "polygon");
