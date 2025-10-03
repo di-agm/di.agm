@@ -442,6 +442,10 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
+  element.style.position = 'absolute';
+  element.style.width = '100px'; 
+  element.style.height = '100px';
+  element.style.zIndex = '1';
   element.style.overflow = 'visible';
 
   pageContent.appendChild(element);
@@ -472,7 +476,7 @@ function selectElement(element) {
 
   // APPLY A SUBTLE GLOW/SHADOW TO THE SELECTED SHAPE INSTEAD OF A THICK BORDER
   if (selectedElement.classList.contains('shape-element')) {
-    selectedElement.style.boxShadow = '0 0 0 2px #3b82f6, 0 0 0 5px rgba(59, 130, 246, 0.5)'; // Blue glow
+    selectedElement.style.boxShadow = 'none'; // Blue glow
     selectedElement.style.border = 'none'; // Ensure no box border
   }
 
