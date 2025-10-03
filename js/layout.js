@@ -387,8 +387,8 @@ function addShapeElement(type) {
       const points = [];
       for (let i = 0; i < sides; i++) {
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        const x = 50 + 40 * Math.cos(angle);
-        const y = 50 + 40 * Math.sin(angle);
+        const x = r * Math.cos(angle);
+        const y = r * Math.sin(angle);
         points.push(`${x},${y}`);
       }
       shape = document.createElementNS(svgNS, "polygon");
@@ -408,8 +408,8 @@ function addShapeElement(type) {
       for (let i = 0; i < 2 * peaks; i++) {
         const angle = (Math.PI * i) / peaks - Math.PI / 2;
         const r = i % 2 === 0 ? outerRadius : innerRadius;
-        const x = 50 + r * Math.cos(angle);
-        const y = 50 + 40 * Math.sin(angle);
+        const x = r * Math.cos(angle);
+        const y = r * Math.sin(angle);
         points.push(`${x},${y}`);
       }
       shape = document.createElementNS(svgNS, "polygon");
@@ -433,8 +433,7 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
-  // NOTE: REMOVED element.style.resize = 'both'; to prevent the default box around the shape.
-  element.style.overflow = 'hidden';
+  //element.style.overflow = 'hidden';
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
@@ -1059,12 +1058,6 @@ function hexToRgbA(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-
-/**
- * Applies the stored style data from the selected element's dataset 
- * directly to the SVG shape inside it.
- * @param {HTMLElement} element - The shape container element. If null, uses selectedElement.
- */
 function applyShapeStyle(element = selectedElement) {
     if (!element || !element.classList.contains('shape-element')) return;
 
@@ -1087,8 +1080,9 @@ function applyShapeStyle(element = selectedElement) {
     svgShape.setAttribute('fill', fillRgba);
     svgShape.setAttribute('stroke', borderRgba);
     svgShape.setAttribute('stroke-width', borderWidth);
-
-    // If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)
+    svgShape.parentElement.style.transform = '';
+    svgShape.parentElement.style.transformOrigin = '';
+    /*/ If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)
     if (svgShape.tagName === 'circle') {
         const size = Math.min(element.offsetWidth, element.offsetHeight);
         const radius = size / 2 * 0.8; // Use 80% of min dimension
@@ -1100,12 +1094,9 @@ function applyShapeStyle(element = selectedElement) {
         const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) / 100;
         svgShape.parentElement.style.transform = `scale(${scaleFactor})`;
         svgShape.parentElement.style.transformOrigin = '0 0';
-    }
+    }*/
 }
 
-/**
- * Reads all control values and applies the resulting style to the selected shape.
- */
 function updateSelectedShapeStyle() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
@@ -1142,9 +1133,6 @@ function updateSelectedShapeStyle() {
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
 
-/**
- * Loads the current selected shape's data state into the editor controls.
- */
 function loadShapeStateToControls() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
@@ -1166,9 +1154,6 @@ function loadShapeStateToControls() {
     updateSelectedShapeStyle();
 }
 
-/**
- * Initializes all event listeners for the shape editor controls. Runs only once.
- */
 function initShapeEditor() {
     if (shapeEditorListenersInitialized) return;
 
@@ -1199,11 +1184,6 @@ function initShapeEditor() {
     
     shapeEditorListenersInitialized = true;
 }
-
-// ====================================================================
-// SHAPE EDITOR LOGIC END
-// ====================================================================
-
 
 function updateSavedLayoutsList() {
   const container = document.getElementById('savedLayouts');
