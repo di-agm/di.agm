@@ -442,7 +442,7 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
-  //element.style.overflow = 'hidden';
+  element.style.overflow = 'visible';
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
