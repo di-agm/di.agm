@@ -218,7 +218,7 @@ function togglePageNumbers() {
 
     const toggleBtn = document.getElementById('togglePageNumbersBtn');
     if (toggleBtn) {
-        toggleBtn.textContent = pageNumbersVisible ? 'Hide Page Numbers' : 'Show Page Numbers';
+        toggleBtn.textContent = pageNumbersVisible ? '#P';
         toggleBtn.classList.toggle('active', pageNumbersVisible);
     }
     
