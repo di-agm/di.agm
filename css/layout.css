@@ -46,14 +46,31 @@ html, body {
 }
 
 .rect {
-  background: #e0e0e0;
+  position: relative;
+  background: #ffffff;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
   color: rgb(0, 0, 0);
   font-weight: 600;
-  user-select: none;
   transition: width 0.4s ease, height 0.4s ease;
+}
+
+.page-a4-initial {
+  width: 794px;
+  height: 1123px;
+  overflow: hidden;
+}
+
+.page-number-label {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  color: #666;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10;
 }
 
 #leftControls {
