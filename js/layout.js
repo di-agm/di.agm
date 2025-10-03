@@ -385,15 +385,21 @@ function addShapeElement(type) {
       let sides = parseInt(prompt("Enter number of sides:", "7"));
       if (isNaN(sides) || sides < 3) sides = 7; // default
       const points = [];
-      const outerRadius = 20;
-      const innerRadius = 40;
+      
+      // FIX: A polygon uses a single radius, not alternating radii like a star.
+      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
+      
       for (let i = 0; i < sides; i++) {
+        // Keeps the top point flat by starting the angle correctly
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        const r = i % 2 === 0 ? outerRadius : innerRadius;
-        const x = 50 + r * Math.cos(angle);
-        const y = 50 + r * Math.sin(angle);
+        
+        // Use the consistent radius for all points
+        const x = 50 + radius * Math.cos(angle); 
+        const y = 50 + radius * Math.sin(angle);
+        
         points.push(`${x},${y}`);
       }
+      
       shape = document.createElementNS(svgNS, "polygon");
       shape.setAttribute("points", points.join(" "));
       shape.setAttribute("fill", "#3b82f6");
