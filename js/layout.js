@@ -79,15 +79,9 @@ function updateRectSize(key) {
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
-  
   const page = pages[currentPageIndex];
-  const width = page.style.width;
-  const height = page.style.height;
-  
-  page.style.width = height;
-  page.style.height = width;
-  
   isPortrait = !isPortrait;
+  page.classList.toggle('landscape', !isPortrait);
 }
 
 function showPage(index) {
