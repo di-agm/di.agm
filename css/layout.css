@@ -55,12 +55,19 @@ html, body {
   color: rgb(0, 0, 0);
   font-weight: 600;
   transition: width 0.4s ease, height 0.4s ease;
+  width: var(--page-width, 210px);
+  height: var(--page-height, 297px);
 }
 
 .page-a4-initial {
-  width: 397px;
-  height: 561px;
+  width: 210px;
+  height: 297px;
   overflow: hidden;
+}
+
+.landscape {
+  width: var(--page-height, 210px);
+  height: var(--page-width, 297px);
 }
 
 .page-number-label {
@@ -163,22 +170,44 @@ button:hover {
 /* Rulers */
 .page-ruler {
   position: absolute;
+  display: none; 
   background: rgba(0,0,0,0.15);
   pointer-events: none;
   z-index: 20;
 }
 
+.has-rulers .page-ruler {
+  display: block;
+}
+
 .page-ruler.horizontal {
-  height: 1px;
   width: 100%;
+  height: 15px;
+  left: 0;
+}
+
+.page-ruler.horizontal.top {
+  top: 0;
+}
+.page-ruler.horizontal.bottom {
+  bottom: 0;
+  top: auto;
 }
 
 .page-ruler.vertical {
-  width: 1px;
   height: 100%;
+  width: 15px;
+  top: 0;
 }
 
-/* Ruler containers */
+.page-ruler.vertical.left {
+  left: 0;
+}
+.page-ruler.vertical.right {
+  right: 0;
+  left: auto; 
+}
+
 .ruler {
   position: absolute;
   background: #f9f9f9;
@@ -187,7 +216,7 @@ button:hover {
   font-family: monospace;
   overflow: hidden;
   z-index: 100;
-  pointer-events: none; /* don’t block clicks */
+  pointer-events: none;
 }
 
 .ruler.horizontal {
@@ -200,7 +229,6 @@ button:hover {
   border-right: 1px solid #ccc;
 }
 
-/* Tick marks */
 .ruler .tick {
   position: absolute;
   background: #777;
@@ -218,7 +246,6 @@ button:hover {
   right: 0;
 }
 
-/* Margins */
 .page-margins {
   position: absolute;
   border: 1px dotted rgba(0,0,0,0.4);
@@ -263,7 +290,6 @@ button:hover {
   cursor: text;  /* change cursor to text when editing */
 }
 
-/* Hamburger menu styles */
 .hamburger-menu {
   position: fixed;
   top: 20px;
