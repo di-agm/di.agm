@@ -70,6 +70,10 @@ html, body {
   height: var(--page-width, 297px);
 }
 
+.page-number-hidden {
+    display: none !important;
+}
+
 .page-number-label {
   position: absolute;
   bottom: 8px;
@@ -143,7 +147,15 @@ button:hover {
   align-items: center;
   justify-content: flex-start;
   resize: both;
-  overflow: hidden;
+  overflow: visible !important; 
+}
+
+.shape-element svg * {
+  fill: #3b82f6;          
+  stroke: #1e3a8a;         
+  stroke-width: 4;         
+  width: 100%;
+  height: 100%;
 }
 
 #pageNumber {
@@ -217,6 +229,8 @@ button:hover {
   overflow: hidden;
   z-index: 100;
   pointer-events: none;
+  border: 1px solid #ccc;
+  box-sizing: content-box;
 }
 
 .ruler.horizontal {
@@ -246,6 +260,21 @@ button:hover {
   right: 0;
 }
 
+.ruler div:not(.tick) {
+  position: absolute;
+  font-size: 10px;
+  color: #333;
+}
+
+/* Horizontal Label Positioning */
+.ruler.horizontal div:not(.tick) {
+  bottom: 10px; /* Position above the ticks */
+}
+/* Vertical Label Positioning */
+.ruler.vertical div:not(.tick) {
+  right: 2px; /* Position on the left side of the ruler area */
+}
+
 .page-margins {
   position: absolute;
   border: 1px dotted rgba(0,0,0,0.4);
@@ -263,11 +292,14 @@ button:hover {
   min-width: 100px;
   min-height: 30px;
   padding: 2px;
+  box-sizing: border-box;
   border-radius: 4px;
   cursor: move;
   color: black;
   z-index: 5;
   transition: border 0.2s;
+  resize: both;
+  overflow: auto;
 }
 
 .text-element .resizer {
@@ -281,13 +313,70 @@ button:hover {
   border-top-left-radius: 3px;
 }
 
+.selected {
+  z-index: 10; 
+}
+
+.shape-element.selected {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); 
+  border: none; 
+}
+
+.shape-element {
+  box-shadow: none;
+  border: none;
+  transition: box-shadow 0.1s ease; 
+}
+
+#textEditor,
+#shapeEditor,
+#noElementSelected,
+#textToolbar,
+#shapeToolbar {
+  display: none;
+  position: absolute;
+  z-index: 100;
+}
+
+.toolbar-visible {
+    display: flex !important; 
+}
+
+.editor-visible {
+    display: block !important;
+}
+
 .text-element.selected {
   border: 2px solid #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
 }
 
 .text-element:focus {
-  cursor: text;  /* change cursor to text when editing */
+  cursor: text;  
+}
+
+.text-element.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.text-element.subtitle {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.text-element.paragraph {
+  font-size: 14px;
+}
+
+.text-element.image-placeholder {
+  width: 150px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  content-editable: false;
 }
 
 .hamburger-menu {
