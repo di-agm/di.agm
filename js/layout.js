@@ -177,28 +177,24 @@ function toggleMargins() {
   });
 }
 
-// layout.js
-
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
     const toggleBtn = document.getElementById('togglePageNumbersBtn');
     if (toggleBtn) {
-        toggleBtn.textContent = pageNumbersVisible ? '#P':'#P';
+        toggleBtn.textContent = pageNumbersVisible ? 'Hide #' : 'Show #';
         toggleBtn.classList.toggle('active', pageNumbersVisible);
     }
     
     pages.forEach(page => {
-        // Get the page-content container
-        const pageContent = page.querySelector('.page-content');
-        if (!pageContent) return;
-        const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
+        const pageNumberLabel = page.querySelector('.page-number-label'); // Assumes this class is set in createPage
 
         if (pageNumberLabel) {
-            pageNumberLabel.style.display = pageNumbersVisible ? 'block' : 'none';
-        } 
+            pageNumberLabel.classList.toggle('page-number-hidden', !pageNumbersVisible);
+        }  
     });
 }
+
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
   if (!rulersVisible) return;
@@ -212,20 +208,22 @@ function drawRulers() {
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
+  // Dynamic positioning remains in JS
   hRuler.style.left = page.offsetLeft + "px";
-  hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
+  hRuler.style.top = (page.offsetTop - 25) + "px"; 
   page.parentElement.appendChild(hRuler);
 
   // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
+  // Dynamic positioning remains in JS
   vRuler.style.top = page.offsetTop + "px";
-  vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
+  vRuler.style.left = (page.offsetLeft - 25) + "px"; 
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing: every 50px in current unit
-  const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
+  // Tick spacing remains in JS
+  const spacing = convertToPx(10, currentRulerUnit);
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
@@ -234,32 +232,31 @@ function drawRulers() {
     const tick = document.createElement("div");
     tick.className = "tick";
     tick.style.left = x + "px";
-    tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; // longer tick every 5
+    // Tick size calculation must remain in JS
+    tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; 
     hRuler.appendChild(tick);
 
     if (x % (spacing * 5) === 0) {
       const label = document.createElement("div");
-      label.style.position = "absolute";
-      label.style.left = x + 2 + "px";
-      label.style.bottom = "10px";
+      // Only dynamic position remains
+      label.style.left = x + 2 + "px"; 
       label.textContent = Math.round(x / convertToPx(1, currentRulerUnit));
       hRuler.appendChild(label);
     }
   }
 
-  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
     tick.style.top = y + "px";
+    // Tick size calculation must remain in JS
     tick.style.width = (y % (spacing * 5) === 0) ? "10px" : "6px";
     vRuler.appendChild(tick);
 
     if (y % (spacing * 5) === 0) {
       const label = document.createElement("div");
-      label.style.position = "absolute";
-      label.style.top = y + "px";
-      label.style.right = "12px";
+      // Only dynamic position remains
+      label.style.top = y + "px"; 
       label.textContent = Math.round(y / convertToPx(1, currentRulerUnit));
       vRuler.appendChild(label);
     }
@@ -271,7 +268,6 @@ function toggleRulers() {
   drawRulers();
 }
 
-// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
@@ -283,43 +279,35 @@ function addTextElement(type) {
   
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
   const element = document.createElement('div');
+  
   element.className = 'text-element';
   element.contentEditable = true;
   element.setAttribute('tabindex', '0');
+  
   element.style.top = '50px';
   element.style.left = '50px';
-  element.style.position = 'absolute';
 
   switch(type) {
     case 'title':
-      element.style.fontSize = '24px';
-      element.style.fontWeight = 'bold';
+      element.classList.add('title');
       element.textContent = 'Title';
       break;
     case 'subtitle':
-      element.style.fontSize = '18px';
-      element.style.fontWeight = 'bold';
+      element.classList.add('subtitle');
       element.textContent = 'Subtitle';
       break;
     case 'paragraph':
-      element.style.fontSize = '14px';
+      element.classList.add('paragraph');
       element.textContent = 'Add your text here';
       break;
     case 'image':
+      element.classList.add('image-placeholder');
       element.textContent = 'Image Placeholder';
-      element.style.width = '150px';
-      element.style.height = '100px';
-      element.style.display = 'flex';
-      element.style.alignItems = 'center';
-      element.style.justifyContent = 'center';
-      element.style.background = '#f0f0f0';
-      element.contentEditable = false;
+      element.contentEditable = false; 
+      
       break;
   }
     
-  element.style.resize = 'both';
-  element.style.overflow = 'auto';
-
   pageContent.appendChild(element);
   makeElementDraggable(element);
   makeRotatable(element);
@@ -331,15 +319,13 @@ function addShapeElement(type) {
 
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
   const element = document.createElement('div');
+  
   element.className = 'shape-element';
   element.setAttribute('tabindex', '0');
-  element.style.top = '50px';
+  
+  element.style.top = '50px'; 
   element.style.left = '50px';
-  element.style.position = 'absolute';
-  element.style.width = '100px';
-  element.style.height = '100px';
 
-  // Create an SVG to hold the shape
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", "100%");
@@ -354,41 +340,29 @@ function addShapeElement(type) {
       shape.setAttribute("cx", "50");
       shape.setAttribute("cy", "50");
       shape.setAttribute("r", "40");
-      shape.setAttribute("fill", "#3b82f6"); // Default blue fill
-      shape.setAttribute("stroke", "#1e3a8a"); // Default dark blue border
-      shape.setAttribute("stroke-width", "4"); // Default border width
       break;
 
     case 'polygon': {
       let sides = parseInt(prompt("Enter number of sides:", "7"));
-      if (isNaN(sides) || sides < 3) sides = 7; // default
+      if (isNaN(sides) || sides < 3) sides = 7; 
       const points = [];
-      
-      // FIX: A polygon uses a single radius, not alternating radii like a star.
-      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
+      const radius = 40; 
       
       for (let i = 0; i < sides; i++) {
-        // Keeps the top point flat by starting the angle correctly
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        
-        // Use the consistent radius for all points
         const x = 50 + radius * Math.cos(angle); 
         const y = 50 + radius * Math.sin(angle);
-        
         points.push(`${x},${y}`);
       }
       
       shape = document.createElementNS(svgNS, "polygon");
       shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
       break;
     }
 
     case 'star': {
       let peaks = parseInt(prompt("Enter number of peaks:", "7"));
-      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
+      if (isNaN(peaks) || peaks < 3) peaks = 7; 
       const points = [];
       const outerRadius = 40;
       const innerRadius = 20;
@@ -401,117 +375,77 @@ function addShapeElement(type) {
       }
       shape = document.createElementNS(svgNS, "polygon");
       shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
       break;
     }
   }
 
   if (shape) {
-    // Store style properties on the container element for persistence
-    element.dataset.fillColor = shape.getAttribute('fill');
+    element.dataset.fillColor = shape.getAttribute('fill') || '#3b82f6'; 
     element.dataset.fillOpacity = 1.0;
-    element.dataset.borderColor = shape.getAttribute('stroke');
+    element.dataset.borderColor = shape.getAttribute('stroke') || '#1e3a8a';
     element.dataset.borderOpacity = 1.0;
-    element.dataset.borderWidth = shape.getAttribute('stroke-width');
+    element.dataset.borderWidth = shape.getAttribute('stroke-width') || '4';
 
     svg.appendChild(shape);
     element.appendChild(svg);
   }
-
-  element.style.position = 'absolute';
-  element.style.width = '100px'; 
-  element.style.height = '100px';
-  element.style.zIndex = '1';
-  element.style.overflow = 'visible';
 
   pageContent.appendChild(element);
   makeElementDraggable(element);
   makeRotatable(element);
   selectElement(element);
 
-  // Re-apply style when element is resized (to ensure SVG scale/transform updates)
   new ResizeObserver(() => {
     updateSelectedShapeStyle(); 
   }).observe(element);
 }
 
 function selectElement(element) {
-  // Clear previous selection
-  document.querySelectorAll('.text-element, .shape-element').forEach(el => {
-    el.classList.remove('selected');
-    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
-    if (el.classList.contains('shape-element')) {
-        el.style.boxShadow = 'none';
-        el.style.border = 'none';
-    }
-  });
+    document.querySelectorAll('.text-element, .shape-element').forEach(el => {
+        el.classList.remove('selected');
+    });
 
-  // Update selectedElement
-  selectedElement = element;
-  selectedElement.classList.add('selected');
-
-  // APPLY A SUBTLE GLOW/SHADOW TO THE SELECTED SHAPE INSTEAD OF A THICK BORDER
-  if (selectedElement.classList.contains('shape-element')) {
-    selectedElement.style.boxShadow = 'none'; // Blue glow
-    selectedElement.style.border = 'none'; // Ensure no box border
-  }
-
-
-  // Hide all editors and toolbars by default
-  document.getElementById('textEditor').style.display = 'none';
-  document.getElementById('shapeEditor').style.display = 'none';
-  document.getElementById('noElementSelected').style.display = 'none';
-
-  const textToolbar = document.getElementById('textToolbar');
-  const shapeToolbar = document.getElementById('shapeToolbar');
-  textToolbar.style.display = 'none';
-  shapeToolbar.style.display = 'none';
-
-  // Position toolbar under the element
-  const rect = element.getBoundingClientRect();
-  const containerRect = document.body.getBoundingClientRect();
-  let toolbar;
-
-  if (element.classList.contains('text-element')) {
-    toolbar = textToolbar;
-    document.getElementById('textEditor').style.display = 'block';
-
-    // update text controls
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    if (fontSizeInput) {
-      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-    }
-    const fontFamilySelect = document.getElementById('fontFamilySelect');
-    if (fontFamilySelect) {
-      fontFamilySelect.value = selectedElement.style.fontFamily || '';
-    }
-    const colorInput = document.getElementById('colorPickerInput');
-    if (colorInput) {
-      colorInput.value = selectedElement.style.color || '#000000';
-    }
-
-  } else if (element.classList.contains('shape-element')) {
-    toolbar = shapeToolbar;
-    document.getElementById('shapeEditor').style.display = 'block';
+    selectedElement = element;
+    selectedElement.classList.add('selected'); 
+  
+    document.getElementById('textEditor').classList.remove('toolbar-visible');
+    document.getElementById('shapeEditor').classList.remove('toolbar-visible');
+    document.getElementById('noElementSelected').classList.remove('toolbar-visible');
     
-    // START NEW SHAPE EDITOR INITIALIZATION
-    initShapeEditor();
-    // Load current shape's state into the editor inputs
-    loadShapeStateToControls();
-    // END NEW SHAPE EDITOR INITIALIZATION
-  }
+    const textToolbar = document.getElementById('textToolbar');
+    const shapeToolbar = document.getElementById('shapeToolbar');
+    textToolbar.classList.remove('toolbar-visible');
+    shapeToolbar.classList.remove('toolbar-visible');
 
-  if (toolbar) {
-    // Check if the toolbar exists before trying to access its offset
-    if (toolbar.offsetWidth === undefined) {
-      toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
+    document.getElementById('noElementSelected').style.display = 'none';
+
+    const rect = element.getBoundingClientRect();
+    const containerRect = document.body.getBoundingClientRect();
+    let toolbar;
+
+    if (element.classList.contains('text-element')) {
+        toolbar = textToolbar;
+        document.getElementById('textEditor').classList.add('toolbar-visible');
+
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        if (fontSizeInput) {
+            fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+        }
+
+    } else if (element.classList.contains('shape-element')) {
+        toolbar = shapeToolbar;
+        document.getElementById('shapeEditor').classList.add('toolbar-visible');
+        
+        initShapeEditor();
+        loadShapeStateToControls();
     }
-    toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-    toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-    toolbar.style.display = 'flex';
-  }
+
+    if (toolbar) {
+        toolbar.classList.add('toolbar-visible'); 
+        
+        toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+        toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+    }
 }
 
 function makeElementDraggable(el) {
@@ -560,9 +494,8 @@ function showToolbar(targetElement) {
   const shapeToolbar = document.getElementById('shapeToolbar');
   if (!textToolbar || !shapeToolbar) return;
 
-  // Hide both first
-  textToolbar.style.display = 'none';
-  shapeToolbar.style.display = 'none';
+  textToolbar.classList.remove('toolbar-visible');
+  shapeToolbar.classList.remove('toolbar-visible');
 
   const rect = targetElement.getBoundingClientRect();
   let toolbar;
@@ -574,8 +507,8 @@ function showToolbar(targetElement) {
   }
 
   if (toolbar) {
-    toolbar.style.display = 'flex';
-    toolbar.style.position = 'absolute';
+    toolbar.classList.add('toolbar-visible'); 
+    
     toolbar.style.top = window.scrollY + rect.bottom + 'px';
     toolbar.style.left = window.scrollX + rect.left + 'px';
   }
@@ -585,11 +518,14 @@ function deleteElement() {
   if (selectedElement) {
     selectedElement.remove();
     selectedElement = null;
-    document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('noElementSelected').style.display = 'block';
+
+    document.getElementById('textToolbar').classList.remove('toolbar-visible');
+    document.getElementById('shapeToolbar').classList.remove('toolbar-visible');
+    
+    document.getElementById('textEditor').classList.remove('editor-visible');
+    document.getElementById('shapeEditor').classList.remove('editor-visible');
+
+    document.getElementById('noElementSelected').classList.add('editor-visible');
   }
 }
 
