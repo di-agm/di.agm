@@ -61,24 +61,20 @@ function updateRectSize(key) {
     const scale = maxWidthPx / widthPx;
     widthPx = widthPx * scale;
     heightPx = heightPx * scale;
-}
+  }
 
-if (rulersVisible) drawRulers();
-window.addEventListener("resize", () => {
   if (rulersVisible) drawRulers();
-});
+  window.addEventListener("resize", () => {
+    if (rulersVisible) drawRulers();
+  });
   
   const page = pages[currentPageIndex];
 
-  // Apply the correct dimensions based on orientation
-  if (!isPortrait) {
-    // Swap for landscape
-    page.style.width = `${heightPx}px`;
-    page.style.height = `${widthPx}px`;
-  } else {
-    page.style.width = `${widthPx}px`;
-    page.style.height = `${heightPx}px`;
-  }
+  page.style.setProperty('--page-width', `${widthPx}px`);
+  page.style.setProperty('--page-height', `${heightPx}px`);
+
+  page.classList.toggle('landscape', !isPortrait);
+  
 }
 
 function updateOrientation() {
