@@ -136,38 +136,28 @@ function duplicatePage(index) {
   updatePageNumbers();
 }
 
+const rulers = [
+    { className: 'page-ruler horizontal top', style: {} },
+    { className: 'page-ruler horizontal bottom', style: { bottom: '0', top: 'auto' } },
+    { className: 'page-ruler vertical left', style: {} },
+    { className: 'page-ruler vertical right', style: { right: '0', left: 'auto' } }
+];
+
+rulers.forEach(rulerData => {
+    const ruler = document.createElement('div');
+    ruler.className = rulerData.className;
+    // Apply special inline styles for positioning (though better in CSS)
+    Object.assign(ruler.style, rulerData.style); 
+    page.appendChild(ruler);
+});
+
+return page;
+
 function toggleRulers() {
   rulersVisible = !rulersVisible;
+  
   pages.forEach(page => {
-    if (rulersVisible) {
-      // Add rulers if not already present
-      if (!page.querySelector('.page-ruler.horizontal.top')) {
-        const top = document.createElement('div');
-        top.className = 'page-ruler horizontal top';
-        page.appendChild(top);
-      }
-      if (!page.querySelector('.page-ruler.horizontal.bottom')) {
-        const bottom = document.createElement('div');
-        bottom.className = 'page-ruler horizontal bottom';
-        bottom.style.bottom = '0';
-        bottom.style.top = 'auto';
-        page.appendChild(bottom);
-      }
-      if (!page.querySelector('.page-ruler.vertical.left')) {
-        const left = document.createElement('div');
-        left.className = 'page-ruler vertical left';
-        page.appendChild(left);
-      }
-      if (!page.querySelector('.page-ruler.vertical.right')) {
-        const right = document.createElement('div');
-        right.className = 'page-ruler vertical right';
-        right.style.right = '0';
-        right.style.left = 'auto';
-        page.appendChild(right);
-      }
-    } else {
-      page.querySelectorAll('.page-ruler').forEach(r => r.remove());
-    }
+    page.classList.toggle('has-rulers', rulersVisible);
   });
 }
 
