@@ -408,16 +408,14 @@ function selectElement(element) {
     selectedElement = element;
     selectedElement.classList.add('selected'); 
   
-    document.getElementById('textEditor').classList.remove('toolbar-visible');
-    document.getElementById('shapeEditor').classList.remove('toolbar-visible');
-    document.getElementById('noElementSelected').classList.remove('toolbar-visible');
-    
+    document.getElementById('textEditor').classList.remove('editor-visible');
+    document.getElementById('shapeEditor').classList.remove('editor-visible');
+    document.getElementById('noElementSelected').classList.remove('editor-visible'); 
+  
     const textToolbar = document.getElementById('textToolbar');
     const shapeToolbar = document.getElementById('shapeToolbar');
     textToolbar.classList.remove('toolbar-visible');
     shapeToolbar.classList.remove('toolbar-visible');
-
-    document.getElementById('noElementSelected').style.display = 'none';
 
     const rect = element.getBoundingClientRect();
     const containerRect = document.body.getBoundingClientRect();
@@ -425,7 +423,7 @@ function selectElement(element) {
 
     if (element.classList.contains('text-element')) {
         toolbar = textToolbar;
-        document.getElementById('textEditor').classList.add('toolbar-visible');
+        document.getElementById('textEditor').classList.add('editor-visible');
 
         const fontSizeInput = document.getElementById('fontSizeInput');
         if (fontSizeInput) {
@@ -434,7 +432,7 @@ function selectElement(element) {
 
     } else if (element.classList.contains('shape-element')) {
         toolbar = shapeToolbar;
-        document.getElementById('shapeEditor').classList.add('toolbar-visible');
+        document.getElementById('shapeEditor').classList.add('editor-visible'); 
         
         initShapeEditor();
         loadShapeStateToControls();
@@ -451,14 +449,12 @@ function selectElement(element) {
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
   el.addEventListener('mousedown', (e) => {
-      // If the element is resizable and the user clicked on the resize handle, skip dragging
       if (getComputedStyle(el).resize !== "none") {
         const rect = el.getBoundingClientRect();
-        const resizeHandleSize = 16; // px size for the corner region
-    
-        // bottom-right corner = resize zone
+        const resizeHandleSize = 16; 
+        
         if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
-          return; // let the browser handle resizing
+          return;
         }
       }
     
@@ -586,7 +582,6 @@ document.addEventListener('click', (e) => {
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal')
   ) {
-    // Replace inline style with class removal
     document.getElementById('textToolbar').classList.remove('toolbar-visible');
     document.getElementById('shapeToolbar').classList.remove('toolbar-visible');
     deselectElement();
@@ -597,7 +592,7 @@ function makeRotatable(el) {
   let rotating = false;
 
   el.addEventListener('mousedown', (e) => {
-    if (!e.altKey) return; // tip: require holding Alt (or Shift) so normal drag still works
+    if (!e.altKey) return;
 
     e.preventDefault();
     rotating = true;
@@ -613,7 +608,6 @@ function makeRotatable(el) {
       const dy = ev.clientY - centerY;
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-      // preserve other transforms
       const existing = el.style.transform.replace(/rotate\([^)]*\)/, '');
       el.style.transform = `${existing} rotate(${angle}deg)`;
     }
