@@ -36,15 +36,6 @@ html, body {
   outline: none;
 }
 
-/* Center container that fills viewport minus left space */
-.center-container {
-  width: 100vw;   /* full viewport width */
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .rect {
   position: relative;
   background: #ffffff;
