@@ -225,6 +225,10 @@ function drawRulers() {
 
 function toggleRulers() {
   rulersVisible = !rulersVisible;
+
+  pages.forEach(page => {
+    page.classList.toggle('has-rulers', rulersVisible);
+  });
   drawRulers();
 }
 
