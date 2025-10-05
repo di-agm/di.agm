@@ -32,12 +32,12 @@ const orientationBtn = document.getElementById('orientationBtn');
 const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
-  a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthIN: 8.5, heightIN: 11 },
-  tabloid: { widthIN: 11, heightIN: 17 }
+  a4: { widthPX: 320, heightPX: 452 }, 
+  letter: { widthPX: 330, heightPX: 425 }, // Example pixel values
+  tabloid: { widthPX: 530, heightPX: 680 }  // Example pixel values
 };
 
-const maxWidthPx = 360;
+const maxWidthPx = 360; /
 
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
