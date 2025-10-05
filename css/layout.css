@@ -48,6 +48,7 @@ html, body {
 .rect {
   position: relative;
   background: #ffffff;
+  box-shadow: 0 8px 20px rgba(2,6,23,0.15); 
   user-select: none;
   display: flex;
   align-items: center;
