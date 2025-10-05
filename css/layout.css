@@ -56,19 +56,15 @@ html, body {
   color: rgb(0, 0, 0);
   font-weight: 600;
   transition: width 0.4s ease, height 0.4s ease;
-  /*width: var(--page-width, 210px);
-  height: var(--page-height, 297px);*/
+  width: var(--page-width, 320px); 
+  height: var(--page-height, 452px);
 }
 
-.page-a4-initial {
-  width: 320px;
-  height: 452px;
-  overflow: hidden;
-}
+.page-a4-initial {}
 
 .landscape {
-  width: var(--page-height, 210px);
-  height: var(--page-width, 297px);
+  width: var(--page-height, 452px);
+  height: var(--page-width, 320px);
 }
 
 .page-number-hidden {
