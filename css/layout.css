@@ -36,40 +36,24 @@ html, body {
   outline: none;
 }
 
+/* Center container that fills viewport minus left space */
+.center-container {
+  width: 100vw;   /* full viewport width */
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .rect {
-  position: relative;
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(2,6,23,0.15); 
-  user-select: none;
+  background: #e0e0e0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: rgb(0, 0, 0);
   font-weight: 600;
+  user-select: none;
   transition: width 0.4s ease, height 0.4s ease;
-  width: var(--page-width, 320px); 
-  height: var(--page-height, 452px);
-}
-
-.page-a4-initial {}
-
-.landscape {
-  width: var(--page-height, 452px);
-  height: var(--page-width, 320px);
-}
-
-.page-number-hidden {
-    display: none !important;
-}
-
-.page-number-label {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  color: #666;
-  font-size: 12px;
-  font-weight: 600;
-  z-index: 10;
 }
 
 #leftControls {
@@ -135,15 +119,7 @@ button:hover {
   align-items: center;
   justify-content: flex-start;
   resize: both;
-  overflow: visible !important; 
-}
-
-.shape-element svg * {
-  fill: #3b82f6;          
-  stroke: #1e3a8a;         
-  stroke-width: 4;         
-  width: 100%;
-  height: 100%;
+  overflow: hidden;
 }
 
 #pageNumber {
@@ -170,44 +146,22 @@ button:hover {
 /* Rulers */
 .page-ruler {
   position: absolute;
-  display: none; 
   background: rgba(0,0,0,0.15);
   pointer-events: none;
   z-index: 20;
 }
 
-.has-rulers .page-ruler {
-  display: block;
-}
-
 .page-ruler.horizontal {
+  height: 1px;
   width: 100%;
-  height: 15px;
-  left: 0;
-}
-
-.page-ruler.horizontal.top {
-  top: 0;
-}
-.page-ruler.horizontal.bottom {
-  bottom: 0;
-  top: auto;
 }
 
 .page-ruler.vertical {
+  width: 1px;
   height: 100%;
-  width: 15px;
-  top: 0;
 }
 
-.page-ruler.vertical.left {
-  left: 0;
-}
-.page-ruler.vertical.right {
-  right: 0;
-  left: auto; 
-}
-
+/* Ruler containers */
 .ruler {
   position: absolute;
   background: #f9f9f9;
@@ -216,9 +170,7 @@ button:hover {
   font-family: monospace;
   overflow: hidden;
   z-index: 100;
-  pointer-events: none;
-  border: 1px solid #ccc;
-  box-sizing: content-box;
+  pointer-events: none; /* don’t block clicks */
 }
 
 .ruler.horizontal {
@@ -231,6 +183,7 @@ button:hover {
   border-right: 1px solid #ccc;
 }
 
+/* Tick marks */
 .ruler .tick {
   position: absolute;
   background: #777;
@@ -248,21 +201,7 @@ button:hover {
   right: 0;
 }
 
-.ruler div:not(.tick) {
-  position: absolute;
-  font-size: 10px;
-  color: #333;
-}
-
-/* Horizontal Label Positioning */
-.ruler.horizontal div:not(.tick) {
-  bottom: 10px; /* Position above the ticks */
-}
-/* Vertical Label Positioning */
-.ruler.vertical div:not(.tick) {
-  right: 2px; /* Position on the left side of the ruler area */
-}
-
+/* Margins */
 .page-margins {
   position: absolute;
   border: 1px dotted rgba(0,0,0,0.4);
@@ -280,14 +219,11 @@ button:hover {
   min-width: 100px;
   min-height: 30px;
   padding: 2px;
-  box-sizing: border-box;
   border-radius: 4px;
   cursor: move;
   color: black;
   z-index: 5;
   transition: border 0.2s;
-  resize: both;
-  overflow: auto;
 }
 
 .text-element .resizer {
@@ -301,89 +237,16 @@ button:hover {
   border-top-left-radius: 3px;
 }
 
-.selected {
-  z-index: 10; 
-}
-
-.shape-element.selected {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); 
-  border: none; 
-}
-
-.shape-element {
-  box-shadow: none;
-  border: none;
-  transition: box-shadow 0.1s ease; 
-}
-
-#textEditor,
-#shapeEditor,
-#noElementSelected,
-#textToolbar,
-#shapeToolbar {
-  display: none;
-  position: absolute;
-  z-index: 100;
-}
-
-.toolbar-visible {
-    display: flex !important; 
-}
-
-.editor-visible,
-.toolbar-visible {
-    display: block !important;
-}
-
 .text-element.selected {
   border: 2px solid #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
 }
 
 .text-element:focus {
-  cursor: text;  
+  cursor: text;  /* change cursor to text when editing */
 }
 
-.text-element.title {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.text-element.subtitle {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.text-element.paragraph {
-  font-size: 14px;
-}
-
-.text-element.image-placeholder {
-  width: 150px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0f0f0;
-  content-editable: false;
-}
-
-.align-left {
-  text-align: left;
-}
-
-.align-center {
-  text-align: center;
-}
-
-.align-right {
-  text-align: right;
-}
-
-.align-justify {
-  text-align: justify;
-}
-
+/* Hamburger menu styles */
 .hamburger-menu {
   position: fixed;
   top: 20px;
@@ -590,6 +453,7 @@ button:hover {
     }
 
 .modal {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -625,10 +489,6 @@ button:hover {
   margin-top: 15px;
 }
 
-.modal-visible {
-  display: flex !important;
-}
-
 #elementToolbar {
   position: absolute;
   display: flex;
@@ -646,12 +506,4 @@ button:hover {
   align-items: center;
   color: white; /* icon or text color */
   cursor: pointer;
-}
-
-.cursor-grab {
-  cursor: grab !important;
-}
-
-.cursor-grabbing {
-  cursor: grabbing !important;
 }
