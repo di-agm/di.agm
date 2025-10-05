@@ -23,6 +23,20 @@ function createPage(pageNumber) {
   pageNumberLabel.textContent = pageNumber;
   page.appendChild(pageNumberLabel);
 
+  const rulers = [
+      { className: 'page-ruler horizontal top', style: {} },
+      { className: 'page-ruler horizontal bottom', style: { bottom: '0', top: 'auto' } },
+      { className: 'page-ruler vertical left', style: {} },
+      { className: 'page-ruler vertical right', style: { right: '0', left: 'auto' } }
+  ];
+  
+  rulers.forEach(rulerData => {
+      const ruler = document.createElement('div');
+      ruler.className = rulerData.className;
+      Object.assign(ruler.style, rulerData.style); 
+      page.appendChild(ruler);
+  });
+  
   return page;
 }
 
@@ -114,23 +128,6 @@ function duplicatePage(index) {
   updatePageNumbers();
 }
 
-const rulers = [
-    { className: 'page-ruler horizontal top', style: {} },
-    { className: 'page-ruler horizontal bottom', style: { bottom: '0', top: 'auto' } },
-    { className: 'page-ruler vertical left', style: {} },
-    { className: 'page-ruler vertical right', style: { right: '0', left: 'auto' } }
-];
-
-rulers.forEach(rulerData => {
-    const ruler = document.createElement('div');
-    ruler.className = rulerData.className;
-    // Apply special inline styles for positioning (though better in CSS)
-    Object.assign(ruler.style, rulerData.style); 
-    page.appendChild(ruler);
-});
-
-return page;
-
 function toggleRulers() {
   rulersVisible = !rulersVisible;
   
@@ -182,60 +179,53 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
-  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
-  // Dynamic positioning remains in JS
   hRuler.style.left = page.offsetLeft + "px";
   hRuler.style.top = (page.offsetTop - 25) + "px"; 
   page.parentElement.appendChild(hRuler);
 
-  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
-  // Dynamic positioning remains in JS
   vRuler.style.top = page.offsetTop + "px";
   vRuler.style.left = (page.offsetLeft - 25) + "px"; 
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing remains in JS
-  const spacing = convertToPx(10, currentRulerUnit);
+  const minorTickSpacing = 10; // Ticks every 10 pixels
+  const majorTickFactor = 5; // Major label/tick every 50 pixels (10 * 5)
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
-  // Horizontal ticks
-  for (let x = 0; x <= maxX; x += spacing) {
+  for (let x = 0; x <= maxX; x += minorTickSpacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
     tick.style.left = x + "px";
-    // Tick size calculation must remain in JS
-    tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; 
+    
+    tick.style.height = (x % (minorTickSpacing * majorTickFactor) === 0) ? "10px" : "6px"; 
     hRuler.appendChild(tick);
 
-    if (x % (spacing * 5) === 0) {
+    if (x % (minorTickSpacing * majorTickFactor) === 0) {
       const label = document.createElement("div");
-      // Only dynamic position remains
       label.style.left = x + 2 + "px"; 
-      label.textContent = Math.round(x / convertToPx(1, currentRulerUnit));
+      label.textContent = x; // Label shows the pixel value
       hRuler.appendChild(label);
     }
   }
 
-  for (let y = 0; y <= maxY; y += spacing) {
+  for (let y = 0; y <= maxY; y += minorTickSpacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
     tick.style.top = y + "px";
-    // Tick size calculation must remain in JS
-    tick.style.width = (y % (spacing * 5) === 0) ? "10px" : "6px";
+
+    tick.style.width = (y % (minorTickSpacing * majorTickFactor) === 0) ? "10px" : "6px";
     vRuler.appendChild(tick);
 
-    if (y % (spacing * 5) === 0) {
+    if (y % (minorTickSpacing * majorTickFactor) === 0) {
       const label = document.createElement("div");
-      // Only dynamic position remains
       label.style.top = y + "px"; 
-      label.textContent = Math.round(y / convertToPx(1, currentRulerUnit));
+      label.textContent = y; // Label shows the pixel value
       vRuler.appendChild(label);
     }
   }
