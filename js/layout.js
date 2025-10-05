@@ -42,7 +42,8 @@ const maxWidthPx = 360;
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let widthPx, heightPx;
+  let widthPx = paperSizes[key]?.widthPX || paperSizes.a4.widthPX; 
+  let heightPx = paperSizes[key]?.heightPX || paperSizes.a4.heightPX;
   if (key === 'a4') {
     widthPx = mmToPx(paperSizes.a4.widthMM);
     heightPx = mmToPx(paperSizes.a4.heightMM);
@@ -74,7 +75,7 @@ function updateRectSize(key) {
   page.style.setProperty('--page-height', `${heightPx}px`);
 
   page.classList.toggle('landscape', !isPortrait);
-  
+  if (rulersVisible) drawRulers();
 }
 
 function updateOrientation() {
