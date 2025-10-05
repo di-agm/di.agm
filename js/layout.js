@@ -1217,16 +1217,3 @@ if (confirmSaveBtn) confirmSaveBtn.addEventListener('click', saveLayout);
 if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
   console.log('File import would be implemented here with a file picker dialog');
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-    if (pages.length === 0) {
-      addPage();
-    }
-    loadSavedLayouts();
-    
-    if (typeof html2canvas === 'undefined') {
-      const html2canvasScript = document.createElement('script');
-      html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
-      document.head.appendChild(html2canvasScript);
-    }
-});
