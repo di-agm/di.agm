@@ -44,37 +44,14 @@ function updateRectSize(key) {
   
   let widthPx = paperSizes[key]?.widthPX || paperSizes.a4.widthPX; 
   let heightPx = paperSizes[key]?.heightPX || paperSizes.a4.heightPX;
-  if (key === 'a4') {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
-  } else if (key === 'letter') {
-    widthPx = inToPx(paperSizes.letter.widthIN);
-    heightPx = inToPx(paperSizes.letter.heightIN);
-  } else if (key === 'tabloid') {
-    widthPx = inToPx(paperSizes.tabloid.widthIN);
-    heightPx = inToPx(paperSizes.tabloid.heightIN);
-  } else {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
-  }
 
-  if (widthPx > maxWidthPx) {
-    const scale = maxWidthPx / widthPx;
-    widthPx = widthPx * scale;
-    heightPx = heightPx * scale;
-  }
-
-  if (rulersVisible) drawRulers();
-  window.addEventListener("resize", () => {
-    if (rulersVisible) drawRulers();
-  });
-  
   const page = pages[currentPageIndex];
-
+  
   page.style.setProperty('--page-width', `${widthPx}px`);
   page.style.setProperty('--page-height', `${heightPx}px`);
 
   page.classList.toggle('landscape', !isPortrait);
+  
   if (rulersVisible) drawRulers();
 }
 
