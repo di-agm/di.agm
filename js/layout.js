@@ -37,7 +37,7 @@ const paperSizes = {
   tabloid: { widthPX: 530, heightPX: 680 }  // Example pixel values
 };
 
-const maxWidthPx = 360; /
+const maxWidthPx = 360; 
 
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
