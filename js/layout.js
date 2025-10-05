@@ -542,13 +542,18 @@ function toggleEdit() {
 
 function alignElement() {
   if (!selectedElement) return;
+
   const alignments = ['left', 'center', 'right', 'justify'];
-  let current = selectedElement.style.textAlign || 'left';
-  let nextIndex = (alignments.indexOf(current) + 1) % alignments.length;
-  selectedElement.style.textAlign = alignments[nextIndex];
+  let currentClass = alignments.find(a => selectedElement.classList.contains(`align-${a}`)) || 'left';
+  
+  let nextIndex = (alignments.indexOf(currentClass) + 1) % alignments.length;
+  let nextAlignment = alignments[nextIndex];
+  
+  alignments.forEach(a => selectedElement.classList.remove(`align-${a}`));
+  
+  selectedElement.classList.add(`align-${nextAlignment}`);
 }
 
-// Toolbar button listeners
 ['textToolbar', 'shapeToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
@@ -579,10 +584,11 @@ document.addEventListener('click', (e) => {
     !e.target.closest('#textToolbar') &&
     !e.target.closest('#shapeToolbar') &&
     !e.target.closest('.sidebar-btn') &&
-    !e.target.closest('.modal') // Don't deselect if clicking modal
+    !e.target.closest('.modal')
   ) {
-    document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
+    // Replace inline style with class removal
+    document.getElementById('textToolbar').classList.remove('toolbar-visible');
+    document.getElementById('shapeToolbar').classList.remove('toolbar-visible');
     deselectElement();
   }
 });
@@ -626,21 +632,16 @@ function makeRotatable(el) {
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
-    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
-    if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = 'none';
-        selectedElement.style.border = 'none';
-    }
     selectedElement = null;
   }
-  document.getElementById('textEditor').style.display = 'none';
-  document.getElementById('shapeEditor').style.display = 'none';
-  document.getElementById('noElementSelected').style.display = 'block';
-  document.getElementById('textToolbar').style.display = 'none';
-  document.getElementById('shapeToolbar').style.display = 'none';
+  
+  document.getElementById('textEditor').classList.remove('editor-visible');
+  document.getElementById('shapeEditor').classList.remove('editor-visible');
+  document.getElementById('textToolbar').classList.remove('toolbar-visible');
+  document.getElementById('shapeToolbar').classList.remove('toolbar-visible');
+  document.getElementById('noElementSelected').classList.add('editor-visible');
 }
 
-// Toggle sidebar functions
 function toggleLeftSidebar() {
   const sidebar = document.getElementById('leftSidebar');
   const hamburger = document.querySelector('#leftMenuBtn .hamburger-icon');
@@ -657,7 +658,6 @@ function toggleRightSidebar() {
 //Zoom
 const center = document.querySelector(".center-container");
 
-// Check if buttons exist before adding listeners
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const handBtn = document.getElementById("handBtn");
@@ -678,11 +678,10 @@ if (zoomOutBtn) {
 
 if (handBtn) {
   handBtn.addEventListener("click", () => {
-    center.style.cursor = "grab";
+    center.classList.add('cursor-grab');
     center.addEventListener("mousedown", startPan);
   });
 }
-
 
 function startPan(e) {
   isPanning = true;
@@ -690,7 +689,9 @@ function startPan(e) {
   startY = e.pageY - center.offsetTop;
   scrollLeft = center.scrollLeft;
   scrollTop = center.scrollTop;
-  center.style.cursor = "grabbing";
+  //center.style.cursor = "grabbing";
+  center.classList.add('cursor-grabbing');
+  center.classList.remove('cursor-grab');
   center.addEventListener("mousemove", panMove);
   center.addEventListener("mouseup", endPan);
 }
@@ -705,18 +706,18 @@ function panMove(e) {
 
 function endPan() {
   isPanning = false;
-  center.style.cursor = "grab";
+  //center.style.cursor = "grab";
+  center.classList.add('cursor-grab');
+  center.classList.remove('cursor-grabbing');
   center.removeEventListener("mousemove", panMove);
   center.removeEventListener("mouseup", endPan);
 }
 
-// Export functions
 function exportAsImage(format) {
   if (!pages[currentPageIndex]) return;
   
   const page = pages[currentPageIndex];
   
-  // Use html2canvas to capture the page
   if (typeof html2canvas === 'undefined') {
     console.error("html2canvas library is not loaded.");
     return;
@@ -726,7 +727,6 @@ function exportAsImage(format) {
     scale: 2,
     backgroundColor: null
   }).then(canvas => {
-    // Create a download link
     const link = document.createElement('a');
     
     if (format === 'png') {
@@ -737,7 +737,6 @@ function exportAsImage(format) {
       link.href = canvas.toDataURL('image/jpeg', 0.9);
     }
     
-    // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -765,11 +764,10 @@ function exportAsPDF() {
   });
 }
 
-// Layout saving and loading functions
 function showSaveLayoutModal() {
   const modal = document.getElementById('saveLayoutModal');
   if (modal) {
-    modal.style.display = 'flex';
+    modal.classList.add('modal-visible');
     document.getElementById('layoutNameInput').focus();
   }
 }
@@ -777,7 +775,7 @@ function showSaveLayoutModal() {
 function hideModal() {
   const modal = document.getElementById('saveLayoutModal');
   if (modal) {
-    modal.style.display = 'none';
+    modal.classList.remove('modal-visible');
   }
 }
 
@@ -785,12 +783,10 @@ function saveLayout() {
   const name = document.getElementById('layoutNameInput').value.trim();
   if (!name) return;
   
-  // Create a serializable representation of pages
   const layoutData = {
     name,
     date: new Date().toISOString(),
     pages: pages.map(page => {
-      // Extract all elements on the page
       const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
         let elementData = {
           type: el.classList.contains('text-element') ? 'text' : 'shape',
@@ -814,7 +810,6 @@ function saveLayout() {
             backgroundColor: el.style.backgroundColor
           };
         } else if (el.classList.contains('shape-element')) {
-          // Save the shape's custom data attributes for styling
           elementData.shapeType = el.querySelector('svg > *').tagName;
           elementData.shapeData = {
               fillColor: el.dataset.fillColor,
@@ -822,7 +817,6 @@ function saveLayout() {
               borderColor: el.dataset.borderColor,
               borderOpacity: el.dataset.borderOpacity,
               borderWidth: el.dataset.borderWidth,
-              // For polygons/stars, save points string if needed (complex)
               points: el.querySelector('svg polygon') ? el.querySelector('svg polygon').getAttribute('points') : null
           };
         }
@@ -838,13 +832,10 @@ function saveLayout() {
     })
   };
   
-  // Add to saved layouts
   savedLayouts.push(layoutData);
   
-  // Save to localStorage
   localStorage.setItem('paperSizeSelectorLayouts', JSON.stringify(savedLayouts));
   
-  // Update UI
   updateSavedLayoutsList();
   hideModal();
 }
@@ -853,10 +844,8 @@ function loadLayout(layoutIndex) {
   const layout = savedLayouts[layoutIndex];
   if (!layout) return;
   
-  // Clear current pages
   pages = [];
   
-  // Recreate pages from layout data
   layout.pages.forEach(pageData => {
     const newPage = createPage(pages.length + 1);
     newPage.style.width = pageData.width;
@@ -878,7 +867,6 @@ function loadLayout(layoutIndex) {
         element.className = 'shape-element';
         element.contentEditable = false;
         
-        // Rebuild SVG shape
         const svgNS = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNS, "svg");
         svg.setAttribute("width", "100%");
@@ -899,7 +887,6 @@ function loadLayout(layoutIndex) {
                 shape.setAttribute("points", elData.shapeData.points);
             }
             break;
-          // Add other shapes as needed
         }
 
         if (shape) {
@@ -907,17 +894,14 @@ function loadLayout(layoutIndex) {
             element.appendChild(svg);
         }
         
-        // Apply saved custom data attributes
         element.dataset.fillColor = elData.shapeData.fillColor;
         element.dataset.fillOpacity = elData.shapeData.fillOpacity;
         element.dataset.borderColor = elData.shapeData.borderColor;
         element.dataset.borderOpacity = elData.shapeData.borderOpacity;
         element.dataset.borderWidth = elData.shapeData.borderWidth;
         
-        // Re-apply styles after loading data
         applyShapeStyle(element);
         
-        // Re-apply style when element is loaded and resized (not strictly necessary here but good for consistency)
         new ResizeObserver(() => {
           applyShapeStyle(element); 
         }).observe(element);
@@ -954,20 +938,8 @@ function loadLayout(layoutIndex) {
   }
 }
 
-// ====================================================================
-// SHAPE EDITOR LOGIC START
-// ====================================================================
-
-// Flag to ensure listeners are only added once
 let shapeEditorListenersInitialized = false;
 
-// --- Utility Function ---
-/**
- * Converts a HEX color code to an RGBA string.
- * @param {string} hex - The hex color code (e.g., "#RRGGBB").
- * @param {number} alpha - The opacity value (0.0 to 1.0).
- * @returns {string} The RGBA color string (e.g., "rgba(255, 0, 0, 0.5)").
- */
 function hexToRgbA(hex, alpha) {
     let r = 0, g = 0, b = 0;
     // 3 or 6 digit hex parsing
@@ -988,10 +960,9 @@ function hexToRgbA(hex, alpha) {
 function applyShapeStyle(element = selectedElement) {
     if (!element || !element.classList.contains('shape-element')) return;
 
-    const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
+    const svgShape = element.querySelector('svg > *');
     if (!svgShape) return;
 
-    // 1. Get values from dataset (where the state is persisted)
     const fillColorHex = element.dataset.fillColor || '#000000';
     const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
     
@@ -999,35 +970,19 @@ function applyShapeStyle(element = selectedElement) {
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
 
-    // 2. Calculate RGBA colors
     const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
-    // 3. Apply style to the SVG shape
     svgShape.setAttribute('fill', fillRgba);
     svgShape.setAttribute('stroke', borderRgba);
     svgShape.setAttribute('stroke-width', borderWidth);
     svgShape.parentElement.style.transform = '';
     svgShape.parentElement.style.transformOrigin = '';
-    /*/ If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)
-    if (svgShape.tagName === 'circle') {
-        const size = Math.min(element.offsetWidth, element.offsetHeight);
-        const radius = size / 2 * 0.8; // Use 80% of min dimension
-        svgShape.setAttribute('r', radius);
-        svgShape.setAttribute('cx', element.offsetWidth / 2);
-        svgShape.setAttribute('cy', element.offsetHeight / 2);
-    } else {
-        // For polygons/stars, transform to center and scale
-        const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) / 100;
-        svgShape.parentElement.style.transform = `scale(${scaleFactor})`;
-        svgShape.parentElement.style.transformOrigin = '0 0';
-    }*/
 }
 
 function updateSelectedShapeStyle() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
-    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
@@ -1037,7 +992,6 @@ function updateSelectedShapeStyle() {
     const borderOpacityValueSpan = document.getElementById('border-opacity-value');
     const borderWidthInput = document.getElementById('shape-border-width');
 
-    // 1. Get current values from controls
     const fillColorHex = fillColorInput.value;
     const fillOpacity = parseFloat(fillOpacityInput.value);
     
@@ -1045,17 +999,14 @@ function updateSelectedShapeStyle() {
     const borderOpacity = parseFloat(borderOpacityInput.value);
     const borderWidth = Math.max(0, parseFloat(borderWidthInput.value));
 
-    // 2. Persist the state in the selected element's dataset
     selectedElement.dataset.fillColor = fillColorHex;
     selectedElement.dataset.fillOpacity = fillOpacity;
     selectedElement.dataset.borderColor = borderColorHex;
     selectedElement.dataset.borderOpacity = borderOpacity;
     selectedElement.dataset.borderWidth = borderWidth;
     
-    // 3. Apply the style
     applyShapeStyle(selectedElement);
 
-    // 4. Update display spans for opacity values
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
@@ -1063,35 +1014,30 @@ function updateSelectedShapeStyle() {
 function loadShapeStateToControls() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
-    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
 
-    // Load from dataset (the source of truth)
     fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
     fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
     borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
     borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
     borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
     
-    // Run update to refresh the span values
     updateSelectedShapeStyle();
 }
 
 function initShapeEditor() {
     if (shapeEditorListenersInitialized) return;
 
-    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     
-    // Check if controls exist before adding listeners
     if (fillColorInput) {
         fillColorInput.addEventListener('input', updateSelectedShapeStyle);
     }
@@ -1106,7 +1052,7 @@ function initShapeEditor() {
     }
     if (borderWidthInput) {
         borderWidthInput.addEventListener('input', updateSelectedShapeStyle);
-        borderWidthInput.addEventListener('change', updateSelectedShapeStyle); // Ensure change also triggers for number input
+        borderWidthInput.addEventListener('change', updateSelectedShapeStyle);
     }
     
     shapeEditorListenersInitialized = true;
@@ -1157,7 +1103,6 @@ function updateSavedLayoutsList() {
   });
 }
 
-// Load saved layouts from localStorage
 function loadSavedLayouts() {
   const saved = localStorage.getItem('paperSizeSelectorLayouts');
   if (saved) {
@@ -1170,7 +1115,6 @@ function loadSavedLayouts() {
   }
 }
 
-// Event Listeners
 if (selector) {
   selector.addEventListener('change', (e) => {
     updateRectSize(e.target.value);
@@ -1182,7 +1126,6 @@ if (orientationBtn) {
     updateOrientation();
   });
 }
-
 
 const prevPageBtn = document.getElementById('prevPageBtn');
 const nextPageBtn = document.getElementById('nextPageBtn');
@@ -1206,14 +1149,12 @@ if (addPageBtn) addPageBtn.addEventListener('click', addPage);
 if (removePageBtn) removePageBtn.addEventListener('click', () => removePage(currentPageIndex));
 if (duplicatePageBtn) duplicatePageBtn.addEventListener('click', () => duplicatePage(currentPageIndex));
 
-// Add menu toggle handlers
 const leftMenuBtn = document.getElementById('leftMenuBtn');
 const rightMenuBtn = document.getElementById('rightMenuBtn');
 
 if (leftMenuBtn) leftMenuBtn.addEventListener('click', toggleLeftSidebar);
 if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 
-// Element addition handlers
 const addTitleBtn = document.getElementById('addTitleBtn');
 const addSubtitleBtn = document.getElementById('addSubtitleBtn');
 const addParagraphBtn = document.getElementById('addParagraphBtn');
@@ -1232,7 +1173,6 @@ if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('
 if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
 if (addStarBtn) addStarBtn.addEventListener('click', () => addShapeElement('star'));
 
-// Color picker handlers
 const fontColorInput = document.getElementById('fontColorInput');
 
 if (fontColorInput) fontColorInput.addEventListener('input', () => {
@@ -1241,7 +1181,6 @@ if (fontColorInput) fontColorInput.addEventListener('input', () => {
   }
 });
 
-// Font size handlers
 const fontSizeInput = document.getElementById('fontSizeInput');
 
 if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
@@ -1253,7 +1192,6 @@ if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
   }
 });
 
-// Font family handler
 const fontFamilySelect = document.getElementById('fontFamilySelect');
 if (fontFamilySelect) fontFamilySelect.addEventListener('change', (e) => {
   if (selectedElement) {
@@ -1278,7 +1216,6 @@ if (fontFileInput) fontFileInput.addEventListener('change', (e) => {
   if (file) loadCustomFont(file);
 });
 
-// Button handlers
 const toggleRulersBtn = document.getElementById('toggleRulersBtn');
 const toggleMarginsBtn = document.getElementById('toggleMarginsBtn');
 const togglePageNumbersBtn = document.getElementById('togglePageNumbersBtn');
@@ -1287,7 +1224,6 @@ if (toggleRulersBtn) toggleRulersBtn.addEventListener('click', toggleRulers);
 if (toggleMarginsBtn) toggleMarginsBtn.addEventListener('click', toggleMargins);
 if (togglePageNumbersBtn) togglePageNumbersBtn.addEventListener('click', togglePageNumbers);
 
-// Export handlers
 const exportPngBtn = document.getElementById('exportPngBtn');
 const exportJpgBtn = document.getElementById('exportJpgBtn');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
@@ -1306,22 +1242,16 @@ if (saveLayoutBtn) saveLayoutBtn.addEventListener('click', showSaveLayoutModal);
 if (cancelSaveBtn) cancelSaveBtn.addEventListener('click', hideModal);
 if (confirmSaveBtn) confirmSaveBtn.addEventListener('click', saveLayout);
 
-// Import layout handlers
 if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
-  // This would typically open a file picker
-  // For simplicity, we'll just show a message
   console.log('File import would be implemented here with a file picker dialog');
 });
 
-// Initialize with first page and load saved layouts
-// Wrap this in a DOMContentLoaded check if this script is not deferred
 document.addEventListener('DOMContentLoaded', () => {
     if (pages.length === 0) {
       addPage();
     }
     loadSavedLayouts();
     
-    // Add html2canvas library for image export if not already present
     if (typeof html2canvas === 'undefined') {
       const html2canvasScript = document.createElement('script');
       html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
