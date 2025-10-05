@@ -128,14 +128,6 @@ function duplicatePage(index) {
   updatePageNumbers();
 }
 
-function toggleRulers() {
-  rulersVisible = !rulersVisible;
-  
-  pages.forEach(page => {
-    page.classList.toggle('has-rulers', rulersVisible);
-  });
-}
-
 function toggleMargins() {
   marginsVisible = !marginsVisible;
   pages.forEach(page => {
@@ -235,12 +227,6 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   drawRulers();
 }
-
-const oldShowPage = showPage;
-showPage = function(index) {
-  oldShowPage(index);
-  if (rulersVisible) drawRulers();
-};
 
 function addTextElement(type) {
   if (!pages[currentPageIndex]) return;
