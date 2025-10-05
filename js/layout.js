@@ -716,24 +716,19 @@ function exportAsImage(format) {
 }
 
 function exportAsPDF() {
-  if (!pages[currentPageIndex]) return;
-  const page = pages[currentPageIndex];
-
-  if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-    console.error("html2canvas or jspdf library is not loaded.");
-    return;
-  }
-  
-  html2canvas(page).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      unit: 'px',
-      format: [canvas.width, canvas.height]
+    const content = document.querySelector('.rect-container');
+    const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4'); 
+    pdf.html(content, {
+        callback: function (doc) {
+            doc.save('layout.pdf');
+        },
+        x: 10,
+        y: 10,
+        html2canvas: {
+            scale: 0.2, // Adjust this scale value to fit content better
+            useCORS: true 
+        }
     });
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save(`layout-${currentPageIndex + 1}.pdf`);
-  });
 }
 
 function showSaveLayoutModal() {
