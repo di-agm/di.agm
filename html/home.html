@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linktree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+<div id="home">
+  <h1 align="center" id="hello">Hello</h1>
+
+    <div class="ring-container">
+        <div class="value-ring" id="valueRing">
+            <div class="ring-knob" id="valueKnob"></div>
+        </div>
+
+        <div class="color-ring" id="colorRing">
+            <div class="ring-knob" id="ringKnob"></div>
+        </div>
+
+        <div class="color-ring-inner">
+            <div id="logoWrapper" onclick="event.stopPropagation(); window.location.hash = '#menu';" style="cursor: pointer;">
+                <img src="https://github.com/DIcreative/linktree/blob/main/Img/DI.png?raw=true" alt="Profile Photo" />
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<div id="menu" style="display:none;">
+    <h1 align="center">Menu</h1>
+        <h2><a href="#AM" class="AM">About me</a></h2>
+        <h2><a href="#P" class="Portfolio">Portfolio</a></h2>
+        <h2><a href="#Tools" class="Tools">Tools</a></h2>
+        <h2><a href="#CV" class="CV">CV</a></h2>
+        <h2><a href="#links" class="follow">Follow me on social media</a></h2>
+        <h2><a href="#stores" class="stores">Store</a></h2>
+    <h1cg class="J2911" align="center" translate="yes">J29:11</h1cg>
+</div>
+    <script src="js/windows.js" defer></script>
+    <script src="js/color.js" defer></script>
+    <script src="js/translations.js" defer></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </body>
+</html>
