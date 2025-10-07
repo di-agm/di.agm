@@ -84,9 +84,7 @@ window.addEventListener("resize", () => {
   
   const page = pages[currentPageIndex];
 
-  // Apply the correct dimensions based on orientation
   if (!isPortrait) {
-    // Swap for landscape
     page.style.width = `${heightPx}px`;
     page.style.height = `${widthPx}px`;
   } else {
@@ -145,11 +143,10 @@ function removePage(index) {
 function duplicatePage(index) {
   const originalPage = pages[index];
   const clone = originalPage.cloneNode(true);
-  const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
+  const clonedElements = clone.querySelectorAll('.text-element, .shape-element, .image-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
-    makeRotatable(element); // Ensure rotation handler is re-added
-    // Re-select handler
+    makeRotatable(element);
     element.addEventListener('click', (e) => {
       e.stopPropagation();
       selectElement(element);
@@ -164,7 +161,6 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   pages.forEach(page => {
     if (rulersVisible) {
-      // Add rulers if not already present
       if (!page.querySelector('.page-ruler.horizontal.top')) {
         const top = document.createElement('div');
         top.className = 'page-ruler horizontal top';
@@ -211,8 +207,6 @@ function toggleMargins() {
   });
 }
 
-// layout.js
-
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
@@ -223,7 +217,6 @@ function togglePageNumbers() {
     }
     
     pages.forEach(page => {
-        // Get the page-content container
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
         const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
@@ -242,7 +235,6 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
-  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
@@ -250,7 +242,6 @@ function drawRulers() {
   hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(hRuler);
 
-  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
@@ -258,12 +249,10 @@ function drawRulers() {
   vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing: every 50px in current unit
   const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
-  // Horizontal ticks
   for (let x = 0; x <= maxX; x += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -281,7 +270,6 @@ function drawRulers() {
     }
   }
 
-  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -305,7 +293,6 @@ function toggleRulers() {
   drawRulers();
 }
 
-// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
@@ -339,16 +326,6 @@ function addTextElement(type) {
       element.style.fontSize = '14px';
       element.textContent = 'Add your text here';
       break;
-    case 'image':
-      element.textContent = 'Image Placeholder';
-      element.style.width = '150px';
-      element.style.height = '100px';
-      element.style.display = 'flex';
-      element.style.alignItems = 'center';
-      element.style.justifyContent = 'center';
-      element.style.background = '#f0f0f0';
-      element.contentEditable = false;
-      break;
   }
     
   element.style.resize = 'both';
@@ -358,6 +335,99 @@ function addTextElement(type) {
   makeElementDraggable(element);
   makeRotatable(element);
   selectElement(element);
+}
+
+function addImageElement() {
+  if (!pages[currentPageIndex]) return;
+
+  const pageContent = pages[currentPageIndex].querySelector('.page-content');
+  const element = document.createElement('div');
+  
+  element.className = 'image-element'; 
+  element.setAttribute('tabindex', '0');
+  element.contentEditable = false; // Important: do not let the user edit the div content
+  element.style.top = '50px';
+  element.style.left = '50px';
+  element.style.position = 'absolute';
+  element.style.width = '150px';
+  element.style.height = '100px';
+  element.style.background = '#f0f0f0';
+  element.style.border = '2px dashed #999';
+  element.style.display = 'flex';
+  element.style.alignItems = 'center';
+  element.style.justifyContent = 'center';
+  element.textContent = 'Paste or Drop Image Here';
+  element.style.overflow = 'hidden';
+  element.style.resize = 'both';
+
+  element.addEventListener('paste', handleImagePaste);
+  element.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectElement(element);
+  });
+  
+  pageContent.appendChild(element);
+  makeElementDraggable(element);
+  makeRotatable(element);
+  selectElement(element);
+}
+
+function handleImagePaste(e) {
+  const element = e.currentTarget;
+  e.preventDefault(); // Stop default paste behavior
+
+  let imageFound = false;
+
+  if (e.clipboardData.files.length > 0) {
+    for (let i = 0; i < e.clipboardData.files.length; i++) {
+      const file = e.clipboardData.files[i];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          insertImage(element, event.target.result);
+        };
+        reader.readAsDataURL(file);
+        imageFound = true;
+        break;
+      }
+    }
+  }
+
+  if (!imageFound && e.clipboardData.items) {
+    for (let i = 0; i < e.clipboardData.items.length; i++) {
+      const item = e.clipboardData.items[i];
+      if (item.type.startsWith('image/')) {
+        const blob = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          insertImage(element, event.target.result);
+        };
+        reader.readAsDataURL(blob);
+        imageFound = true;
+        break;
+      }
+    }
+  }
+  
+  if (!imageFound) {
+      console.log('No image found in clipboard data.');
+  }
+}
+
+function insertImage(element, dataUrl) {
+    element.textContent = '';
+    element.style.border = 'none';
+    element.style.background = 'none';
+
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain'; // or 'cover' depending on desired fit
+    img.style.pointerEvents = 'none'; // so clicks go to the parent element
+
+    element.innerHTML = ''; 
+    element.appendChild(img);
 }
 
 function addShapeElement(type) {
@@ -472,38 +542,34 @@ function addShapeElement(type) {
 }
 
 function selectElement(element) {
-  // Clear previous selection
-  document.querySelectorAll('.text-element, .shape-element').forEach(el => {
+  document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
     el.classList.remove('selected');
-    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
     if (el.classList.contains('shape-element')) {
         el.style.boxShadow = 'none';
         el.style.border = 'none';
     }
   });
 
-  // Update selectedElement
   selectedElement = element;
   selectedElement.classList.add('selected');
 
-  // APPLY A SUBTLE GLOW/SHADOW TO THE SELECTED SHAPE INSTEAD OF A THICK BORDER
   if (selectedElement.classList.contains('shape-element')) {
     selectedElement.style.boxShadow = 'none'; // Blue glow
     selectedElement.style.border = 'none'; // Ensure no box border
   }
 
-
-  // Hide all editors and toolbars by default
   document.getElementById('textEditor').style.display = 'none';
   document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('imageEditor').style.display = 'none';
   document.getElementById('noElementSelected').style.display = 'none';
 
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
+  const imageToolbar = document.getElementById('imageToolbar');
   textToolbar.style.display = 'none';
   shapeToolbar.style.display = 'none';
+  imageToolbar.style.display = 'none';
 
-  // Position toolbar under the element
   const rect = element.getBoundingClientRect();
   const containerRect = document.body.getBoundingClientRect();
   let toolbar;
@@ -512,7 +578,6 @@ function selectElement(element) {
     toolbar = textToolbar;
     document.getElementById('textEditor').style.display = 'block';
 
-    // update text controls
     const fontSizeInput = document.getElementById('fontSizeInput');
     if (fontSizeInput) {
       fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
@@ -530,15 +595,17 @@ function selectElement(element) {
     toolbar = shapeToolbar;
     document.getElementById('shapeEditor').style.display = 'block';
     
-    // START NEW SHAPE EDITOR INITIALIZATION
     initShapeEditor();
-    // Load current shape's state into the editor inputs
     loadShapeStateToControls();
-    // END NEW SHAPE EDITOR INITIALIZATION
+  } else if (element.classList.contains('image-element')) { // NEW: Handle image element
+    toolbar = imageToolbar; // You can reuse the shape toolbar for image manipulation
+    document.getElementById('shapeEditor').style.display = 'block';
+  }
+    
+    document.getElementById('noElementSelected').style.display = 'block'; // Or create a new image editor
   }
 
   if (toolbar) {
-    // Check if the toolbar exists before trying to access its offset
     if (toolbar.offsetWidth === undefined) {
       toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
     }
@@ -551,12 +618,10 @@ function selectElement(element) {
 function makeElementDraggable(el) {
   let offsetX = 0, offsetY = 0, isDragging = false;
   el.addEventListener('mousedown', (e) => {
-      // If the element is resizable and the user clicked on the resize handle, skip dragging
       if (getComputedStyle(el).resize !== "none") {
         const rect = el.getBoundingClientRect();
         const resizeHandleSize = 16; // px size for the corner region
     
-        // bottom-right corner = resize zone
         if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
           return; // let the browser handle resizing
         }
@@ -592,11 +657,12 @@ function makeElementDraggable(el) {
 function showToolbar(targetElement) {
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
-  if (!textToolbar || !shapeToolbar) return;
+  const imageToolbar = document.getElementById('imageToolbar');
+  if (!textToolbar || !shapeToolbar || !imageToolbar) return;
 
-  // Hide both first
   textToolbar.style.display = 'none';
   shapeToolbar.style.display = 'none';
+  imageToolbar.style.display = 'none';
 
   const rect = targetElement.getBoundingClientRect();
   let toolbar;
@@ -605,6 +671,8 @@ function showToolbar(targetElement) {
     toolbar = textToolbar;
   } else if (targetElement.classList.contains('shape-element')) {
     toolbar = shapeToolbar;
+  } else if (targetElement.classList.contains('image-element')) {
+    toolbar = imageToolbar;
   }
 
   if (toolbar) {
@@ -621,8 +689,10 @@ function deleteElement() {
     selectedElement = null;
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('imageToolbar').style.display = 'none';
     document.getElementById('textEditor').style.display = 'none';
     document.getElementById('shapeEditor').style.display = 'none';
+    document.getElementById('imageEditor').style.display = 'none';
     document.getElementById('noElementSelected').style.display = 'block';
   }
 }
@@ -646,8 +716,7 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-// Toolbar button listeners
-['textToolbar', 'shapeToolbar'].forEach(toolbarId => {
+['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -662,25 +731,26 @@ function alignElement() {
   });
 });
 
-// Handle clicks on elements and outside
 document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
+  const clickedElement = e.target.closest('.text-element, .shape-element, .image-element');
 
   if (clickedElement) {
     if (selectedElement !== clickedElement) {
       selectElement(clickedElement);
     }
-    // No need to call showToolbar here if selectElement handles it
   } else if (
     !e.target.closest('#textEditor') &&
     !e.target.closest('#shapeEditor') &&
+    !e.target.closest('#imageEditor') &&
     !e.target.closest('#textToolbar') &&
     !e.target.closest('#shapeToolbar') &&
+    !e.target.closest('#imageToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('imageToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -724,7 +794,6 @@ function makeRotatable(el) {
 function deselectElement() {
   if (selectedElement) {
     selectedElement.classList.remove('selected');
-    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
     if (selectedElement.classList.contains('shape-element')) {
         selectedElement.style.boxShadow = 'none';
         selectedElement.style.border = 'none';
@@ -733,12 +802,13 @@ function deselectElement() {
   }
   document.getElementById('textEditor').style.display = 'none';
   document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('imageEditor').style.display = 'none';
   document.getElementById('noElementSelected').style.display = 'block';
   document.getElementById('textToolbar').style.display = 'none';
   document.getElementById('shapeToolbar').style.display = 'none';
+  document.getElementById('imageToolbar').style.display = 'none';
 }
 
-// Toggle sidebar functions
 function toggleLeftSidebar() {
   const sidebar = document.getElementById('leftSidebar');
   const hamburger = document.querySelector('#leftMenuBtn .hamburger-icon');
@@ -883,15 +953,13 @@ function saveLayout() {
   const name = document.getElementById('layoutNameInput').value.trim();
   if (!name) return;
   
-  // Create a serializable representation of pages
   const layoutData = {
     name,
     date: new Date().toISOString(),
     pages: pages.map(page => {
-      // Extract all elements on the page
-      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
+      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element, .image-element')).map(el => {
         let elementData = {
-          type: el.classList.contains('text-element') ? 'text' : 'shape',
+          type: el.classList.contains('text-element') ? 'text' : 'shape' : 'image',
           style: {
             top: el.style.top,
             left: el.style.left,
@@ -912,7 +980,6 @@ function saveLayout() {
             backgroundColor: el.style.backgroundColor
           };
         } else if (el.classList.contains('shape-element')) {
-          // Save the shape's custom data attributes for styling
           elementData.shapeType = el.querySelector('svg > *').tagName;
           elementData.shapeData = {
               fillColor: el.dataset.fillColor,
@@ -920,10 +987,18 @@ function saveLayout() {
               borderColor: el.dataset.borderColor,
               borderOpacity: el.dataset.borderOpacity,
               borderWidth: el.dataset.borderWidth,
-              // For polygons/stars, save points string if needed (complex)
               points: el.querySelector('svg polygon') ? el.querySelector('svg polygon').getAttribute('points') : null
           };
-        }
+        } else if (el.classList.contains('image-element')) {
+          elementData.content = el.innerText;
+          elementData.style = {
+            ...elementData.style,
+            fontSize: el.style.fontSize,
+            fontWeight: el.style.fontWeight,
+            fontFamily: el.style.fontFamily,
+            color: el.style.color,
+            backgroundColor: el.style.backgroundColor
+          };
 
         return elementData;
       });
@@ -936,13 +1011,10 @@ function saveLayout() {
     })
   };
   
-  // Add to saved layouts
   savedLayouts.push(layoutData);
   
-  // Save to localStorage
   localStorage.setItem('paperSizeSelectorLayouts', JSON.stringify(savedLayouts));
   
-  // Update UI
   updateSavedLayoutsList();
   hideModal();
 }
@@ -951,10 +1023,8 @@ function loadLayout(layoutIndex) {
   const layout = savedLayouts[layoutIndex];
   if (!layout) return;
   
-  // Clear current pages
   pages = [];
   
-  // Recreate pages from layout data
   layout.pages.forEach(pageData => {
     const newPage = createPage(pages.length + 1);
     newPage.style.width = pageData.width;
@@ -962,7 +1032,6 @@ function loadLayout(layoutIndex) {
     
     const pageContent = newPage.querySelector('.page-content');
     
-    // Add elements
     pageData.elements.forEach(elData => {
       let element;
 
@@ -976,7 +1045,6 @@ function loadLayout(layoutIndex) {
         element.className = 'shape-element';
         element.contentEditable = false;
         
-        // Rebuild SVG shape
         const svgNS = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNS, "svg");
         svg.setAttribute("width", "100%");
@@ -997,7 +1065,6 @@ function loadLayout(layoutIndex) {
                 shape.setAttribute("points", elData.shapeData.points);
             }
             break;
-          // Add other shapes as needed
         }
 
         if (shape) {
@@ -1005,25 +1072,26 @@ function loadLayout(layoutIndex) {
             element.appendChild(svg);
         }
         
-        // Apply saved custom data attributes
         element.dataset.fillColor = elData.shapeData.fillColor;
         element.dataset.fillOpacity = elData.shapeData.fillOpacity;
         element.dataset.borderColor = elData.shapeData.borderColor;
         element.dataset.borderOpacity = elData.shapeData.borderOpacity;
         element.dataset.borderWidth = elData.shapeData.borderWidth;
         
-        // Re-apply styles after loading data
         applyShapeStyle(element);
         
-        // Re-apply style when element is loaded and resized (not strictly necessary here but good for consistency)
         new ResizeObserver(() => {
           applyShapeStyle(element); 
         }).observe(element);
+      } else if (elData.type === 'image') {
+        element = document.createElement('div');
+        element.className = 'image-element';
+        element.contentEditable = true;
+        element.innerText = elData.content;
       } else {
         return; // Skip unknown element type
       }
 
-      // Apply common styles
       Object.entries(elData.style).forEach(([prop, value]) => {
         if (value) element.style[prop] = value;
       });
@@ -1032,7 +1100,6 @@ function loadLayout(layoutIndex) {
       makeElementDraggable(element);
       makeRotatable(element);
       
-      // Re-add click listener for selection
       element.addEventListener('click', (e) => {
         e.stopPropagation();
         selectElement(element);
@@ -1042,33 +1109,18 @@ function loadLayout(layoutIndex) {
     pages.push(newPage);
   });
   
-  // Show first page
   currentPageIndex = 0;
   showPage(0);
   
-  // Toggle right sidebar
   if (document.getElementById('rightSidebar').classList.contains('open')) {
     toggleRightSidebar();
   }
 }
 
-// ====================================================================
-// SHAPE EDITOR LOGIC START
-// ====================================================================
-
-// Flag to ensure listeners are only added once
 let shapeEditorListenersInitialized = false;
 
-// --- Utility Function ---
-/**
- * Converts a HEX color code to an RGBA string.
- * @param {string} hex - The hex color code (e.g., "#RRGGBB").
- * @param {number} alpha - The opacity value (0.0 to 1.0).
- * @returns {string} The RGBA color string (e.g., "rgba(255, 0, 0, 0.5)").
- */
 function hexToRgbA(hex, alpha) {
     let r = 0, g = 0, b = 0;
-    // 3 or 6 digit hex parsing
     if (hex.length >= 4) {
         if (hex.length === 4) {
             r = parseInt(hex[1] + hex[1], 16);
@@ -1089,7 +1141,6 @@ function applyShapeStyle(element = selectedElement) {
     const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
     if (!svgShape) return;
 
-    // 1. Get values from dataset (where the state is persisted)
     const fillColorHex = element.dataset.fillColor || '#000000';
     const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
     
@@ -1097,17 +1148,14 @@ function applyShapeStyle(element = selectedElement) {
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
 
-    // 2. Calculate RGBA colors
     const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
-    // 3. Apply style to the SVG shape
     svgShape.setAttribute('fill', fillRgba);
     svgShape.setAttribute('stroke', borderRgba);
     svgShape.setAttribute('stroke-width', borderWidth);
     svgShape.parentElement.style.transform = '';
     svgShape.parentElement.style.transformOrigin = '';
-    /*/ If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)*/
     if (svgShape.tagName === 'circle') {
         const size = Math.min(element.offsetWidth, element.offsetHeight);
         const radius = size / 2 * 0.8; // Use 80% of min dimension
@@ -1124,7 +1172,6 @@ function applyShapeStyle(element = selectedElement) {
 function updateSelectedShapeStyle() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
-    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
@@ -1134,7 +1181,6 @@ function updateSelectedShapeStyle() {
     const borderOpacityValueSpan = document.getElementById('border-opacity-value');
     const borderWidthInput = document.getElementById('shape-border-width');
 
-    // 1. Get current values from controls
     const fillColorHex = fillColorInput.value;
     const fillOpacity = parseFloat(fillOpacityInput.value);
     
@@ -1142,17 +1188,14 @@ function updateSelectedShapeStyle() {
     const borderOpacity = parseFloat(borderOpacityInput.value);
     const borderWidth = Math.max(0, parseFloat(borderWidthInput.value));
 
-    // 2. Persist the state in the selected element's dataset
     selectedElement.dataset.fillColor = fillColorHex;
     selectedElement.dataset.fillOpacity = fillOpacity;
     selectedElement.dataset.borderColor = borderColorHex;
     selectedElement.dataset.borderOpacity = borderOpacity;
     selectedElement.dataset.borderWidth = borderWidth;
     
-    // 3. Apply the style
     applyShapeStyle(selectedElement);
 
-    // 4. Update display spans for opacity values
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
@@ -1160,35 +1203,30 @@ function updateSelectedShapeStyle() {
 function loadShapeStateToControls() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
-    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
 
-    // Load from dataset (the source of truth)
     fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
     fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
     borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
     borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
     borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
     
-    // Run update to refresh the span values
     updateSelectedShapeStyle();
 }
 
 function initShapeEditor() {
     if (shapeEditorListenersInitialized) return;
 
-    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     
-    // Check if controls exist before adding listeners
     if (fillColorInput) {
         fillColorInput.addEventListener('input', updateSelectedShapeStyle);
     }
@@ -1254,7 +1292,6 @@ function updateSavedLayoutsList() {
   });
 }
 
-// Load saved layouts from localStorage
 function loadSavedLayouts() {
   const saved = localStorage.getItem('paperSizeSelectorLayouts');
   if (saved) {
@@ -1267,7 +1304,6 @@ function loadSavedLayouts() {
   }
 }
 
-// Event Listeners
 if (selector) {
   selector.addEventListener('change', (e) => {
     updateRectSize(e.target.value);
@@ -1279,7 +1315,6 @@ if (orientationBtn) {
     updateOrientation();
   });
 }
-
 
 const prevPageBtn = document.getElementById('prevPageBtn');
 const nextPageBtn = document.getElementById('nextPageBtn');
@@ -1303,14 +1338,12 @@ if (addPageBtn) addPageBtn.addEventListener('click', addPage);
 if (removePageBtn) removePageBtn.addEventListener('click', () => removePage(currentPageIndex));
 if (duplicatePageBtn) duplicatePageBtn.addEventListener('click', () => duplicatePage(currentPageIndex));
 
-// Add menu toggle handlers
 const leftMenuBtn = document.getElementById('leftMenuBtn');
 const rightMenuBtn = document.getElementById('rightMenuBtn');
 
 if (leftMenuBtn) leftMenuBtn.addEventListener('click', toggleLeftSidebar);
 if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 
-// Element addition handlers
 const addTitleBtn = document.getElementById('addTitleBtn');
 const addSubtitleBtn = document.getElementById('addSubtitleBtn');
 const addParagraphBtn = document.getElementById('addParagraphBtn');
@@ -1319,7 +1352,7 @@ const addImageBtn = document.getElementById('addImageBtn');
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
 if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
+if (addImageBtn) addImageBtn.addEventListener('click', addImageElement); 
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
@@ -1329,7 +1362,6 @@ if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('
 if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
 if (addStarBtn) addStarBtn.addEventListener('click', () => addShapeElement('star'));
 
-// Color picker handlers
 const fontColorInput = document.getElementById('fontColorInput');
 
 if (fontColorInput) fontColorInput.addEventListener('input', () => {
@@ -1338,7 +1370,6 @@ if (fontColorInput) fontColorInput.addEventListener('input', () => {
   }
 });
 
-// Font size handlers
 const fontSizeInput = document.getElementById('fontSizeInput');
 
 if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
@@ -1350,7 +1381,6 @@ if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
   }
 });
 
-// Font family handler
 const fontFamilySelect = document.getElementById('fontFamilySelect');
 if (fontFamilySelect) fontFamilySelect.addEventListener('change', (e) => {
   if (selectedElement) {
@@ -1375,7 +1405,6 @@ if (fontFileInput) fontFileInput.addEventListener('change', (e) => {
   if (file) loadCustomFont(file);
 });
 
-// Button handlers
 const toggleRulersBtn = document.getElementById('toggleRulersBtn');
 const toggleMarginsBtn = document.getElementById('toggleMarginsBtn');
 const togglePageNumbersBtn = document.getElementById('togglePageNumbersBtn');
@@ -1384,7 +1413,6 @@ if (toggleRulersBtn) toggleRulersBtn.addEventListener('click', toggleRulers);
 if (toggleMarginsBtn) toggleMarginsBtn.addEventListener('click', toggleMargins);
 if (togglePageNumbersBtn) togglePageNumbersBtn.addEventListener('click', togglePageNumbers);
 
-// Export handlers
 const exportPngBtn = document.getElementById('exportPngBtn');
 const exportJpgBtn = document.getElementById('exportJpgBtn');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
@@ -1393,7 +1421,6 @@ if (exportPngBtn) exportPngBtn.addEventListener('click', () => exportAsImage('pn
 if (exportJpgBtn) exportJpgBtn.addEventListener('click', () => exportAsImage('jpg'));
 if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportAsPDF);
 
-// Save layout handlers
 const saveLayoutBtn = document.getElementById('saveLayoutBtn');
 const cancelSaveBtn = document.getElementById('cancelSaveBtn');
 const confirmSaveBtn = document.getElementById('confirmSaveBtn');
@@ -1403,7 +1430,6 @@ if (saveLayoutBtn) saveLayoutBtn.addEventListener('click', showSaveLayoutModal);
 if (cancelSaveBtn) cancelSaveBtn.addEventListener('click', hideModal);
 if (confirmSaveBtn) confirmSaveBtn.addEventListener('click', saveLayout);
 
-// Import layout handlers
 if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
   // This would typically open a file picker
   // For simplicity, we'll just show a message
@@ -1418,7 +1444,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadSavedLayouts();
     
-    // Add html2canvas library for image export if not already present
     if (typeof html2canvas === 'undefined') {
       const html2canvasScript = document.createElement('script');
       html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
