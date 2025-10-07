@@ -597,13 +597,11 @@ function selectElement(element) {
     
     initShapeEditor();
     loadShapeStateToControls();
-  } else if (element.classList.contains('image-element')) { // NEW: Handle image element
-    toolbar = imageToolbar; // You can reuse the shape toolbar for image manipulation
-    document.getElementById('shapeEditor').style.display = 'block';
-  }
-    
-    document.getElementById('noElementSelected').style.display = 'block'; // Or create a new image editor
-  }
+  } else if (element.classList.contains('image-element')) { 
+    toolbar = imageToolbar; 
+    document.getElementById('imageEditor').style.display = 'block';} // REMOVE the unconditional 
+  
+  document.getElementById('noElementSelected').style.display = 'block';
 
   if (toolbar) {
     if (toolbar.offsetWidth === undefined) {
@@ -959,7 +957,7 @@ function saveLayout() {
     pages: pages.map(page => {
       const elements = Array.from(page.querySelectorAll('.text-element, .shape-element, .image-element')).map(el => {
         let elementData = {
-          type: el.classList.contains('text-element') ? 'text' : 'shape' : 'image',
+          type: el.classList.contains('text-element') ? 'text' : (el.classList.contains('shape-element') ? 'shape' : 'image'),
           style: {
             top: el.style.top,
             left: el.style.left,
@@ -989,16 +987,9 @@ function saveLayout() {
               borderWidth: el.dataset.borderWidth,
               points: el.querySelector('svg polygon') ? el.querySelector('svg polygon').getAttribute('points') : null
           };
-        } else if (el.classList.contains('image-element')) {
-          elementData.content = el.innerText;
-          elementData.style = {
-            ...elementData.style,
-            fontSize: el.style.fontSize,
-            fontWeight: el.style.fontWeight,
-            fontFamily: el.style.fontFamily,
-            color: el.style.color,
-            backgroundColor: el.style.backgroundColor
-          };
+        } else if (el.classList.contains('image-element')) { 
+          const img = el.querySelector('img'); 
+          elementData.imageSrc = img ? img.src : null;} // Save the image source 
 
         return elementData;
       });
@@ -1083,12 +1074,18 @@ function loadLayout(layoutIndex) {
         new ResizeObserver(() => {
           applyShapeStyle(element); 
         }).observe(element);
-      } else if (elData.type === 'image') {
-        element = document.createElement('div');
-        element.className = 'image-element';
-        element.contentEditable = true;
-        element.innerText = elData.content;
-      } else {
+      } else if (elData.type === 'image') { 
+          element = document.createElement('div'); 
+          element.className = 'image-element'; 
+          element.contentEditable = false; // Recreate the placeholder 
+          styles: element.style.background = '#f0f0f0'; 
+          element.style.border = '2px dashed #999'; 
+          element.style.display = 'flex'; 
+          element.style.alignItems = 'center'; 
+          element.style.justifyContent = 'center'; 
+          element.textContent = 'Paste or Drop Image Here'; 
+          element.addEventListener('paste', handleImagePaste); 
+          if (elData.imageSrc) { insertImage(element, elData.imageSrc); } } else {
         return; // Skip unknown element type
       }
 
