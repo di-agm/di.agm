@@ -1107,7 +1107,7 @@ function applyShapeStyle(element = selectedElement) {
     svgShape.setAttribute('stroke-width', borderWidth);
     svgShape.parentElement.style.transform = '';
     svgShape.parentElement.style.transformOrigin = '';
-    /*/ If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)
+    /*/ If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)*/
     if (svgShape.tagName === 'circle') {
         const size = Math.min(element.offsetWidth, element.offsetHeight);
         const radius = size / 2 * 0.8; // Use 80% of min dimension
@@ -1115,11 +1115,10 @@ function applyShapeStyle(element = selectedElement) {
         svgShape.setAttribute('cx', element.offsetWidth / 2);
         svgShape.setAttribute('cy', element.offsetHeight / 2);
     } else {
-        // For polygons/stars, transform to center and scale
         const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) / 100;
         svgShape.parentElement.style.transform = `scale(${scaleFactor})`;
         svgShape.parentElement.style.transformOrigin = '0 0';
-    }*/
+    }
 }
 
 function updateSelectedShapeStyle() {
