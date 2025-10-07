@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/horarios.css" />
 </head>
 
 <body>
@@ -14,10 +16,12 @@
   <h1 align="center" id="hello">Hello</h1>
 
     <div class="ring-container">
+        <!-- Value ring behind all others -->
         <div class="value-ring" id="valueRing">
             <div class="ring-knob" id="valueKnob"></div>
         </div>
 
+        <!-- Hue ring on top -->
         <div class="color-ring" id="colorRing">
             <div class="ring-knob" id="ringKnob"></div>
         </div>
@@ -32,16 +36,349 @@
 </div>
 <div id="menu" style="display:none;">
     <h1 align="center">Menu</h1>
-        <h2><a href="html/aboutme.html" class="AM">About me</a></h2>
-        <h2><a href="html/Portfolio.html" class="Portfolio">Portfolio</a></h2>
-        <h2><a href="html/tools.html" class="Tools">Tools</a></h2>
+        <h2><a href="#AM" class="AM">About me</a></h2>
+        <h2><a href="#P" class="Portfolio">Portfolio</a></h2>
+        <h2><a href="#Tools" class="Tools">Tools</a></h2>
         <h2><a href="#CV" class="CV">CV</a></h2>
-        <h2><a href="html/linktree.html" class="follow">Follow me on social media</a></h2>
+        <h2><a href="#links" class="follow">Follow me on social media</a></h2>
+        <h2><a href="#stores" class="stores">Store</a></h2>
     <h1cg class="J2911" align="center" translate="yes">J29:11</h1cg>
 </div>
+<div id="links" class="links" style="display:none;">
+    <h1 align="center" class="follow">Follow me on social media</h1>
+    <div class="link-icon">
+      <a href="https://www.instagram.com/di.creative.agm?igsh=MW9mcjB1ODdpYm8zag==" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Instagram.png?raw=true" alt="Instagram" />
+        <span class="label">Instagram</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://www.tumblr.com/dicreative?source=share" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Tumblr.png?raw=true" alt="Tumblr" />
+        <span class="label">Tumblr</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://www.reddit.com/u/dicreative/s/idyRAk0iTx" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Reddit.png?raw=true" alt="Reddit" />
+        <span class="label">Reddit</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://pin.it/4kXf9Bu18" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Pinterest%20.png?raw=true" alt="Pinterest" />
+        <span class="label">Pinterest</span>
+      </a>
+    </div>
+</div>
+<div id="stores" class="links" style="display:none;">
+    <h1 align="center" class="stores">Store</h1>
+    <div class="link-icon">
+      <a href="https://ko-fi.com/dicreative" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/Ko-fi.png?raw=true" alt="KoFi" />
+        <span class="label">KoFi</span>
+      </a>
+    </div>
+    <br/>
+    <div class="link-icon">
+      <a href="https://coff.ee/dicreative" target="_blank">
+        <img src="https://github.com/DIcreative/linktree/blob/main/Img/BmaC.png?raw=true" alt="Buy me a coffee" />
+        <span class="label">Buy me a coffee</span>
+      </a>
+    </div>
+</div>
+<div id="AM" align="justify">
+  <h2 class="AM"></h2>
+  <p>¡Hola! Esto es <strong>di.agm</strong>, apasionada diseñadora industrial.</p>
+  <p>Me especializo en diseño asistido por computadora: CAD, y amo el diseño universal. Soy autista, aunque no tengo un diagnostigo oficial porque no puedo pagarlo por el momento, o soy autista o tengo otros 50 diagnósticos diferentes, además no hay un examen oficial 100% confiable. Esto significa que hay cosas que realmente me apasionan, aunque siempre me gusta experimentar cosas nuevas mientras esten en mi zona segura.</p>
+  <p>También me encanta la ilustración, leer y escribir, o experimentar con programación.</p>
+  <p>Quiero emprender y trabajar con los Objetivos de Desarrollo Sostenible utilizando el diseño industrial. Mi sueño es trabajar con y ayudar a personas en situación de discapacidad.</p>
+</div>
+
+<div id="P" align="justify">
+  <h2 class="Portfolio"></h2>
+</div>
+
+<div id="Tools" align="center">
+    <h1 class="Tools" align="center">Tools</h1>
+        <h2><a href="#layout" class="layout">Layout</a></h2>
+        <h2><a href="#LS">LS</a></h2>
+        <h2><a href="#tt" class="tt">Time table</a></h2>
+</div>
+
+<div id="layout" style="display:none;">
+    <div class="hamburger-menu" style="left: 20px;" id="leftMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <!-- Right hamburger button -->  
+  <div class="hamburger-menu" style="right: 20px;" id="rightMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <!-- Left sidebar -->  
+  <div class="sidebar left-sidebar" id="leftSidebar">
+    <div class="sidebar-section">
+      <h3>Page Setup</h3>
+      <select id="sizeSelector" aria-label="Select paper size">
+        <option value="a4">A4 (210 × 297 mm)</option>
+        <option value="letter">Letter (8.5 × 11 in)</option>
+        <option value="tabloid">Tabloid (11 × 17 in)</option>
+        <option value="custom">Custom Size...</option>
+      </select>
+        <div id="customSizeInputs" style="display:none; margin-top:5px;">
+          <input type="number" id="customWidth" placeholder="Width">
+          <input type="number" id="customHeight" placeholder="Height">
+          <select id="customUnit">
+            <option value="px">px</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="in">in</option>
+          </select>
+          <button id="applyCustomSize">Apply</button>
+        </div>
+      <div style="margin-top: 10px;"></div>
+      <button class="sidebar-btn full-width" id="orientationBtn">↺</button>
+    </div>
+
+    <div class="sidebar-section">
+        <button id="toggleRulersBtn">📏</button>
+        <button id="rulerUnitBtn">Unit</button>
+        <button id="toggleMarginsBtn">⌗</button>
+        <button id="togglePageNumbersBtn">#P</button>
+        <button id="zoomInBtn">🔎︎+</button>
+        <button id="zoomOutBtn">-🔍︎</button>
+        <button id="handBtn">✋︎</button>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Elements</h3>
+      <div class="sidebar-buttons">
+        <button id="addTitleBtn">𝐓</button>
+        <button id="addSubtitleBtn">𝓢</button>
+        <button id="addParagraphBtn">𝓟</button>
+        <button id="addImageBtn">🏖</button>
+        <button id="addCircleBtn">⬤</button>
+        <button id="addPolygonBtn">⬟</button>
+        <button id="addStarBtn">★</button>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Element Style</h3>
+      <div id="textEditor" class="editor-panel" style="display: none;">
+        <h4>Text Color</h4>
+        <div class="color-picker-container">
+          <label for="fontColorInput">Font color:</label>
+          <input type="color" id="fontColorInput" value="#000000" style="width: 40px; height: 30px; padding: 0; border: none;">
+        </div>
+        
+        <h4>Font Size</h4>
+        <div class="font-size-options">
+          <label for="fontSizeInput">Font size:</label>
+          <input 
+            id="fontSizeInput" 
+            type="number" 
+            min="1" 
+            max="100" 
+            value="16"
+          >
+        </div>
+
+        <h4>Font Family</h4>
+        <select class="font-family-select" id="fontFamilySelect">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Impact, sans-serif">Impact</option>
+          <option value="'Didact Gothic', sans-serif">Didact Gothic</option>
+          <option value="'Lora', serif">Lora</option>
+          <option><input type="file" id="fontFileInput" accept=".ttf,.otf"></option>
+        </select>
+      </div>
+        
+      <div id="shapeEditor" class="editor-panel" style="display: none;">
+        <h2>Shape Editor</h2>
+
+        <!-- FILL CONTROLS -->
+        <h3 class="mt-4 text-sm font-semibold">Fill Style</h3>
+        <div class="editor-group mt-2">
+            <label for="shape-fill-color" class="block text-xs font-medium text-gray-700">Fill Color:</label>
+            <input type="color" id="shape-fill-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-fill-opacity" class="block text-xs font-medium text-gray-700">Fill Opacity: <span id="fill-opacity-value">1.0</span></label>
+            <input type="range" id="shape-fill-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
+        </div>
+
+        <!-- BORDER CONTROLS -->
+        <h3 class="mt-4 text-sm font-semibold">Border Style</h3>
+        <div class="editor-group mt-2">
+            <label for="shape-border-color" class="block text-xs font-medium text-gray-700">Border Color:</label>
+            <input type="color" id="shape-border-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-border-opacity" class="block text-xs font-medium text-gray-700">Border Opacity: <span id="border-opacity-value">1.0</span></label>
+            <input type="range" id="shape-border-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-border-width" class="block text-xs font-medium text-gray-700">Border Width (px):</label>
+            <input type="number" id="shape-border-width" min="0" value="1" class="w-full border border-gray-300 rounded-md p-1">
+        </div>
+
+    </div>
+        
+      <div id="noElementSelected" style="opacity: 0; text-align: center; padding: 10px;">
+        Select an element to edit
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>Pages</h3>
+      <div class="sidebar-buttons">
+        <button id="prevPageBtn">⮜</button>
+        <button id="nextPageBtn">⮞</button>
+        <button id="addPageBtn">✚</button>
+        <button id="removePageBtn">🗑</button>
+        <button id="duplicatePageBtn">⎘</button>
+      </div>
+    </div>
+      <p></p>
+ </div>
+  
+  <!-- Right sidebar -->  
+  <div class="sidebar right-sidebar" id="rightSidebar">
+    <div class="sidebar-section">
+      <h3>Export</h3>
+      <div class="sidebar-buttons">
+        <button id="exportPngBtn">PNG</button>
+        <button id="exportJpgBtn">JPG</button>
+        <button id="exportPdfBtn">PDF</button>
+        <button id="saveLayoutBtn">💾</button>
+          <p></p>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h3>Saved Layouts</h3>
+      <div id="savedLayouts" class="saved-layouts">
+        <div class="layout-item" style="opacity: 0.6; font-style: italic;">
+          No saved layouts
+        </div>
+      </div>
+      <div style="margin-top: 15px;"></div>
+      <button class="sidebar-btn full-width" id="importLayoutBtn">🗁 Import</button>
+    </div>
+  </div>
+  
+  <!-- Save layout modal -->
+  <div class="modal" id="saveLayoutModal">
+    <div class="modal-content">
+      <h3>Save Layout</h3>
+      <input type="text" id="layoutNameInput" placeholder="Layout name">
+      <div class="modal-buttons">
+        <button class="sidebar-btn" id="cancelSaveBtn">Cancel</button>
+        <button class="sidebar-btn" id="confirmSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-container"><!-- Page will be inserted here by JS --></div>
+</div>
+    
+    <div id="textToolbar" class="toolbar" style="
+      position: absolute;
+      display: none;
+      gap: 8px;
+      align: center;
+      z-index: 1000;
+    ">
+      <button class="toolbar-btn" data-action="edit">✎</button>
+      <button class="toolbar-btn" data-action="delete">✖</button>
+      <button class="toolbar-btn" data-action="rotate">🗘</button>
+      <button class="toolbar-btn" data-action="align">≡</button>
+    </div>
+
+    <div id="shapeToolbar" class="toolbar" style="
+      position: absolute;
+      display: none;
+      gap: 8px;
+      align: center;
+      z-index: 1000;
+    ">
+      <button class="toolbar-btn" data-action="delete">✖</button>
+      <button class="toolbar-btn" data-action="rotate">🗘</button>
+    </div>
+    
+    <div id="tt" style="display:none;">
+    <div class="container">
+        <h1>Generador de Horarios</h1>
+        
+        <!-- Configuración básica -->
+        <div class="form-group">
+            <label for="numDays">Número de días:</label>
+            <input type="text" id="numDays" placeholder="Ej: 7 o 5+2">
+        </div>
+        
+        <div class="form-group">
+            <label for="timeRange">Hora de inicio y fin (HH:MM - HH:MM):</label>
+            <input type="text" id="timeRange" placeholder="Ej: 08:00 - 18:00">
+        </div>
+        
+        <div class="form-group">
+            <label for="startDay">Día de inicio (1=Lunes, 7=Domingo):</label>
+            <select id="startDay">
+                <option value="1">Lunes</option>
+                <option value="2">Martes</option>
+                <option value="3">Miércoles</option>
+                <option value="4">Jueves</option>
+                <option value="5">Viernes</option>
+                <option value="6">Sábado</option>
+                <option value="7">Domingo</option>
+            </select>
+        </div>
+        
+        <!-- Actividades -->
+        <h3>Actividades</h3>
+        <div id="activitiesContainer"></div>
+        <button type="button" class="add-btn" onclick="addActivity()">Agregar Actividad</button>
+        
+        <!-- Bloques no accesibles -->
+        <h3>Bloques No Accesibles</h3>
+        <div id="blocksContainer"></div>
+        <button type="button" class="add-btn" onclick="addBlock()">Agregar Bloque</button>
+        
+        <!-- Botón generar -->
+        <button type="button" onclick="generateSchedule()">Generar Horario</button>
+    </div>
+    
+    <!-- Resultado -->
+    <div class="container" id="scheduleResult">
+        <h2>Horario Generado</h2>
+        <div id="scheduleTable"></div>
+        <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
+    </div>
+</div>
+    
     <script src="js/windows.js" defer></script>
     <script src="js/color.js" defer></script>
     <script src="js/translations.js" defer></script>
+    <script src="js/layout.js" defer></script>
+    <script src="js/horarios.js"></script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     </body>
 </html>
