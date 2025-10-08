@@ -602,20 +602,27 @@ function selectElement(element) {
     
     initShapeEditor();
     loadShapeStateToControls();
-  } else if (element.classList.contains('image-element')) { 
-    toolbar = imageToolbar; 
-    document.getElementById('imageEditor').style.display = 'block';
-  } // REMOVE the unconditional 
+  } else if (element.classList.contains('image-element')) {
+    if (imageToolbar) {
+      toolbar = imageToolbar;
+      document.getElementById('imageEditor').style.display = 'block';
+    }
+  }
+  if (toolbar) toolbar.style.display = 'flex';
   
   document.getElementById('noElementSelected').style.display = 'block';
 
   if (toolbar) {
-    if (toolbar.offsetWidth === undefined) {
+    toolbar.style.display = 'flex';
+    toolbar.style.left = `${element.offsetLeft}px`;
+    toolbar.style.top = `${element.offsetTop - 50}px`;
+    
+    /*if (toolbar.offsetWidth === undefined) {
       toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
     }
     toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
     toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-    toolbar.style.display = 'flex';
+    toolbar.style.display = 'flex';*/
   }
 }
 
