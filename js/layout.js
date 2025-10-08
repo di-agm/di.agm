@@ -548,8 +548,8 @@ function selectElement(element) {
   document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
     el.classList.remove('selected');
     if (el.classList.contains('shape-element')) {
-        el.style.boxShadow = 'none';
-        el.style.border = 'none';
+      el.style.boxShadow = 'none';
+      el.style.border = 'none';
     }
   });
 
@@ -557,14 +557,14 @@ function selectElement(element) {
   selectedElement.classList.add('selected');
 
   if (selectedElement.classList.contains('shape-element')) {
-    selectedElement.style.boxShadow = 'none'; // Blue glow
-    selectedElement.style.border = 'none'; // Ensure no box border
+    selectedElement.style.boxShadow = 'none'; // You might want to remove this and add a selection border instead
+    selectedElement.style.border = 'none';
   }
 
   document.getElementById('textEditor').style.display = 'none';
   document.getElementById('shapeEditor').style.display = 'none';
   document.getElementById('imageEditor').style.display = 'none';
-  document.getElementById('noElementSelected').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'none'; // CORRECT: Hides it *before* selection
 
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
@@ -574,47 +574,25 @@ function selectElement(element) {
   imageToolbar.style.display = 'none';
 
   const rect = element.getBoundingClientRect();
-  const containerRect = document.body.getBoundingClientRect();
   let toolbar;
 
-  document.getElementById('toolbar').style.display = 'block';
-  
+  document.getElementById('toolbar').style.display = 'block'; // Shows the main top menu
+
   if (element.classList.contains('text-element')) {
     toolbar = textToolbar;
     document.getElementById('textEditor').style.display = 'block';
-
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    if (fontSizeInput) {
-      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-    }
-    const fontFamilySelect = document.getElementById('fontFamilySelect');
-    if (fontFamilySelect) {
-      fontFamilySelect.value = selectedElement.style.fontFamily || '';
-    }
-    const colorInput = document.getElementById('colorPickerInput');
-    if (colorInput) {
-      colorInput.value = selectedElement.style.color || '#000000';
-    }
-
   } else if (element.classList.contains('shape-element')) {
     toolbar = shapeToolbar;
     document.getElementById('shapeEditor').style.display = 'block';
-    
-    initShapeEditor();
-    loadShapeStateToControls();
   } else if (element.classList.contains('image-element')) {
     if (imageToolbar) {
       toolbar = imageToolbar;
       document.getElementById('imageEditor').style.display = 'block';
     }
   }
-  if (toolbar) toolbar.style.display = 'flex';
-  
-  document.getElementById('noElementSelected').style.display = 'block';
 
   if (toolbar) {
     toolbar.style.display = 'flex';
-    const rect = element.getBoundingClientRect();
     toolbar.style.left = `${rect.left + window.scrollX}px`;
     toolbar.style.top = `${rect.top + window.scrollY - 50}px`; 
   }
