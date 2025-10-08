@@ -574,6 +574,8 @@ function selectElement(element) {
   const containerRect = document.body.getBoundingClientRect();
   let toolbar;
 
+  document.getElementById('toolbar').style.display = 'block';
+  
   if (element.classList.contains('text-element')) {
     toolbar = textToolbar;
     document.getElementById('textEditor').style.display = 'block';
@@ -599,7 +601,8 @@ function selectElement(element) {
     loadShapeStateToControls();
   } else if (element.classList.contains('image-element')) { 
     toolbar = imageToolbar; 
-    document.getElementById('imageEditor').style.display = 'block';} // REMOVE the unconditional 
+    document.getElementById('imageEditor').style.display = 'block';
+  } // REMOVE the unconditional 
   
   document.getElementById('noElementSelected').style.display = 'block';
 
