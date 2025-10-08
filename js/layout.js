@@ -614,15 +614,9 @@ function selectElement(element) {
 
   if (toolbar) {
     toolbar.style.display = 'flex';
-    toolbar.style.left = `${element.offsetLeft}px`;
-    toolbar.style.top = `${element.offsetTop - 50}px`;
-    
-    /*if (toolbar.offsetWidth === undefined) {
-      toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
-    }
-    toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-    toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-    toolbar.style.display = 'flex';*/
+    const rect = element.getBoundingClientRect();
+    toolbar.style.left = `${rect.left + window.scrollX}px`;
+    toolbar.style.top = `${rect.top + window.scrollY - 50}px`; 
   }
 }
 
@@ -696,6 +690,9 @@ function showToolbar(targetElement) {
 
 function deleteElement() {
   if (selectedElement) {
+    if (selectedElement.classList.contains('image-element')) { 
+      selectedElement.removeEventListener('paste', handleImagePaste);
+    }
     selectedElement.remove();
     selectedElement = null;
     document.getElementById('textToolbar').style.display = 'none';
