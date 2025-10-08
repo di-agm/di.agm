@@ -9,6 +9,9 @@ let pageNumbersVisible = true;
 let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
+let textToolbar;
+let shapeToolbar;
+let imageToolbar;
 
 function createPage(pageNumber) {
   const page = document.createElement('div');
@@ -1439,6 +1442,10 @@ if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
 // Initialize with first page and load saved layouts
 // Wrap this in a DOMContentLoaded check if this script is not deferred
 document.addEventListener('DOMContentLoaded', () => {
+  textToolbar = document.getElementById('textToolbar'); 
+  shapeToolbar = document.getElementById('shapeToolbar');
+  imageToolbar = document.getElementById('imageToolbar');
+  
     if (pages.length === 0) {
       addPage();
     }
