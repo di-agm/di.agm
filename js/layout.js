@@ -925,64 +925,59 @@ function hideModal() {
 }
 
 function saveLayout() {
-  const name = document.getElementById('layoutNameInput').value.trim();
-  if (!name) return;
-  
-  const layoutData = {
-    name,
-    date: new Date().toISOString(),
-    pages: pages.map(page => {
-      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
-        let elementData = {
-          type: el.classList.contains('text-element') ? 'text' : 'shape',
-          style: {
-            top: el.style.top,
-            left: el.style.left,
-            width: el.style.width,
-            height: el.style.height,
-            transform: el.style.transform // Save rotation
-          }
-        };
+    const layoutData = {
+        name: document.getElementById('layoutNameInput').value || `Layout ${savedLayouts.length + 1}`,
+        pages: pages.map(page => {
+            const pageContent = page.querySelector('.page-content');
+            
+            const elementsData = Array.from(pageContent.children).map(element => {
+                let elData = {
+                    type: '',
+                    content: '', // For text/image content
+                    style: {}
+                };
 
-        if (el.classList.contains('text-element')) {
-          elementData.content = el.innerText;
-          elementData.style = {
-            ...elementData.style,
-            fontSize: el.style.fontSize,
-            fontWeight: el.style.fontWeight,
-            fontFamily: el.style.fontFamily,
-            color: el.style.color,
-            backgroundColor: el.style.backgroundColor
-          };
-        } else if (el.classList.contains('shape-element')) {
-          elementData.shapeType = el.querySelector('svg > *').tagName;
-          elementData.shapeData = {
-              fillColor: el.dataset.fillColor,
-              fillOpacity: el.dataset.fillOpacity,
-              borderColor: el.dataset.borderColor,
-              borderOpacity: el.dataset.borderOpacity,
-              borderWidth: el.dataset.borderWidth,
-              points: el.querySelector('svg polygon') ? el.querySelector('svg polygon').getAttribute('points') : null
-          };
-        }
+                const computedStyle = window.getComputedStyle(element);
+                const stylesToSave = ['position', 'top', 'left', 'width', 'height', 'zIndex', 'transform', 'fontSize', 'fontWeight', 'color', 'backgroundColor', 'border', 'borderRadius', 'boxShadow', 'filter', 'opacity'];
+                stylesToSave.forEach(prop => {
+                    if (element.style[prop] || computedStyle[prop] !== 'none' || computedStyle[prop] !== 'auto') {
+                         elData.style[prop] = element.style[prop] || computedStyle[prop];
+                    }
+                });
 
-        return elementData;
-      });
-      
-      return {
-        width: page.style.width,
-        height: page.style.height,
-        elements
-      };
-    })
-  };
-  
-  savedLayouts.push(layoutData);
-  
-  localStorage.setItem('paperSizeSelectorLayouts', JSON.stringify(savedLayouts));
-  
-  updateSavedLayoutsList();
-  hideModal();
+                if (element.classList.contains('text-element')) {
+                    elData.type = 'text';
+                    elData.content = element.innerText;
+                } else if (element.classList.contains('shape-element')) {
+                    elData.type = 'shape';
+                    elData.shapeType = element.dataset.shapeType;
+                    elData.shapeData = {
+                        fillColor: element.dataset.fillColor,
+                        fillOpacity: element.dataset.fillOpacity,
+                        borderColor: element.dataset.borderColor,
+                        borderOpacity: element.dataset.borderOpacity,
+                        borderWidth: element.dataset.borderWidth,
+                    };
+                } else if (element.classList.contains('image-element')) {
+                    elData.type = 'image';
+                    elData.content = element.src; // Save the image URL in the content field
+                }
+
+                return elData.type ? elData : null;
+            }).filter(d => d !== null); // Filter out any null/unknown elements
+
+            return {
+                width: page.style.width,
+                height: page.style.height,
+                elements: elementsData
+            };
+        })
+    };
+    
+    console.log('Layout Data Saved:', layoutData);
+    savedLayouts.push(layoutData);
+    
+    hideModal(); // Hide the save modal
 }
 
 function loadLayout(layoutIndex) {
