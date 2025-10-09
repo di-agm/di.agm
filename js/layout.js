@@ -823,7 +823,7 @@ function exportAsImage(format) {
   }
 
   html2canvas(page, {
-    scale: 10,
+    scale: 20,
     backgroundColor: null
   }).then(canvas => {
     // Create a download link
@@ -853,7 +853,7 @@ function exportAsPDF() {
     return;
   }
   
-  html2canvas(page, { scale: 10 }).then(canvas => {
+  html2canvas(page, { scale: 20 }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
