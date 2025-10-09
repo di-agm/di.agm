@@ -853,7 +853,7 @@ function exportAsPDF() {
     return;
   }
   
-  html2canvas(page).then(canvas => {
+  html2canvas(page, { scale: 10 }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
