@@ -460,12 +460,8 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
-  element.style.position = 'absolute';
-  element.style.width = '100px'; 
-  element.style.height = '100px';
   element.style.zIndex = '1';
-  element.style.overflow = 'visible';
-
+  
   pageContent.appendChild(element);
   makeElementDraggable(element);
   makeRotatable(element);
