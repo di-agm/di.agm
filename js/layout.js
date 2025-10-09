@@ -18,8 +18,8 @@ function createPage(pageNumber) {
   page.style.boxShadow = '0 8px 20px rgba(2,6,23,0.15)';
   page.style.userSelect = 'none';
   page.style.transition = 'width 0.4s ease, height 0.4s ease';
-  page.style.width = '480px';
-  page.style.height = '678px'; // A4 ratio initially
+  page.style.width = '416px';
+  page.style.height = '588px'; // A4 ratio initially
   page.style.overflow = 'hidden';
   
   const content = document.createElement('div');
@@ -76,6 +76,10 @@ function updateRectSize(key) {
     widthPx = widthPx * scale;
     heightPx = heightPx * scale;
 }
+
+  const pageElement = pages[currentPageIndex];
+  pageElement.style.width = `${widthPx}px`;
+  pageElement.style.height = `${heightPx}px`;
 
 if (rulersVisible) drawRulers();
 window.addEventListener("resize", () => {
