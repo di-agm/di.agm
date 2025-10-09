@@ -372,6 +372,8 @@ function addShapeElement(type) {
   element.style.position = 'absolute';
   element.style.width = '100px';
   element.style.height = '100px';
+  element.style.resize = 'both';
+  element.style.overflow = 'auto';
 
   // Create an SVG to hold the shape
   const svgNS = "http://www.w3.org/2000/svg";
