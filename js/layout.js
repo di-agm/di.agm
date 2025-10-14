@@ -18,8 +18,8 @@ function createPage(pageNumber) {
   page.style.boxShadow = '0 8px 20px rgba(2,6,23,0.15)';
   page.style.userSelect = 'none';
   page.style.transition = 'width 0.4s ease, height 0.4s ease';
-  page.style.width = '374px';
-  page.style.height = '529px'; // A4 ratio initially
+  page.style.width = '320px';
+  page.style.height = '452px'; // A4 ratio initially
   page.style.overflow = 'hidden';
   
   const content = document.createElement('div');
@@ -77,10 +77,6 @@ function updateRectSize(key) {
     heightPx = heightPx * scale;
 }
 
-  const pageElement = pages[currentPageIndex];
-  pageElement.style.width = `${widthPx}px`;
-  pageElement.style.height = `${heightPx}px`;
-
 if (rulersVisible) drawRulers();
 window.addEventListener("resize", () => {
   if (rulersVisible) drawRulers();
@@ -97,22 +93,6 @@ window.addEventListener("resize", () => {
     page.style.width = `${widthPx}px`;
     page.style.height = `${heightPx}px`;
   }
-}
-
-function mmToPx(mm) {
-    return mm * 3.78; 
-} 
-
-function inToPx(inch) {
-    return inch * 96; 
-}
-
-let currentRulerUnit = 'mm';
-
-function convertToPx(value, unit) {
-    if (unit === 'mm') return mmToPx(value);
-    if (unit === 'in') return inToPx(value);
-    return value; // Fallback assumes pixels
 }
 
 function updateOrientation() {
@@ -359,6 +339,16 @@ function addTextElement(type) {
       element.style.fontSize = '14px';
       element.textContent = 'Add your text here';
       break;
+    case 'image':
+      element.textContent = 'Image Placeholder';
+      element.style.width = '150px';
+      element.style.height = '100px';
+      element.style.display = 'flex';
+      element.style.alignItems = 'center';
+      element.style.justifyContent = 'center';
+      element.style.background = '#f0f0f0';
+      element.contentEditable = false;
+      break;
   }
     
   element.style.resize = 'both';
@@ -368,45 +358,6 @@ function addTextElement(type) {
   makeElementDraggable(element);
   makeRotatable(element);
   selectElement(element);
-}
-
-  function addImageElement() {
-    if (!pages[currentPageIndex]) { addPage(); }
-    
-    const pageContent = pages[currentPageIndex].querySelector('.page-content');
-    
-    const container = document.createElement('div');
-    container.className = 'image-element-container';
-    container.style.top = '50px';
-    container.style.left = '50px';
-    container.style.position = 'absolute';
-    container.style.width = '150px'; 
-    container.style.height = '100px';
-    
-    const element = document.createElement('img');
-    element.className = 'image-element';
-    element.src = DEFAULT_IMAGE_SRC;
-    element.alt = 'User-defined image';
-    element.crossOrigin = "anonymous";
-    
-    container.appendChild(element);
-    container.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectElement(container); // Select the container, not the image
-    });
-
-    pageContent.appendChild(container);
-    makeElementDraggable(container);
-    selectElement(container);
-}
-
-function updateImageSource(newSrc) {
-    if (selectedElement && selectedElement.classList.contains('image-element-container')) {
-        const img = selectedElement.querySelector('.image-element');
-        if (img) {
-            img.src = newSrc;
-        }
-    }
 }
 
 function addShapeElement(type) {
@@ -421,8 +372,6 @@ function addShapeElement(type) {
   element.style.position = 'absolute';
   element.style.width = '100px';
   element.style.height = '100px';
-  element.style.resize = 'both';
-  element.style.overflow = 'auto';
 
   // Create an SVG to hold the shape
   const svgNS = "http://www.w3.org/2000/svg";
@@ -505,8 +454,12 @@ function addShapeElement(type) {
     element.appendChild(svg);
   }
 
+  element.style.position = 'absolute';
+  element.style.width = '100px'; 
+  element.style.height = '100px';
   element.style.zIndex = '1';
-  
+  element.style.overflow = 'visible';
+
   pageContent.appendChild(element);
   makeElementDraggable(element);
   makeRotatable(element);
@@ -519,131 +472,159 @@ function addShapeElement(type) {
 }
 
 function selectElement(element) {
-    if (!document.getElementById('editorCanvas').contains(element)) return;
-
-    document.querySelectorAll('.text-element, .shape-element, .image-element-container').forEach(el => {
-        el.classList.remove('selected');
+  // Clear previous selection
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => {
+    el.classList.remove('selected');
+    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
+    if (el.classList.contains('shape-element')) {
+        el.style.boxShadow = 'none';
         el.style.border = 'none';
-        el.style.outline = 'none';
-        el.style.padding = '0'; 
-        if (el.classList.contains('shape-element')) {
-            el.style.boxShadow = 'none';
-        }
-    });
+    }
+  });
 
-    if (element.id === 'editorCanvas' || element.id === 'pagesContainer') {
-        deselectElement();
-        return;
+  // Update selectedElement
+  selectedElement = element;
+  selectedElement.classList.add('selected');
+
+  // APPLY A SUBTLE GLOW/SHADOW TO THE SELECTED SHAPE INSTEAD OF A THICK BORDER
+  if (selectedElement.classList.contains('shape-element')) {
+    selectedElement.style.boxShadow = 'none'; // Blue glow
+    selectedElement.style.border = 'none'; // Ensure no box border
+  }
+
+
+  // Hide all editors and toolbars by default
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'none';
+
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+  textToolbar.style.display = 'none';
+  shapeToolbar.style.display = 'none';
+
+  // Position toolbar under the element
+  const rect = element.getBoundingClientRect();
+  const containerRect = document.body.getBoundingClientRect();
+  let toolbar;
+
+  if (element.classList.contains('text-element')) {
+    toolbar = textToolbar;
+    document.getElementById('textEditor').style.display = 'block';
+
+    // update text controls
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) {
+      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+    }
+    const fontFamilySelect = document.getElementById('fontFamilySelect');
+    if (fontFamilySelect) {
+      fontFamilySelect.value = selectedElement.style.fontFamily || '';
+    }
+    const colorInput = document.getElementById('colorPickerInput');
+    if (colorInput) {
+      colorInput.value = selectedElement.style.color || '#000000';
     }
 
-    selectedElement = element;
-    selectedElement.classList.add('selected');
+  } else if (element.classList.contains('shape-element')) {
+    toolbar = shapeToolbar;
+    document.getElementById('shapeEditor').style.display = 'block';
     
-    if (selectedElement.classList.contains('image-element-container') || selectedElement.classList.contains('text-element')) {
-        selectedElement.style.border = '2px dashed #3B82F6';
-        selectedElement.style.outline = '1px solid #ffffff';
-        selectedElement.style.padding = '2px';
+    // START NEW SHAPE EDITOR INITIALIZATION
+    initShapeEditor();
+    // Load current shape's state into the editor inputs
+    loadShapeStateToControls();
+    // END NEW SHAPE EDITOR INITIALIZATION
+  }
+
+  if (toolbar) {
+    // Check if the toolbar exists before trying to access its offset
+    if (toolbar.offsetWidth === undefined) {
+      toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
     }
-
-    document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; 
-    document.getElementById('noElementSelected').style.display = 'none';
-
-    const textToolbar = document.getElementById('textToolbar');
-    const shapeToolbar = document.getElementById('shapeToolbar');
-    const imageToolbar = document.getElementById('imageToolbar');
-
-    textToolbar.style.display = 'none';
-    shapeToolbar.style.display = 'none';
-    imageToolbar.style.display = 'none';
-
-    let toolbar;
-    if (element.classList.contains('text-element')) {
-        toolbar = textToolbar;
-        document.getElementById('textEditor').style.display = 'block';
-        const fontSizeInput = document.getElementById('fontSizeInput');
-        if (fontSizeInput) fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-        const fontFamilySelect = document.getElementById('fontFamilySelect');
-        if (fontFamilySelect) fontFamilySelect.value = selectedElement.style.fontFamily || '';
-        const colorInput = document.getElementById('colorPickerInput');
-        if (colorInput) colorInput.value = selectedElement.style.color || '#000000';
-
-    } else if (element.classList.contains('shape-element')) {
-        toolbar = shapeToolbar;
-        document.getElementById('shapeEditor').style.display = 'block';
-    
-    } else if (element.classList.contains('image-element-container')) { 
-        toolbar = imageToolbar;
-        document.getElementById('imageEditor').style.display = 'block';
-        
-        const img = selectedElement.querySelector('.image-element');
-        const imageUrlInput = document.getElementById('imageUrlInput');
-        if (imageUrlInput && img) {
-            imageUrlInput.value = img.src;
-        }
-    }
-
-
-    if (toolbar) {
-        const rect = element.getBoundingClientRect();
-        toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-        toolbar.style.top = `${rect.bottom + 5}px`;
-        toolbar.style.display = 'flex';
-    } else {
-        document.getElementById('noElementSelected').style.display = 'block';
-    }
+    toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+    toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+    toolbar.style.display = 'flex';
+  }
 }
 
-function makeElementDraggable(element) { 
-    element.addEventListener('mousedown', (e) => {
-        if (!e.target.classList.contains('text-element') && !e.target.classList.contains('image-element-container')) return; 
+function makeElementDraggable(el) {
+  let offsetX = 0, offsetY = 0, isDragging = false;
+  el.addEventListener('mousedown', (e) => {
+      // If the element is resizable and the user clicked on the resize handle, skip dragging
+      if (getComputedStyle(el).resize !== "none") {
+        const rect = el.getBoundingClientRect();
+        const resizeHandleSize = 16; // px size for the corner region
+    
+        // bottom-right corner = resize zone
+        if (e.clientX > rect.right - resizeHandleSize && e.clientY > rect.bottom - resizeHandleSize) {
+          return; // let the browser handle resizing
+        }
+      }
+    
+      e.preventDefault();
+      isDragging = true;
+      const rect = el.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
 
-        e.stopPropagation();
-        let shiftX = e.clientX - element.getBoundingClientRect().left;
-        let shiftY = e.clientY - element.getBoundingClientRect().top;
-        
-        function moveAt(pageX, pageY) {
-            element.style.left = (pageX - shiftX) + 'px';
-            element.style.top = (pageY - shiftY) + 'px';
-        }
-        
-        function onMouseMove(e) {
-            moveAt(e.pageX, e.pageY);
-        }
-        
-        document.addEventListener('mousemove', onMouseMove);
-        
-        element.onmouseup = function() {
-            document.removeEventListener('mousemove', onMouseMove);
-            element.onmouseup = null;
-        };
-    });
-    element.ondragstart = function() { return false; }; 
+  function onMouseMove(e) {
+    if (!isDragging) return;
+    const container = el.parentElement;
+    const containerRect = container.getBoundingClientRect();
+    let newLeft = e.clientX - containerRect.left - offsetX;
+    let newTop = e.clientY - containerRect.top - offsetY;
+    newLeft = Math.max(0, Math.min(newLeft, container.clientWidth - el.offsetWidth));
+    newTop = Math.max(0, Math.min(newTop, container.clientHeight - el.offsetHeight));
+    el.style.left = newLeft + 'px';
+    el.style.top = newTop + 'px';
+  }
+  function onMouseUp() {
+    isDragging = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
 }
-function makeRotatable(element) { /* Placeholder for rotation logic */ }
-function showPage(index) { 
-    pages.forEach((page, i) => {
-        page.style.display = (i === index) ? 'flex' : 'none';
-    });
-    if (pages[index]) pages[index].style.display = 'block';
+
+function showToolbar(targetElement) {
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+  if (!textToolbar || !shapeToolbar) return;
+
+  // Hide both first
+  textToolbar.style.display = 'none';
+  shapeToolbar.style.display = 'none';
+
+  const rect = targetElement.getBoundingClientRect();
+  let toolbar;
+
+  if (targetElement.classList.contains('text-element')) {
+    toolbar = textToolbar;
+  } else if (targetElement.classList.contains('shape-element')) {
+    toolbar = shapeToolbar;
+  }
+
+  if (toolbar) {
+    toolbar.style.display = 'flex';
+    toolbar.style.position = 'absolute';
+    toolbar.style.top = window.scrollY + rect.bottom + 'px';
+    toolbar.style.left = window.scrollX + rect.left + 'px';
+  }
 }
 
 function deleteElement() {
-    if (selectedElement) {
-        selectedElement.remove();
-        selectedElement = null;
-        
-        document.getElementById('textToolbar').style.display = 'none';
-        document.getElementById('shapeToolbar').style.display = 'none';
-        document.getElementById('imageToolbar').style.display = 'none'; 
-      
-        document.getElementById('textEditor').style.display = 'none';
-        document.getElementById('shapeEditor').style.display = 'none';
-        document.getElementById('imageEditor').style.display = 'none'; 
-      
-        document.getElementById('noElementSelected').style.display = 'block';
-    }
+  if (selectedElement) {
+    selectedElement.remove();
+    selectedElement = null;
+    document.getElementById('textToolbar').style.display = 'none';
+    document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('textEditor').style.display = 'none';
+    document.getElementById('shapeEditor').style.display = 'none';
+    document.getElementById('noElementSelected').style.display = 'block';
+  }
 }
 
 function toggleEdit() {
@@ -665,7 +646,8 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
+// Toolbar button listeners
+['textToolbar', 'shapeToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -692,16 +674,13 @@ document.addEventListener('click', (e) => {
   } else if (
     !e.target.closest('#textEditor') &&
     !e.target.closest('#shapeEditor') &&
-    !e.target.closest('#imageEditor') &&
     !e.target.closest('#textToolbar') &&
     !e.target.closest('#shapeToolbar') &&
-    !e.target.closest('#imageToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -743,33 +722,23 @@ function makeRotatable(el) {
 }
 
 function deselectElement() {
-    if (selectedElement) {
-        selectedElement.classList.remove('selected');
-        
-        if (selectedElement.classList.contains('text-element') || selectedElement.classList.contains('image-element')) {
-            selectedElement.style.border = 'none';
-            selectedElement.style.outline = 'none';
-        }
-        
-        if (selectedElement.classList.contains('shape-element')) {
-            selectedElement.style.boxShadow = 'none';
-            selectedElement.style.border = 'none';
-        }
-
-        selectedElement = null;
+  if (selectedElement) {
+    selectedElement.classList.remove('selected');
+    // REMOVE THE VISIBLE BORDER/SHADOW FOR SHAPES
+    if (selectedElement.classList.contains('shape-element')) {
+        selectedElement.style.boxShadow = 'none';
+        selectedElement.style.border = 'none';
     }
-    
-    document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; // MODIFICATION 1: Hide image editor
-    
-    document.getElementById('noElementSelected').style.display = 'block';
-    
-    document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none'; // MODIFICATION 2: Hide image toolbar
+    selectedElement = null;
+  }
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'block';
+  document.getElementById('textToolbar').style.display = 'none';
+  document.getElementById('shapeToolbar').style.display = 'none';
 }
 
+// Toggle sidebar functions
 function toggleLeftSidebar() {
   const sidebar = document.getElementById('leftSidebar');
   const hamburger = document.querySelector('#leftMenuBtn .hamburger-icon');
@@ -812,6 +781,7 @@ if (handBtn) {
   });
 }
 
+
 function startPan(e) {
   isPanning = true;
   startX = e.pageX - center.offsetLeft;
@@ -838,72 +808,59 @@ function endPan() {
   center.removeEventListener("mouseup", endPan);
 }
 
-async function exportAsImage(format) {
-    if (pages.length === 0) return;
+// Export functions
+function exportAsImage(format) {
+  if (!pages[currentPageIndex]) return;
+  
+  const page = pages[currentPageIndex];
+  
+  // Use html2canvas to capture the page
+  if (typeof html2canvas === 'undefined') {
+    console.error("html2canvas library is not loaded.");
+    return;
+  }
 
-    const target = pages[currentPageIndex]; 
+  html2canvas(page, {
+    scale: 2,
+    backgroundColor: null
+  }).then(canvas => {
+    // Create a download link
+    const link = document.createElement('a');
     
-    const originalScrollY = window.scrollY;
-    const originalScrollX = window.scrollX;
-
-    target.scrollIntoView({ block: 'start' });
-
-    try {
-        const canvas = await html2canvas(target, {
-            // CRITICAL FIX: Enable CORS for external images
-            useCORS: true, 
-            logging: true,
-            allowTaint: true,
-            backgroundColor: null, 
-            scale: 2 
-        });
-
-        const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(mimeType, format === 'jpg' ? 0.9 : 1.0);
-
-        const link = document.createElement('a');
-        link.download = `layout_page_${currentPageIndex + 1}.${format}`;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-    } catch (error) {
-        console.error("Error during image export. This is usually due to the image host not allowing CORS.", error);
-    } finally {
-        window.scrollTo(originalScrollX, originalScrollY);
+    if (format === 'png') {
+      link.download = `layout-${currentPageIndex + 1}.png`;
+      link.href = canvas.toDataURL('image/png');
+    } else if (format === 'jpg') {
+      link.download = `layout-${currentPageIndex + 1}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.9);
     }
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
 }
 
-async function exportAsPDF() {
-    if (pages.length === 0 || typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
-        console.log("PDF export dependencies not loaded or no pages.");
-        return;
-    }
+function exportAsPDF() {
+  if (!pages[currentPageIndex]) return;
+  const page = pages[currentPageIndex];
 
+  if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+    console.error("html2canvas or jspdf library is not loaded.");
+    return;
+  }
+  
+  html2canvas(page).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
-    const target = pages[currentPageIndex];
-    const originalScrollY = window.scrollY;
-    target.scrollIntoView({ block: 'start' });
-
-    try {
-        const canvas = await html2canvas(target, {
-            useCORS: true, 
-            scale: 2
-        });
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 210; 
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save(`layout_page_${currentPageIndex + 1}.pdf`);
-
-    } catch (error) {
-        console.error("Error during PDF export:", error);
-    } finally {
-        window.scrollTo(originalScrollX, originalScrollY);
-    }
+    const pdf = new jsPDF({
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save(`layout-${currentPageIndex + 1}.pdf`);
+  });
 }
 
 // Layout saving and loading functions
@@ -923,163 +880,195 @@ function hideModal() {
 }
 
 function saveLayout() {
-    const layoutData = {
-        name: document.getElementById('layoutNameInput').value || `Layout ${savedLayouts.length + 1}`,
-        pages: pages.map(page => {
-            const pageContent = page.querySelector('.page-content');
-            
-            const elementsData = Array.from(pageContent.children).map(element => {
-                let elData = {
-                    type: '',
-                    content: '', // For text/image content
-                    style: {}
-                };
+  const name = document.getElementById('layoutNameInput').value.trim();
+  if (!name) return;
+  
+  // Create a serializable representation of pages
+  const layoutData = {
+    name,
+    date: new Date().toISOString(),
+    pages: pages.map(page => {
+      // Extract all elements on the page
+      const elements = Array.from(page.querySelectorAll('.text-element, .shape-element')).map(el => {
+        let elementData = {
+          type: el.classList.contains('text-element') ? 'text' : 'shape',
+          style: {
+            top: el.style.top,
+            left: el.style.left,
+            width: el.style.width,
+            height: el.style.height,
+            transform: el.style.transform // Save rotation
+          }
+        };
 
-                const computedStyle = window.getComputedStyle(element);
-                const stylesToSave = ['position', 'top', 'left', 'width', 'height', 'zIndex', 'transform', 'fontSize', 'fontWeight', 'color', 'backgroundColor', 'border', 'borderRadius', 'boxShadow', 'filter', 'opacity'];
-                stylesToSave.forEach(prop => {
-                    if (element.style[prop] || computedStyle[prop] !== 'none' || computedStyle[prop] !== 'auto') {
-                         elData.style[prop] = element.style[prop] || computedStyle[prop];
-                    }
-                });
+        if (el.classList.contains('text-element')) {
+          elementData.content = el.innerText;
+          elementData.style = {
+            ...elementData.style,
+            fontSize: el.style.fontSize,
+            fontWeight: el.style.fontWeight,
+            fontFamily: el.style.fontFamily,
+            color: el.style.color,
+            backgroundColor: el.style.backgroundColor
+          };
+        } else if (el.classList.contains('shape-element')) {
+          // Save the shape's custom data attributes for styling
+          elementData.shapeType = el.querySelector('svg > *').tagName;
+          elementData.shapeData = {
+              fillColor: el.dataset.fillColor,
+              fillOpacity: el.dataset.fillOpacity,
+              borderColor: el.dataset.borderColor,
+              borderOpacity: el.dataset.borderOpacity,
+              borderWidth: el.dataset.borderWidth,
+              // For polygons/stars, save points string if needed (complex)
+              points: el.querySelector('svg polygon') ? el.querySelector('svg polygon').getAttribute('points') : null
+          };
+        }
 
-                if (element.classList.contains('text-element')) {
-                    elData.type = 'text';
-                    elData.content = element.innerText;
-                } else if (element.classList.contains('shape-element')) {
-                    elData.type = 'shape';
-                    elData.shapeType = element.dataset.shapeType;
-                    elData.shapeData = {
-                        fillColor: element.dataset.fillColor,
-                        fillOpacity: element.dataset.fillOpacity,
-                        borderColor: element.dataset.borderColor,
-                        borderOpacity: element.dataset.borderOpacity,
-                        borderWidth: element.dataset.borderWidth,
-                    };
-                } else if (element.classList.contains('image-element')) {
-                    elData.type = 'image';
-                    elData.content = element.src; // Save the image URL in the content field
-                }
-
-                return elData.type ? elData : null;
-            }).filter(d => d !== null); // Filter out any null/unknown elements
-
-            return {
-                width: page.style.width,
-                height: page.style.height,
-                elements: elementsData
-            };
-        })
-    };
-    
-    console.log('Layout Data Saved:', layoutData);
-    savedLayouts.push(layoutData);
-    
-    hideModal(); // Hide the save modal
+        return elementData;
+      });
+      
+      return {
+        width: page.style.width,
+        height: page.style.height,
+        elements
+      };
+    })
+  };
+  
+  // Add to saved layouts
+  savedLayouts.push(layoutData);
+  
+  // Save to localStorage
+  localStorage.setItem('paperSizeSelectorLayouts', JSON.stringify(savedLayouts));
+  
+  // Update UI
+  updateSavedLayoutsList();
+  hideModal();
 }
 
 function loadLayout(layoutIndex) {
-    const layout = savedLayouts[layoutIndex];
-    if (!layout) return;
+  const layout = savedLayouts[layoutIndex];
+  if (!layout) return;
+  
+  // Clear current pages
+  pages = [];
+  
+  // Recreate pages from layout data
+  layout.pages.forEach(pageData => {
+    const newPage = createPage(pages.length + 1);
+    newPage.style.width = pageData.width;
+    newPage.style.height = pageData.height;
     
-    const container = document.getElementById('pagesContainer');
-    if (container) container.innerHTML = '';
+    const pageContent = newPage.querySelector('.page-content');
     
-    pages = [];
-    
-    layout.pages.forEach(pageData => {
-        const newPage = createPage(pages.length + 1);
-        newPage.style.width = pageData.width;
-        newPage.style.height = pageData.height;
+    // Add elements
+    pageData.elements.forEach(elData => {
+      let element;
+
+      if (elData.type === 'text') {
+        element = document.createElement('div');
+        element.className = 'text-element';
+        element.contentEditable = true;
+        element.innerText = elData.content;
+      } else if (elData.type === 'shape') {
+        element = document.createElement('div');
+        element.className = 'shape-element';
+        element.contentEditable = false;
         
-        const pageContent = newPage.querySelector('.page-content');
-        
-        pageData.elements.forEach(elData => {
-            let element;
+        // Rebuild SVG shape
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("width", "100%");
+        svg.setAttribute("height", "100%");
+        svg.setAttribute("viewBox", "0 0 100 100");
+        let shape;
 
-            if (elData.type === 'text') {
-                element = document.createElement('div');
-                element.className = 'text-element';
-                element.contentEditable = true;
-                element.innerText = elData.content;
-            } else if (elData.type === 'shape') {
-                element = document.createElement('div');
-                element.className = 'shape-element';
-                element.contentEditable = false;
-                
-                const svgNS = "http://www.w3.org/2000/svg";
-                const svg = document.createElementNS(svgNS, "svg");
-                svg.setAttribute("width", "100%");
-                svg.setAttribute("height", "100%");
-                svg.setAttribute("viewBox", "0 0 100 100");
-                let shape;
-
-                switch(elData.shapeType) {
-                    case 'circle':
-                        shape = document.createElementNS(svgNS, "circle");
-                        shape.setAttribute("cx", "50");
-                        shape.setAttribute("cy", "50");
-                        shape.setAttribute("r", "40");
-                        break;
-                    case 'polygon':
-                        shape = document.createElementNS(svgNS, "polygon");
-                        if (elData.shapeData.points) {
-                            shape.setAttribute("points", elData.shapeData.points);
-                        }
-                        break;
-                }
-
-                if (shape) {
-                    svg.appendChild(shape);
-                    element.appendChild(svg);
-                }
-                
-                element.dataset.fillColor = elData.shapeData.fillColor;
-                element.dataset.fillOpacity = elData.shapeData.fillOpacity;
-                element.dataset.borderColor = elData.shapeData.borderColor;
-                element.dataset.borderOpacity = elData.shapeData.borderOpacity;
-                element.dataset.borderWidth = elData.shapeData.borderWidth;
-                
-                applyShapeStyle(element);
-                
-                new ResizeObserver(() => {
-                    applyShapeStyle(element);
-                }).observe(element);
-            } else if (elData.type === 'image') { // <-- ADDED: Handle image element type
-                element = document.createElement('img');
-                element.className = 'image-element';
-                element.contentEditable = false;
-                element.src = elData.content; 
-            } else {
-                return; // Skip unknown element type
+        switch(elData.shapeType) {
+          case 'circle':
+            shape = document.createElementNS(svgNS, "circle");
+            shape.setAttribute("cx", "50");
+            shape.setAttribute("cy", "50");
+            shape.setAttribute("r", "40");
+            break;
+          case 'polygon':
+            shape = document.createElementNS(svgNS, "polygon");
+            if (elData.shapeData.points) {
+                shape.setAttribute("points", elData.shapeData.points);
             }
+            break;
+          // Add other shapes as needed
+        }
 
-            Object.entries(elData.style).forEach(([prop, value]) => {
-                if (value) element.style[prop] = value;
-            });
-            
-            pageContent.appendChild(element);
-            makeElementDraggable(element);
-            makeRotatable(element);
-            
-            element.addEventListener('click', (e) => {
-                e.stopPropagation();
-                selectElement(element);
-            });
-        });
+        if (shape) {
+            svg.appendChild(shape);
+            element.appendChild(svg);
+        }
         
-        if (container) container.appendChild(newPage); // Append new page to container
-        pages.push(newPage);
+        // Apply saved custom data attributes
+        element.dataset.fillColor = elData.shapeData.fillColor;
+        element.dataset.fillOpacity = elData.shapeData.fillOpacity;
+        element.dataset.borderColor = elData.shapeData.borderColor;
+        element.dataset.borderOpacity = elData.shapeData.borderOpacity;
+        element.dataset.borderWidth = elData.shapeData.borderWidth;
+        
+        // Re-apply styles after loading data
+        applyShapeStyle(element);
+        
+        // Re-apply style when element is loaded and resized (not strictly necessary here but good for consistency)
+        new ResizeObserver(() => {
+          applyShapeStyle(element); 
+        }).observe(element);
+      } else {
+        return; // Skip unknown element type
+      }
+
+      // Apply common styles
+      Object.entries(elData.style).forEach(([prop, value]) => {
+        if (value) element.style[prop] = value;
+      });
+      
+      pageContent.appendChild(element);
+      makeElementDraggable(element);
+      makeRotatable(element);
+      
+      // Re-add click listener for selection
+      element.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectElement(element);
+      });
     });
     
-    currentPageIndex = 0;
-    showPage(0);
+    pages.push(newPage);
+  });
+  
+  // Show first page
+  currentPageIndex = 0;
+  showPage(0);
+  
+  // Toggle right sidebar
+  if (document.getElementById('rightSidebar').classList.contains('open')) {
+    toggleRightSidebar();
+  }
 }
 
+// ====================================================================
+// SHAPE EDITOR LOGIC START
+// ====================================================================
+
+// Flag to ensure listeners are only added once
 let shapeEditorListenersInitialized = false;
 
+// --- Utility Function ---
+/**
+ * Converts a HEX color code to an RGBA string.
+ * @param {string} hex - The hex color code (e.g., "#RRGGBB").
+ * @param {number} alpha - The opacity value (0.0 to 1.0).
+ * @returns {string} The RGBA color string (e.g., "rgba(255, 0, 0, 0.5)").
+ */
 function hexToRgbA(hex, alpha) {
     let r = 0, g = 0, b = 0;
+    // 3 or 6 digit hex parsing
     if (hex.length >= 4) {
         if (hex.length === 4) {
             r = parseInt(hex[1] + hex[1], 16);
@@ -1100,6 +1089,7 @@ function applyShapeStyle(element = selectedElement) {
     const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
     if (!svgShape) return;
 
+    // 1. Get values from dataset (where the state is persisted)
     const fillColorHex = element.dataset.fillColor || '#000000';
     const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
     
@@ -1107,19 +1097,35 @@ function applyShapeStyle(element = selectedElement) {
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
 
+    // 2. Calculate RGBA colors
     const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
+    // 3. Apply style to the SVG shape
     svgShape.setAttribute('fill', fillRgba);
     svgShape.setAttribute('stroke', borderRgba);
     svgShape.setAttribute('stroke-width', borderWidth);
     svgShape.parentElement.style.transform = '';
     svgShape.parentElement.style.transformOrigin = '';
+    /*/ If it's a circle, make sure its cx/cy/r scale with the container (best effort for simple shapes)
+    if (svgShape.tagName === 'circle') {
+        const size = Math.min(element.offsetWidth, element.offsetHeight);
+        const radius = size / 2 * 0.8; // Use 80% of min dimension
+        svgShape.setAttribute('r', radius);
+        svgShape.setAttribute('cx', element.offsetWidth / 2);
+        svgShape.setAttribute('cy', element.offsetHeight / 2);
+    } else {
+        // For polygons/stars, transform to center and scale
+        const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) / 100;
+        svgShape.parentElement.style.transform = `scale(${scaleFactor})`;
+        svgShape.parentElement.style.transformOrigin = '0 0';
+    }*/
 }
 
 function updateSelectedShapeStyle() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
+    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
@@ -1129,6 +1135,7 @@ function updateSelectedShapeStyle() {
     const borderOpacityValueSpan = document.getElementById('border-opacity-value');
     const borderWidthInput = document.getElementById('shape-border-width');
 
+    // 1. Get current values from controls
     const fillColorHex = fillColorInput.value;
     const fillOpacity = parseFloat(fillOpacityInput.value);
     
@@ -1136,14 +1143,17 @@ function updateSelectedShapeStyle() {
     const borderOpacity = parseFloat(borderOpacityInput.value);
     const borderWidth = Math.max(0, parseFloat(borderWidthInput.value));
 
+    // 2. Persist the state in the selected element's dataset
     selectedElement.dataset.fillColor = fillColorHex;
     selectedElement.dataset.fillOpacity = fillOpacity;
     selectedElement.dataset.borderColor = borderColorHex;
     selectedElement.dataset.borderOpacity = borderOpacity;
     selectedElement.dataset.borderWidth = borderWidth;
     
+    // 3. Apply the style
     applyShapeStyle(selectedElement);
 
+    // 4. Update display spans for opacity values
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
@@ -1151,30 +1161,35 @@ function updateSelectedShapeStyle() {
 function loadShapeStateToControls() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
+    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
 
+    // Load from dataset (the source of truth)
     fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
     fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
     borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
     borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
     borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
     
+    // Run update to refresh the span values
     updateSelectedShapeStyle();
 }
 
 function initShapeEditor() {
     if (shapeEditorListenersInitialized) return;
 
+    // --- DOM References (Local to the editor panel) ---
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     
+    // Check if controls exist before adding listeners
     if (fillColorInput) {
         fillColorInput.addEventListener('input', updateSelectedShapeStyle);
     }
@@ -1189,7 +1204,7 @@ function initShapeEditor() {
     }
     if (borderWidthInput) {
         borderWidthInput.addEventListener('input', updateSelectedShapeStyle);
-        borderWidthInput.addEventListener('change', updateSelectedShapeStyle); 
+        borderWidthInput.addEventListener('change', updateSelectedShapeStyle); // Ensure change also triggers for number input
     }
     
     shapeEditorListenersInitialized = true;
@@ -1240,6 +1255,7 @@ function updateSavedLayoutsList() {
   });
 }
 
+// Load saved layouts from localStorage
 function loadSavedLayouts() {
   const saved = localStorage.getItem('paperSizeSelectorLayouts');
   if (saved) {
@@ -1252,6 +1268,7 @@ function loadSavedLayouts() {
   }
 }
 
+// Event Listeners
 if (selector) {
   selector.addEventListener('change', (e) => {
     updateRectSize(e.target.value);
@@ -1263,6 +1280,7 @@ if (orientationBtn) {
     updateOrientation();
   });
 }
+
 
 const prevPageBtn = document.getElementById('prevPageBtn');
 const nextPageBtn = document.getElementById('nextPageBtn');
@@ -1286,12 +1304,14 @@ if (addPageBtn) addPageBtn.addEventListener('click', addPage);
 if (removePageBtn) removePageBtn.addEventListener('click', () => removePage(currentPageIndex));
 if (duplicatePageBtn) duplicatePageBtn.addEventListener('click', () => duplicatePage(currentPageIndex));
 
+// Add menu toggle handlers
 const leftMenuBtn = document.getElementById('leftMenuBtn');
 const rightMenuBtn = document.getElementById('rightMenuBtn');
 
 if (leftMenuBtn) leftMenuBtn.addEventListener('click', toggleLeftSidebar);
 if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 
+// Element addition handlers
 const addTitleBtn = document.getElementById('addTitleBtn');
 const addSubtitleBtn = document.getElementById('addSubtitleBtn');
 const addParagraphBtn = document.getElementById('addParagraphBtn');
@@ -1310,6 +1330,7 @@ if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('
 if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
 if (addStarBtn) addStarBtn.addEventListener('click', () => addShapeElement('star'));
 
+// Color picker handlers
 const fontColorInput = document.getElementById('fontColorInput');
 
 if (fontColorInput) fontColorInput.addEventListener('input', () => {
@@ -1318,6 +1339,7 @@ if (fontColorInput) fontColorInput.addEventListener('input', () => {
   }
 });
 
+// Font size handlers
 const fontSizeInput = document.getElementById('fontSizeInput');
 
 if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
@@ -1329,6 +1351,7 @@ if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
   }
 });
 
+// Font family handler
 const fontFamilySelect = document.getElementById('fontFamilySelect');
 if (fontFamilySelect) fontFamilySelect.addEventListener('change', (e) => {
   if (selectedElement) {
@@ -1353,6 +1376,7 @@ if (fontFileInput) fontFileInput.addEventListener('change', (e) => {
   if (file) loadCustomFont(file);
 });
 
+// Button handlers
 const toggleRulersBtn = document.getElementById('toggleRulersBtn');
 const toggleMarginsBtn = document.getElementById('toggleMarginsBtn');
 const togglePageNumbersBtn = document.getElementById('togglePageNumbersBtn');
@@ -1361,6 +1385,7 @@ if (toggleRulersBtn) toggleRulersBtn.addEventListener('click', toggleRulers);
 if (toggleMarginsBtn) toggleMarginsBtn.addEventListener('click', toggleMargins);
 if (togglePageNumbersBtn) togglePageNumbersBtn.addEventListener('click', togglePageNumbers);
 
+// Export handlers
 const exportPngBtn = document.getElementById('exportPngBtn');
 const exportJpgBtn = document.getElementById('exportJpgBtn');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
@@ -1369,6 +1394,7 @@ if (exportPngBtn) exportPngBtn.addEventListener('click', () => exportAsImage('pn
 if (exportJpgBtn) exportJpgBtn.addEventListener('click', () => exportAsImage('jpg'));
 if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportAsPDF);
 
+// Save layout handlers
 const saveLayoutBtn = document.getElementById('saveLayoutBtn');
 const cancelSaveBtn = document.getElementById('cancelSaveBtn');
 const confirmSaveBtn = document.getElementById('confirmSaveBtn');
