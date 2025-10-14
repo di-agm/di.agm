@@ -99,6 +99,22 @@ window.addEventListener("resize", () => {
   }
 }
 
+function mmToPx(mm) {
+    return mm * 3.78; 
+} 
+
+function inToPx(inch) {
+    return inch * 96; 
+}
+
+let currentRulerUnit = 'mm';
+
+function convertToPx(value, unit) {
+    if (unit === 'mm') return mmToPx(value);
+    if (unit === 'in') return inToPx(value);
+    return value; // Fallback assumes pixels
+}
+
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
   
