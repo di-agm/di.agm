@@ -344,9 +344,9 @@ function addTextElement(type) {
 }
 
 @param {string} shapeType
-@param {boolean} isImageFrame
+@param {boolean} isImageframe
 
-function addFrameElement(shapeType, isImageFrame = false) {
+function addframeElement(shapeType, isImageframe = false) {
     if (!pages[currentPageIndex]) return;
 
     const pageContent = pages[currentPageIndex].querySelector('.page-content');
@@ -367,13 +367,13 @@ function addFrameElement(shapeType, isImageFrame = false) {
     const defaultBorderWidth = '4';
     const imageUrl = 'https://via.placeholder.com/300?text=Click+to+Add+Image'; 
 
-    element.dataset.fillType = isImageFrame ? 'image' : 'color';
+    element.dataset.fillType = isImageframe ? 'image' : 'color';
     element.dataset.fillColor = defaultFillColor;
     element.dataset.fillOpacity = 1.0;
     element.dataset.borderColor = defaultBorderColor;
     element.dataset.borderOpacity = 1.0;
     element.dataset.borderWidth = defaultBorderWidth;
-    element.dataset.imageUrl = isImageFrame ? imageUrl : '';
+    element.dataset.imageUrl = isImageframe ? imageUrl : '';
 
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
@@ -445,37 +445,20 @@ function addFrameElement(shapeType, isImageFrame = false) {
     makeRotatable(element);
     selectElement(element);
 
-    applyFrameStyle(element);
+    applyframeStyle(element);
     
     new ResizeObserver(() => {
-        applyFrameStyle(element);
+        applyframeStyle(element);
     }).observe(element);
 }
 
 function selectElement(element) {
     document.querySelectorAll('.text-element, .frame-element').forEach(el => {
         el.classList.remove('selected');
-        /*if (el.classList.contains('shape-element')) {
-            el.style.boxShadow = 'none';
-            el.style.border = 'none';
-        }
-        if (el.classList.contains('image-element')) {
-            el.style.border = 'none';
-        }*/
     });
 
     selectedElement = element;
     selectedElement.classList.add('selected');
-    
-    /*if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
-        selectedElement.style.border = '2px solid #3B82F6';
-        selectedElement.style.outline = '1px solid #ffffff';
-    }
-
-    if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
-        selectedElement.style.border = 'none'; // Ensure no box border
-    }*/
 
     document.getElementById('textEditor').style.display = 'none';
     document.getElementById('frameEditor').style.display = 'none';
@@ -957,9 +940,10 @@ function loadLayout(layoutIndex) {
                 svg.appendChild(document.createElementNS(svgNS, "defs")); // Add defs container
 
                 let shape;
-                const shapeType = elData.data.shapeType;
+                // CORRECT: Accessing frame properties via frameData
+                const shapeType = elData.frameData.shapeType; 
 
-                // This shape recreation logic must match the creation logic in addFrameElement
+                // This shape recreation logic must match the creation logic in addframeElement
                 switch(shapeType) {
                     case 'circle':
                         shape = document.createElementNS(svgNS, "circle");
@@ -974,14 +958,14 @@ function loadLayout(layoutIndex) {
                         shape.setAttribute("width", "80");
                         shape.setAttribute("height", "80");
                         break;
-                    case 'polygon': // For polygon, you must save and load the specific points
+                    case 'polygon': 
                     case 'star': {
                         shape = document.createElementNS(svgNS, "polygon");
-                        if (elData.data.points) {
-                             shape.setAttribute("points", elData.data.points);
+                        // CORRECT: Loading saved polygon points
+                        if (elData.frameData.points) { 
+                             shape.setAttribute("points", elData.frameData.points);
                         } else {
-                            // Fallback: If points weren't saved, you might need to re-run the calculation
-                            // or ideally, ensure the points are saved in the saving function.
+                            // Fallback logic remains here
                         }
                         break;
                     }
@@ -993,16 +977,17 @@ function loadLayout(layoutIndex) {
                 svg.appendChild(shape);
                 element.appendChild(svg);
                 
-                Object.entries(elData.data).forEach(([key, value]) => {
-                    if (key !== 'points') { // 'points' is special-cased for the SVG element
+                // CORRECT: Applying all frameData properties to the element's dataset
+                Object.entries(elData.frameData).forEach(([key, value]) => {
+                    if (key !== 'points') { // 'points' is special-cased for the SVG element, not dataset
                         element.dataset[key] = value;
                     }
                 });
-
             } else {
                 return; // Skip unknown or deprecated (old shape/image) element types
             }
 
+            // Apply base CSS styles
             Object.entries(elData.style).forEach(([prop, value]) => {
                 if (value) element.style[prop] = value;
             });
@@ -1012,10 +997,10 @@ function loadLayout(layoutIndex) {
             makeRotatable(element);
             
             if (elData.type === 'frame') {
-                applyFrameStyle(element); 
+                applyframeStyle(element); // Apply the SVG fill/border based on dataset
                 
                 new ResizeObserver(() => {
-                    applyFrameStyle(element);
+                    applyframeStyle(element);
                 }).observe(element);
             }
 
@@ -1051,7 +1036,7 @@ function hexToRgbA(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function applyFrameStyle(element = selectedElement) {
+function applyframeStyle(element = selectedElement) {
     if (!element || !element.classList.contains('frame-element')) return;
 
     const svg = element.querySelector('svg');
