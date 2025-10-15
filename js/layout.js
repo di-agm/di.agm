@@ -149,11 +149,10 @@ function removePage(index) {
 function duplicatePage(index) {
   const originalPage = pages[index];
   const clone = originalPage.cloneNode(true);
-  const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
+  const clonedElements = clone.querySelectorAll('.text-element, .frame-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
-    makeRotatable(element); // Ensure rotation handler is re-added
-    // Re-select handler
+    makeRotatable(element); 
     element.addEventListener('click', (e) => {
       e.stopPropagation();
       selectElement(element);
@@ -168,7 +167,6 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   pages.forEach(page => {
     if (rulersVisible) {
-      // Add rulers if not already present
       if (!page.querySelector('.page-ruler.horizontal.top')) {
         const top = document.createElement('div');
         top.className = 'page-ruler horizontal top';
@@ -215,8 +213,6 @@ function toggleMargins() {
   });
 }
 
-// layout.js
-
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
@@ -227,7 +223,6 @@ function togglePageNumbers() {
     }
     
     pages.forEach(page => {
-        // Get the page-content container
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
         const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
@@ -246,7 +241,6 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
-  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
@@ -254,7 +248,6 @@ function drawRulers() {
   hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(hRuler);
 
-  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
@@ -262,12 +255,10 @@ function drawRulers() {
   vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing: every 50px in current unit
   const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
-  // Horizontal ticks
   for (let x = 0; x <= maxX; x += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -285,7 +276,6 @@ function drawRulers() {
     }
   }
 
-  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -309,7 +299,6 @@ function toggleRulers() {
   drawRulers();
 }
 
-// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
@@ -354,159 +343,131 @@ function addTextElement(type) {
   selectElement(element);
 }
 
-  function addImageElement() {
-    // Ensure current page exists and is a DOM element with a querySelector method
-    if (!pages[currentPageIndex] || !pages[currentPageIndex].querySelector) return;
-    
+@param {string} shapeType
+@param {boolean} isImageFrame
+
+function addFrameElement(shapeType, isImageFrame = false) {
+    if (!pages[currentPageIndex]) return;
+
     const pageContent = pages[currentPageIndex].querySelector('.page-content');
-    const element = document.createElement('img');
-    
-    element.className = 'image-element';
-    element.src = DEFAULT_IMAGE_SRC;
-    element.alt = 'User-defined image';
-    element.contentEditable = false; 
-    
+    const element = document.createElement('div');
+    element.className = 'frame-element'; // The new unified class
+    element.setAttribute('tabindex', '0');
     element.style.top = '50px';
     element.style.left = '50px';
     element.style.position = 'absolute';
-    element.style.width = '150px'; 
-    element.style.height = '100px';
-    element.style.objectFit = 'cover'; // Helps the image scale nicely within the bounds
-    
+    element.style.width = '150px';
+    element.style.height = '150px';
     element.style.resize = 'both';
-    element.style.overflow = 'hidden'; // Hide parts of the image that might exceed bounds
+    element.style.overflow = 'hidden';
+    element.dataset.shapeType = shapeType;
 
+    const defaultFillColor = '#3b82f6';
+    const defaultBorderColor = '#1e3a8a';
+    const defaultBorderWidth = '4';
+    const imageUrl = 'https://via.placeholder.com/300?text=Click+to+Add+Image'; 
+
+    element.dataset.fillType = isImageFrame ? 'image' : 'color';
+    element.dataset.fillColor = defaultFillColor;
+    element.dataset.fillOpacity = 1.0;
+    element.dataset.borderColor = defaultBorderColor;
+    element.dataset.borderOpacity = 1.0;
+    element.dataset.borderWidth = defaultBorderWidth;
+    element.dataset.imageUrl = isImageFrame ? imageUrl : '';
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.setAttribute("viewBox", "0 0 100 100");
+
+    const defs = document.createElementNS(svgNS, "defs");
+    let shape;
+
+    switch(shapeType) {
+        case 'circle':
+            shape = document.createElementNS(svgNS, "circle");
+            shape.setAttribute("cx", "50");
+            shape.setAttribute("cy", "50");
+            shape.setAttribute("r", "40");
+            break;
+        case 'rect': // Add a basic rectangle option
+            shape = document.createElementNS(svgNS, "rect");
+            shape.setAttribute("x", "10");
+            shape.setAttribute("y", "10");
+            shape.setAttribute("width", "80");
+            shape.setAttribute("height", "80");
+            break;
+        case 'polygon': {
+            let sides = parseInt(prompt("Enter number of sides:", "5"));
+            if (isNaN(sides) || sides < 3) sides = 5; 
+            const points = [];
+            const radius = 40; 
+            for (let i = 0; i < sides; i++) {
+                const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
+                const x = 50 + radius * Math.cos(angle); 
+                const y = 50 + radius * Math.sin(angle);
+                points.push(`${x},${y}`);
+            }
+            shape = document.createElementNS(svgNS, "polygon");
+            shape.setAttribute("points", points.join(" "));
+            break;
+        }
+        case 'star': {
+            let peaks = parseInt(prompt("Enter number of peaks:", "5"));
+            if (isNaN(peaks) || peaks < 3) peaks = 5; 
+            const points = [];
+            const outerRadius = 40;
+            const innerRadius = 20;
+            for (let i = 0; i < 2 * peaks; i++) {
+                const angle = (Math.PI * i) / peaks - Math.PI / 2;
+                const r = i % 2 === 0 ? outerRadius : innerRadius;
+                const x = 50 + r * Math.cos(angle);
+                const y = 50 + r * Math.sin(angle);
+                points.push(`${x},${y}`);
+            }
+            shape = document.createElementNS(svgNS, "polygon");
+            shape.setAttribute("points", points.join(" "));
+            break;
+        }
+        default:
+            return; 
+    }
+
+    svg.appendChild(defs);
+    svg.appendChild(shape);
+    element.appendChild(svg);
+    
+    element.style.zIndex = '1';
+    
     pageContent.appendChild(element);
     makeElementDraggable(element);
     makeRotatable(element);
     selectElement(element);
-}
 
-function addShapeElement(type) {
-  if (!pages[currentPageIndex]) return;
-
-  const pageContent = pages[currentPageIndex].querySelector('.page-content');
-  const element = document.createElement('div');
-  element.className = 'shape-element';
-  element.setAttribute('tabindex', '0');
-  element.style.top = '50px';
-  element.style.left = '50px';
-  element.style.position = 'absolute';
-  element.style.width = '100px';
-  element.style.height = '100px';
-  element.style.resize = 'both';
-  element.style.overflow = 'auto';
-
-  // Create an SVG to hold the shape
-  const svgNS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("width", "100%");
-  svg.setAttribute("height", "100%");
-  svg.setAttribute("viewBox", "0 0 100 100");
-
-  let shape;
-
-  switch(type) {
-    case 'circle':
-      shape = document.createElementNS(svgNS, "circle");
-      shape.setAttribute("cx", "50");
-      shape.setAttribute("cy", "50");
-      shape.setAttribute("r", "40");
-      shape.setAttribute("fill", "#3b82f6"); // Default blue fill
-      shape.setAttribute("stroke", "#1e3a8a"); // Default dark blue border
-      shape.setAttribute("stroke-width", "4"); // Default border width
-      break;
-
-    case 'polygon': {
-      let sides = parseInt(prompt("Enter number of sides:", "7"));
-      if (isNaN(sides) || sides < 3) sides = 7; // default
-      const points = [];
-      
-      // FIX: A polygon uses a single radius, not alternating radii like a star.
-      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
-      
-      for (let i = 0; i < sides; i++) {
-        // Keeps the top point flat by starting the angle correctly
-        const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        
-        // Use the consistent radius for all points
-        const x = 50 + radius * Math.cos(angle); 
-        const y = 50 + radius * Math.sin(angle);
-        
-        points.push(`${x},${y}`);
-      }
-      
-      shape = document.createElementNS(svgNS, "polygon");
-      shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
-      break;
-    }
-
-    case 'star': {
-      let peaks = parseInt(prompt("Enter number of peaks:", "7"));
-      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
-      const points = [];
-      const outerRadius = 40;
-      const innerRadius = 20;
-      for (let i = 0; i < 2 * peaks; i++) {
-        const angle = (Math.PI * i) / peaks - Math.PI / 2;
-        const r = i % 2 === 0 ? outerRadius : innerRadius;
-        const x = 50 + r * Math.cos(angle);
-        const y = 50 + r * Math.sin(angle);
-        points.push(`${x},${y}`);
-      }
-      shape = document.createElementNS(svgNS, "polygon");
-      shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
-      break;
-    }
-  }
-
-  if (shape) {
-    // Store style properties on the container element for persistence
-    element.dataset.fillColor = shape.getAttribute('fill');
-    element.dataset.fillOpacity = 1.0;
-    element.dataset.borderColor = shape.getAttribute('stroke');
-    element.dataset.borderOpacity = 1.0;
-    element.dataset.borderWidth = shape.getAttribute('stroke-width');
-
-    svg.appendChild(shape);
-    element.appendChild(svg);
-  }
-
-  element.style.zIndex = '1';
-  
-  pageContent.appendChild(element);
-  makeElementDraggable(element);
-  makeRotatable(element);
-  selectElement(element);
-
-  // Re-apply style when element is resized (to ensure SVG scale/transform updates)
-  new ResizeObserver(() => {
-    updateSelectedShapeStyle(); 
-  }).observe(element);
+    applyFrameStyle(element);
+    
+    new ResizeObserver(() => {
+        applyFrameStyle(element);
+    }).observe(element);
 }
 
 function selectElement(element) {
-    document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
+    document.querySelectorAll('.text-element, .frame-element').forEach(el => {
         el.classList.remove('selected');
-        if (el.classList.contains('shape-element')) {
+        /*if (el.classList.contains('shape-element')) {
             el.style.boxShadow = 'none';
             el.style.border = 'none';
         }
         if (el.classList.contains('image-element')) {
             el.style.border = 'none';
-        }
+        }*/
     });
 
     selectedElement = element;
     selectedElement.classList.add('selected');
     
-    if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
+    /*if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
         selectedElement.style.border = '2px solid #3B82F6';
         selectedElement.style.outline = '1px solid #ffffff';
     }
@@ -514,19 +475,17 @@ function selectElement(element) {
     if (selectedElement.classList.contains('shape-element')) {
         selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
         selectedElement.style.border = 'none'; // Ensure no box border
-    }
+    }*/
 
     document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; 
+    document.getElementById('frameEditor').style.display = 'none';
     document.getElementById('noElementSelected').style.display = 'none';
 
     const textToolbar = document.getElementById('textToolbar');
-    const shapeToolbar = document.getElementById('shapeToolbar');
-    const imageToolbar = document.getElementById('imageToolbar');
+    const frameToolbar = document.getElementById('frameToolbar');
 
     textToolbar.style.display = 'none';
-    shapeToolbar.style.display = 'none';
+    frameToolbar.style.display = 'none';
     if (imageToolbar) imageToolbar.style.display = 'none';
 
     const rect = element.getBoundingClientRect();
@@ -550,22 +509,14 @@ function selectElement(element) {
           colorInput.value = selectedElement.style.color || '#000000';
         }
 
-    } else if (element.classList.contains('shape-element')) {
-        toolbar = shapeToolbar;
-        document.getElementById('shapeEditor').style.display = 'block';
+    } else if (element.classList.contains('frame-element')) {
+        toolbar = frameToolbar;
+        document.getElementById('frameEditor').style.display = 'block';
         
-        initShapeEditor();
-        loadShapeStateToControls();
+        initframeEditor();
+        loadframeStateToControls();
     
-    } else if (element.classList.contains('image-element')) { 
-        toolbar = imageToolbar;
-        document.getElementById('imageEditor').style.display = 'block';
-        
-        const imageUrlInput = document.getElementById('imageUrlInput');
-        if (imageUrlInput) {
-            imageUrlInput.value = selectedElement.src;
-        }
-    }
+    } 
 
     if (toolbar) {
         if (toolbar.offsetWidth === undefined) {
@@ -620,25 +571,21 @@ function makeElementDraggable(el) {
 
 function showToolbar(targetElement) {
     const textToolbar = document.getElementById('textToolbar');
-    const shapeToolbar = document.getElementById('shapeToolbar');
-    const imageToolbar = document.getElementById('imageToolbar'); 
+    const frameToolbar = document.getElementById('frameToolbar');
 
-    if (!textToolbar || !shapeToolbar || !imageToolbar) return; 
+    if (!textToolbar || !frameToolbar) return; 
   
     textToolbar.style.display = 'none';
-    shapeToolbar.style.display = 'none';
-    imageToolbar.style.display = 'none'; 
+    frameToolbar.style.display = 'none';
 
     const rect = targetElement.getBoundingClientRect();
     let toolbar;
 
     if (targetElement.classList.contains('text-element')) {
         toolbar = textToolbar;
-    } else if (targetElement.classList.contains('shape-element')) {
-        toolbar = shapeToolbar;
-    } else if (targetElement.classList.contains('image-element')) {
-        toolbar = imageToolbar;
-    }
+    } else if (targetElement.classList.contains('frame-element')) {
+        toolbar = frameToolbar;
+    } 
 
     if (toolbar) {
         toolbar.style.display = 'flex';
@@ -654,12 +601,10 @@ function deleteElement() {
         selectedElement = null;
         
         document.getElementById('textToolbar').style.display = 'none';
-        document.getElementById('shapeToolbar').style.display = 'none';
-        document.getElementById('imageToolbar').style.display = 'none'; 
+        document.getElementById('frameToolbar').style.display = 'none';
       
         document.getElementById('textEditor').style.display = 'none';
-        document.getElementById('shapeEditor').style.display = 'none';
-        document.getElementById('imageEditor').style.display = 'none'; 
+        document.getElementById('frameEditor').style.display = 'none';
       
         document.getElementById('noElementSelected').style.display = 'block';
     }
@@ -684,7 +629,7 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
+['textToolbar', 'frameToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -699,28 +644,23 @@ function alignElement() {
   });
 });
 
-// Handle clicks on elements and outside
 document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
+  const clickedElement = e.target.closest('.text-element, .frame-element');
 
   if (clickedElement) {
     if (selectedElement !== clickedElement) {
       selectElement(clickedElement);
     }
-    // No need to call showToolbar here if selectElement handles it
   } else if (
     !e.target.closest('#textEditor') &&
-    !e.target.closest('#shapeEditor') &&
-    !e.target.closest('#imageEditor') &&
+    !e.target.closest('#frameEditor') &&
     !e.target.closest('#textToolbar') &&
-    !e.target.closest('#shapeToolbar') &&
-    !e.target.closest('#imageToolbar') &&
+    !e.target.closest('#frameToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none';
+    document.getElementById('frameToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -779,14 +719,12 @@ function deselectElement() {
     }
     
     document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; // MODIFICATION 1: Hide image editor
+    document.getElementById('frameEditor').style.display = 'none';
     
     document.getElementById('noElementSelected').style.display = 'block';
     
     document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none'; // MODIFICATION 2: Hide image toolbar
+    document.getElementById('frameToolbar').style.display = 'none';
 }
 
 function toggleLeftSidebar() {
@@ -925,59 +863,60 @@ function hideModal() {
 }
 
 function saveLayout() {
-    const layoutData = {
-        name: document.getElementById('layoutNameInput').value || `Layout ${savedLayouts.length + 1}`,
-        pages: pages.map(page => {
-            const pageContent = page.querySelector('.page-content');
-            
-            const elementsData = Array.from(pageContent.children).map(element => {
-                let elData = {
-                    type: '',
-                    content: '', // For text/image content
-                    style: {}
-                };
+  const layoutData = {
+    name: document.getElementById('layoutNameInput').value || `Layout ${savedLayouts.length + 1}`,
+    pages: pages.map(page => {
+      const pageContent = page.querySelector('.page-content');
+      
+      const elementsData = Array.from(pageContent.children).map(element => {
+        let elData = {
+          type: '',
+          content: '', // For text/image content
+          style: {}
+        };
 
-                const computedStyle = window.getComputedStyle(element);
-                const stylesToSave = ['position', 'top', 'left', 'width', 'height', 'zIndex', 'transform', 'fontSize', 'fontWeight', 'color', 'backgroundColor', 'border', 'borderRadius', 'boxShadow', 'filter', 'opacity'];
-                stylesToSave.forEach(prop => {
-                    if (element.style[prop] || computedStyle[prop] !== 'none' || computedStyle[prop] !== 'auto') {
-                         elData.style[prop] = element.style[prop] || computedStyle[prop];
-                    }
-                });
+        const computedStyle = window.getComputedStyle(element);
+        const stylesToSave = ['position', 'top', 'left', 'width', 'height', 'zIndex', 'transform', 'fontSize', 'fontWeight', 'color', 'backgroundColor', 'border', 'borderRadius', 'boxShadow', 'filter', 'opacity'];
+        stylesToSave.forEach(prop => {
+          if (element.style[prop] || (computedStyle[prop] !== 'none' && computedStyle[prop] !== 'auto' && computedStyle[prop] !== '0px')) {
+             elData.style[prop] = element.style[prop] || computedStyle[prop];
+          }
+        });
 
-                if (element.classList.contains('text-element')) {
-                    elData.type = 'text';
-                    elData.content = element.innerText;
-                } else if (element.classList.contains('shape-element')) {
-                    elData.type = 'shape';
-                    elData.shapeType = element.dataset.shapeType;
-                    elData.shapeData = {
-                        fillColor: element.dataset.fillColor,
-                        fillOpacity: element.dataset.fillOpacity,
-                        borderColor: element.dataset.borderColor,
-                        borderOpacity: element.dataset.borderOpacity,
-                        borderWidth: element.dataset.borderWidth,
-                    };
-                } else if (element.classList.contains('image-element')) {
-                    elData.type = 'image';
-                    elData.content = element.src; // Save the image URL in the content field
-                }
+        if (element.classList.contains('text-element')) {
+          elData.type = 'text';
+          elData.content = element.innerText;
 
-                return elData.type ? elData : null;
-            }).filter(d => d !== null); // Filter out any null/unknown elements
+        } else if (element.classList.contains('frame-element')) {
+          elData.type = 'frame'; // New type identifier
+          elData.shapeType = element.dataset.shapeType;
+          
+          elData.frameData = {
+            fillType: element.dataset.fillType,     // 'color' or 'image'
+            fillColor: element.dataset.fillColor,   
+            fillOpacity: element.dataset.fillOpacity,
+            borderColor: element.dataset.borderColor,
+            borderOpacity: element.dataset.borderOpacity,
+            borderWidth: element.dataset.borderWidth,
+            imageUrl: element.dataset.imageUrl || '', // The image URL if fillType is 'image'
+          };
+        }
 
-            return {
-                width: page.style.width,
-                height: page.style.height,
-                elements: elementsData
-            };
-        })
-    };
-    
-    console.log('Layout Data Saved:', layoutData);
-    savedLayouts.push(layoutData);
-    
-    hideModal(); // Hide the save modal
+        return elData.type ? elData : null;
+      }).filter(d => d !== null); 
+
+      return {
+        width: page.style.width,
+        height: page.style.height,
+        elements: elementsData
+      };
+    })
+  };
+  
+  console.log('Layout Data Saved:', layoutData);
+  savedLayouts.push(layoutData);
+  
+  hideModal();
 }
 
 function loadLayout(layoutIndex) {
@@ -1004,56 +943,64 @@ function loadLayout(layoutIndex) {
                 element.className = 'text-element';
                 element.contentEditable = true;
                 element.innerText = elData.content;
-            } else if (elData.type === 'shape') {
+
+            } else if (elData.type === 'frame') {
                 element = document.createElement('div');
-                element.className = 'shape-element';
-                element.contentEditable = false;
+                element.className = 'frame-element';
+                element.setAttribute('tabindex', '0');
                 
                 const svgNS = "http://www.w3.org/2000/svg";
                 const svg = document.createElementNS(svgNS, "svg");
                 svg.setAttribute("width", "100%");
                 svg.setAttribute("height", "100%");
                 svg.setAttribute("viewBox", "0 0 100 100");
-                let shape;
+                svg.appendChild(document.createElementNS(svgNS, "defs")); // Add defs container
 
-                switch(elData.shapeType) {
+                let shape;
+                const shapeType = elData.data.shapeType;
+
+                // This shape recreation logic must match the creation logic in addFrameElement
+                switch(shapeType) {
                     case 'circle':
                         shape = document.createElementNS(svgNS, "circle");
                         shape.setAttribute("cx", "50");
                         shape.setAttribute("cy", "50");
                         shape.setAttribute("r", "40");
                         break;
-                    case 'polygon':
+                    case 'rect':
+                        shape = document.createElementNS(svgNS, "rect");
+                        shape.setAttribute("x", "10");
+                        shape.setAttribute("y", "10");
+                        shape.setAttribute("width", "80");
+                        shape.setAttribute("height", "80");
+                        break;
+                    case 'polygon': // For polygon, you must save and load the specific points
+                    case 'star': {
                         shape = document.createElementNS(svgNS, "polygon");
-                        if (elData.shapeData.points) {
-                            shape.setAttribute("points", elData.shapeData.points);
+                        if (elData.data.points) {
+                             shape.setAttribute("points", elData.data.points);
+                        } else {
+                            // Fallback: If points weren't saved, you might need to re-run the calculation
+                            // or ideally, ensure the points are saved in the saving function.
                         }
                         break;
+                    }
+                    default:
+                        console.warn(`Unknown shape type: ${shapeType}`);
+                        return;
                 }
+                
+                svg.appendChild(shape);
+                element.appendChild(svg);
+                
+                Object.entries(elData.data).forEach(([key, value]) => {
+                    if (key !== 'points') { // 'points' is special-cased for the SVG element
+                        element.dataset[key] = value;
+                    }
+                });
 
-                if (shape) {
-                    svg.appendChild(shape);
-                    element.appendChild(svg);
-                }
-                
-                element.dataset.fillColor = elData.shapeData.fillColor;
-                element.dataset.fillOpacity = elData.shapeData.fillOpacity;
-                element.dataset.borderColor = elData.shapeData.borderColor;
-                element.dataset.borderOpacity = elData.shapeData.borderOpacity;
-                element.dataset.borderWidth = elData.shapeData.borderWidth;
-                
-                applyShapeStyle(element);
-                
-                new ResizeObserver(() => {
-                    applyShapeStyle(element);
-                }).observe(element);
-            } else if (elData.type === 'image') { // <-- ADDED: Handle image element type
-                element = document.createElement('img');
-                element.className = 'image-element';
-                element.contentEditable = false;
-                element.src = elData.content; 
             } else {
-                return; // Skip unknown element type
+                return; // Skip unknown or deprecated (old shape/image) element types
             }
 
             Object.entries(elData.style).forEach(([prop, value]) => {
@@ -1064,13 +1011,21 @@ function loadLayout(layoutIndex) {
             makeElementDraggable(element);
             makeRotatable(element);
             
+            if (elData.type === 'frame') {
+                applyFrameStyle(element); 
+                
+                new ResizeObserver(() => {
+                    applyFrameStyle(element);
+                }).observe(element);
+            }
+
             element.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectElement(element);
             });
         });
         
-        if (container) container.appendChild(newPage); // Append new page to container
+        if (container) container.appendChild(newPage);
         pages.push(newPage);
     });
     
@@ -1096,105 +1051,58 @@ function hexToRgbA(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function applyShapeStyle(element = selectedElement) {
-    if (!element || !element.classList.contains('shape-element')) return;
+function applyFrameStyle(element = selectedElement) {
+    if (!element || !element.classList.contains('frame-element')) return;
 
-    const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
-    if (!svgShape) return;
+    const svg = element.querySelector('svg');
+    const shape = svg.querySelector('svg > *[fill]'); 
+    if (!shape) return;
 
-    const fillColorHex = element.dataset.fillColor || '#000000';
-    const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
-    
     const borderColorHex = element.dataset.borderColor || '#000000';
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
-
-    const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
-    svgShape.setAttribute('fill', fillRgba);
-    svgShape.setAttribute('stroke', borderRgba);
-    svgShape.setAttribute('stroke-width', borderWidth);
-    svgShape.parentElement.style.transform = '';
-    svgShape.parentElement.style.transformOrigin = '';
-}
+    shape.setAttribute('stroke', borderRgba);
+    shape.setAttribute('stroke-width', borderWidth);
 
-function updateSelectedShapeStyle() {
-    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
+    const fillType = element.dataset.fillType || 'color';
 
-    const fillColorInput = document.getElementById('shape-fill-color');
-    const fillOpacityInput = document.getElementById('shape-fill-opacity');
-    const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
+    const oldPattern = svg.querySelector('defs pattern');
+    if (oldPattern) oldPattern.remove();
+    shape.setAttribute('fill', ''); // Clear existing fill
 
-    const borderColorInput = document.getElementById('shape-border-color');
-    const borderOpacityInput = document.getElementById('shape-border-opacity');
-    const borderOpacityValueSpan = document.getElementById('border-opacity-value');
-    const borderWidthInput = document.getElementById('shape-border-width');
+    if (fillType === 'color') {
+        const fillColorHex = element.dataset.fillColor || '#000000';
+        const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
+        const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
+        shape.setAttribute('fill', fillRgba);
 
-    const fillColorHex = fillColorInput.value;
-    const fillOpacity = parseFloat(fillOpacityInput.value);
-    
-    const borderColorHex = borderColorInput.value;
-    const borderOpacity = parseFloat(borderOpacityInput.value);
-    const borderWidth = Math.max(0, parseFloat(borderWidthInput.value));
+    } else if (fillType === 'image') {
+        const imageUrl = element.dataset.imageUrl || 'https://via.placeholder.com/300?text=Image+Missing';
 
-    selectedElement.dataset.fillColor = fillColorHex;
-    selectedElement.dataset.fillOpacity = fillOpacity;
-    selectedElement.dataset.borderColor = borderColorHex;
-    selectedElement.dataset.borderOpacity = borderOpacity;
-    selectedElement.dataset.borderWidth = borderWidth;
-    
-    applyShapeStyle(selectedElement);
+        const defs = svg.querySelector('defs') || document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        if (!svg.contains(defs)) svg.insertBefore(defs, svg.firstChild);
 
-    if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
-    if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
-}
+        const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        const patternId = `img-pattern-${Date.now()}`;
+        pattern.setAttribute("id", patternId);
+        pattern.setAttribute("patternUnits", "objectBoundingBox");
+        pattern.setAttribute("width", "1");
+        pattern.setAttribute("height", "1");
 
-function loadShapeStateToControls() {
-    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
+        const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+        image.setAttributeNS("http://www.w3.org/1999/xlink", "href", imageUrl);
+        image.setAttribute("x", "0");
+        image.setAttribute("y", "0");
+        image.setAttribute("width", "100"); // Fixed dimensions for the pattern's viewBox
+        image.setAttribute("height", "100");
+        image.setAttribute("preserveAspectRatio", "xMidYMid slice"); // Zoom and center
 
-    const fillColorInput = document.getElementById('shape-fill-color');
-    const fillOpacityInput = document.getElementById('shape-fill-opacity');
-    const borderWidthInput = document.getElementById('shape-border-width');
-    const borderColorInput = document.getElementById('shape-border-color');
-    const borderOpacityInput = document.getElementById('shape-border-opacity');
-
-    fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
-    fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
-    borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
-    borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
-    borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
-    
-    updateSelectedShapeStyle();
-}
-
-function initShapeEditor() {
-    if (shapeEditorListenersInitialized) return;
-
-    const fillColorInput = document.getElementById('shape-fill-color');
-    const fillOpacityInput = document.getElementById('shape-fill-opacity');
-    const borderColorInput = document.getElementById('shape-border-color');
-    const borderOpacityInput = document.getElementById('shape-border-opacity');
-    const borderWidthInput = document.getElementById('shape-border-width');
-    
-    if (fillColorInput) {
-        fillColorInput.addEventListener('input', updateSelectedShapeStyle);
+        pattern.appendChild(image);
+        defs.appendChild(pattern);
+        shape.setAttribute("fill", `url(#${patternId})`);
     }
-    if (fillOpacityInput) {
-        fillOpacityInput.addEventListener('input', updateSelectedShapeStyle);
-    }
-    if (borderColorInput) {
-        borderColorInput.addEventListener('input', updateSelectedShapeStyle);
-    }
-    if (borderOpacityInput) {
-        borderOpacityInput.addEventListener('input', updateSelectedShapeStyle);
-    }
-    if (borderWidthInput) {
-        borderWidthInput.addEventListener('input', updateSelectedShapeStyle);
-        borderWidthInput.addEventListener('change', updateSelectedShapeStyle); 
-    }
-    
-    shapeEditorListenersInitialized = true;
 }
 
 function updateSavedLayoutsList() {
@@ -1297,20 +1205,12 @@ if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 const addTitleBtn = document.getElementById('addTitleBtn');
 const addSubtitleBtn = document.getElementById('addSubtitleBtn');
 const addParagraphBtn = document.getElementById('addParagraphBtn');
-const addImageBtn = document.getElementById('addImageBtn');
+const addImageBtn = document.getElementById('addframeBtn');
 
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
 if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
-
-const addCircleBtn = document.getElementById('addCircleBtn');
-const addPolygonBtn = document.getElementById('addPolygonBtn');
-const addStarBtn = document.getElementById('addStarBtn');
-
-if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('circle'));
-if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
-if (addStarBtn) addStarBtn.addEventListener('click', () => addShapeElement('star'));
+if (addframeBtn) addImageBtn.addEventListener('click', () => addTextElement('frame'));
 
 const fontColorInput = document.getElementById('fontColorInput');
 
@@ -1380,7 +1280,6 @@ if (saveLayoutBtn) saveLayoutBtn.addEventListener('click', showSaveLayoutModal);
 if (cancelSaveBtn) cancelSaveBtn.addEventListener('click', hideModal);
 if (confirmSaveBtn) confirmSaveBtn.addEventListener('click', saveLayout);
 
-// Import layout handlers
 if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
   // This would typically open a file picker
   // For simplicity, we'll just show a message
@@ -1395,7 +1294,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadSavedLayouts();
     
-    // Add html2canvas library for image export if not already present
     if (typeof html2canvas === 'undefined') {
       const html2canvasScript = document.createElement('script');
       html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
