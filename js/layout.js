@@ -885,6 +885,14 @@ function saveLayout() {
           };
         }
 
+        const shapeType = element.dataset.shapeType;
+          if (shapeType === 'polygon' || shapeType === 'star') {
+              const svgShape = element.querySelector('svg polygon');
+              if (svgShape) {
+                  elData.frameData.points = svgShape.getAttribute('points');
+              }
+          }
+
         return elData.type ? elData : null;
       }).filter(d => d !== null); 
 
@@ -1195,7 +1203,8 @@ const addImageBtn = document.getElementById('addframeBtn');
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
 if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addframeBtn) addImageBtn.addEventListener('click', () => addTextElement('frame'));
+const addRectangleFrameBtn = document.getElementById('addRectFrameBtn'); 
+if (addframeBtn) addframeBtn.addEventListener('click', () => addFrameElement('rect', true)); 
 
 const fontColorInput = document.getElementById('fontColorInput');
 
@@ -1285,3 +1294,22 @@ document.addEventListener('DOMContentLoaded', () => {
       document.head.appendChild(html2canvasScript);
     }
 });
+
+function initframeEditor() {
+    // This is where you would attach event listeners to the editor controls (Mistake E)
+    // For now, it prevents the crash.
+    if (!frameEditorListenersInitialized) {
+      // Initialize listeners here (see Mistake E)
+      frameEditorListenersInitialized = true;
+    }
+}
+
+function loadframeStateToControls() {
+    if (!selectedElement || !selectedElement.classList.contains('frame-element')) return;
+    document.getElementById('frameFillColorInput').value = selectedElement.dataset.fillColor;
+} else if (element.classList.contains('frame-element')) {
+        toolbar = frameToolbar;
+        document.getElementById('frameEditor').style.display = 'block';
+        initframeEditor();
+        loadframeStateToControls(); // This will no longer crash
+    } 
