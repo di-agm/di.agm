@@ -9,6 +9,7 @@ let pageNumbersVisible = true;
 let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
+let frameEditorListenersInitialized = false;
 
 function createPage(pageNumber) {
   const page = document.createElement('div');
@@ -1198,7 +1199,7 @@ if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 const addTitleBtn = document.getElementById('addTitleBtn');
 const addSubtitleBtn = document.getElementById('addSubtitleBtn');
 const addParagraphBtn = document.getElementById('addParagraphBtn');
-const addImageBtn = document.getElementById('addframeBtn');
+const addframeBtn = document.getElementById('addframeBtn');
 
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
@@ -1296,20 +1297,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initframeEditor() {
-    // This is where you would attach event listeners to the editor controls (Mistake E)
-    // For now, it prevents the crash.
     if (!frameEditorListenersInitialized) {
-      // Initialize listeners here (see Mistake E)
       frameEditorListenersInitialized = true;
     }
 }
 
 function loadframeStateToControls() {
     if (!selectedElement || !selectedElement.classList.contains('frame-element')) return;
-    document.getElementById('frameFillColorInput').value = selectedElement.dataset.fillColor;
-} else if (element.classList.contains('frame-element')) {
-        toolbar = frameToolbar;
-        document.getElementById('frameEditor').style.display = 'block';
-        initframeEditor();
-        loadframeStateToControls(); // This will no longer crash
-    } 
+    const fillType = selectedElement.dataset.fillType || 'color';
+    
+    document.getElementById('colorFillControls').style.display = (fillType === 'color' ? 'block' : 'none');
+    document.getElementById('imageFillControls').style.display = (fillType === 'image' ? 'block' : 'none');
+    document.getElementById('frameFillColorInput').value = selectedElement.dataset.fillColor || '#3b82f6';
+    document.getElementById('frameImageUrlInput').value = selectedElement.dataset.imageUrl || '';
+    document.getElementById('frameBorderWidthInput').value = selectedElement.dataset.borderWidth || '4';
+    document.getElementById('frameBorderColorInput').value = selectedElement.dataset.borderColor || '#1e3a8a';
+}
