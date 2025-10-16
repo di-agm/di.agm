@@ -646,14 +646,19 @@ function showToolbar(targetElement) {
     imageToolbar.style.display = 'none'; 
 
     const rect = targetElement.getBoundingClientRect();
-    let toolbar;
+    let toolbar = null;
 
     if (targetElement.classList.contains('text-element')) {
         toolbar = textToolbar;
-    } else if (targetElement.classList.contains('shape-element')) {
-        toolbar = shapeToolbar;
-    } else if (targetElement.classList.contains('image-element')) {
-        toolbar = imageToolbar;
+        
+    } else if (targetElement.classList.contains('frame-element')) {
+        const mode = targetElement.dataset.mode;
+        
+        if (mode === 'shape') {
+            toolbar = shapeToolbar;
+        } else if (mode === 'image') {
+            toolbar = imageToolbar;
+        }
     }
 
     if (toolbar) {
@@ -670,13 +675,9 @@ function deleteElement() {
         selectedElement = null;
         
         document.getElementById('textToolbar').style.display = 'none';
-        document.getElementById('shapeToolbar').style.display = 'none';
-        document.getElementById('imageToolbar').style.display = 'none'; 
-      
         document.getElementById('textEditor').style.display = 'none';
-        document.getElementById('shapeEditor').style.display = 'none';
-        document.getElementById('imageEditor').style.display = 'none'; 
-      
+        document.getElementById('frameToolbar').style.display = 'none';
+        document.getElementById('frameEditor').style.display = 'none';
         document.getElementById('noElementSelected').style.display = 'block';
     }
 }
@@ -700,7 +701,7 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
+['textToolbar', 'frameToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -715,28 +716,23 @@ function alignElement() {
   });
 });
 
-// Handle clicks on elements and outside
 document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .shape-element');
+  const clickedElement = e.target.closest('.text-element, .frame-element');
 
   if (clickedElement) {
     if (selectedElement !== clickedElement) {
       selectElement(clickedElement);
     }
-    // No need to call showToolbar here if selectElement handles it
   } else if (
     !e.target.closest('#textEditor') &&
-    !e.target.closest('#shapeEditor') &&
-    !e.target.closest('#imageEditor') &&
+    !e.target.closest('#frameEditor') &&
     !e.target.closest('#textToolbar') &&
-    !e.target.closest('#shapeToolbar') &&
-    !e.target.closest('#imageToolbar') &&
+    !e.target.closest('#frameToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none';
+    document.getElementById('frameToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -781,28 +777,32 @@ function deselectElement() {
     if (selectedElement) {
         selectedElement.classList.remove('selected');
         
-        if (selectedElement.classList.contains('text-element') || selectedElement.classList.contains('image-element')) {
+        if (selectedElement.classList.contains('text-element')) {
             selectedElement.style.border = 'none';
             selectedElement.style.outline = 'none';
+            document.getElementById('textEditor').style.display = 'none';
+            document.getElementById('textToolbar').style.display = 'none';
         }
         
-        if (selectedElement.classList.contains('shape-element')) {
+        if (selectedElement.classList.contains('frame-element')) {
             selectedElement.style.boxShadow = 'none';
-            selectedElement.style.border = 'none';
+            selectedElement.style.border = 'none'; 
+            
+            const mode = selectedElement.dataset.mode;
+            
+            if (mode === 'image') {
+                document.getElementById('imageEditor').style.display = 'none'; 
+                document.getElementById('imageToolbar').style.display = 'none'; 
+            } else if (mode === 'shape') {
+                document.getElementById('shapeEditor').style.display = 'none';
+                document.getElementById('shapeToolbar').style.display = 'none';
+            }
         }
-
+        
         selectedElement = null;
     }
     
-    document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; // MODIFICATION 1: Hide image editor
-    
     document.getElementById('noElementSelected').style.display = 'block';
-    
-    document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none'; // MODIFICATION 2: Hide image toolbar
 }
 
 function toggleLeftSidebar() {
@@ -820,8 +820,6 @@ function toggleRightSidebar() {
 }
 //Zoom
 const center = document.querySelector(".center-container");
-
-// Check if buttons exist before adding listeners
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const handBtn = document.getElementById("handBtn");
@@ -924,7 +922,6 @@ function exportAsPDF() {
   });
 }
 
-// Layout saving and loading functions
 function showSaveLayoutModal() {
   const modal = document.getElementById('saveLayoutModal');
   if (modal) {
@@ -964,21 +961,24 @@ function saveLayout() {
                 if (element.classList.contains('text-element')) {
                     elData.type = 'text';
                     elData.content = element.innerText;
-                } else if (element.classList.contains('shape-element')) {
-                    elData.type = 'shape';
-                    elData.shapeType = element.dataset.shapeType;
-                    elData.shapeData = {
-                        fillColor: element.dataset.fillColor,
-                        fillOpacity: element.dataset.fillOpacity,
-                        borderColor: element.dataset.borderColor,
-                        borderOpacity: element.dataset.borderOpacity,
-                        borderWidth: element.dataset.borderWidth,
-                    };
-                } else if (element.classList.contains('image-element')) {
-                    elData.type = 'image';
-                    elData.content = element.src; // Save the image URL in the content field
-                }
+                } 
+                else if (element.classList.contains('frame-element')) {
+                    const mode = element.dataset.mode;
+                    elData.type = 'frame'; // Use a generic 'frame' type
+                    elData.mode = mode;    // Save the specific mode ('image' or 'shape')
 
+                    if (mode === 'shape') {
+                        elData.shapeType = element.dataset.shapeType;
+                        elData.shapeData = {
+                            fillColor: element.dataset.fillColor,
+                            borderColor: element.dataset.borderColor,
+                            borderWidth: element.dataset.borderWidth,
+                        };
+                    } else if (mode === 'image') {
+                        const imageElement = element.querySelector('.frame-content-image');
+                        elData.content = imageElement ? imageElement.src : ''; // Save the image URL
+                    }
+                } 
                 return elData.type ? elData : null;
             }).filter(d => d !== null); // Filter out any null/unknown elements
 
@@ -988,11 +988,9 @@ function saveLayout() {
                 elements: elementsData
             };
         })
-    };
-    
+    };    
     console.log('Layout Data Saved:', layoutData);
     savedLayouts.push(layoutData);
-    
     hideModal(); // Hide the save modal
 }
 
@@ -1020,58 +1018,72 @@ function loadLayout(layoutIndex) {
                 element.className = 'text-element';
                 element.contentEditable = true;
                 element.innerText = elData.content;
-            } else if (elData.type === 'shape') {
+            } else if (elData.type === 'frame') {
                 element = document.createElement('div');
-                element.className = 'shape-element';
-                element.contentEditable = false;
+                element.className = 'frame-element'; // Use the new class
+                element.setAttribute('tabindex', '0');
                 
-                const svgNS = "http://www.w3.org/2000/svg";
-                const svg = document.createElementNS(svgNS, "svg");
-                svg.setAttribute("width", "100%");
-                svg.setAttribute("height", "100%");
-                svg.setAttribute("viewBox", "0 0 100 100");
-                let shape;
+                element.dataset.mode = elData.mode || 'image'; 
+                element.dataset.shapeType = elData.shapeType || 'none';
+                
+                if (elData.mode === 'image') {
+                    const img = document.createElement('img');
+                    img.className = 'frame-content-image';
+                    img.src = elData.content; // Content is the image URL
+                    img.alt = 'User-defined image';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.contentEditable = false; 
+                    element.appendChild(img);
+                
+                } else if (elData.mode === 'shape') {
+                    const svgNS = "http://www.w3.org/2000/svg";
+                    const svg = document.createElementNS(svgNS, "svg");
+                    svg.setAttribute("width", "100%");
+                    svg.setAttribute("height", "100%");
+                    svg.setAttribute("viewBox", "0 0 100 100");
+                    svg.className = 'frame-content-shape';
+                    
+                    let shape;
 
-                switch(elData.shapeType) {
-                    case 'circle':
-                        shape = document.createElementNS(svgNS, "circle");
-                        shape.setAttribute("cx", "50");
-                        shape.setAttribute("cy", "50");
-                        shape.setAttribute("r", "40");
-                        break;
-                    case 'polygon':
-                        shape = document.createElementNS(svgNS, "polygon");
-                        if (elData.shapeData.points) {
-                            shape.setAttribute("points", elData.shapeData.points);
-                        }
-                        break;
+                    switch(elData.shapeType) {
+                        case 'circle':
+                            shape = document.createElementNS(svgNS, "circle");
+                            shape.setAttribute("cx", "50");
+                            shape.setAttribute("cy", "50");
+                            shape.setAttribute("r", "40");
+                            break;
+                        case 'polygon':
+                        case 'star':
+                            shape = document.createElementNS(svgNS, "polygon");
+                            if (elData.shapeData && elData.shapeData.points) {
+                                shape.setAttribute("points", elData.shapeData.points);
+                            }
+                            break;
+                    }
+
+                    if (shape) {
+                        element.dataset.fillColor = elData.shapeData.fillColor;
+                        element.dataset.borderColor = elData.shapeData.borderColor;
+                        element.dataset.borderWidth = elData.shapeData.borderWidth;
+                        
+                        svg.appendChild(shape);
+                        element.appendChild(svg);
+                    }
                 }
 
-                if (shape) {
-                    svg.appendChild(shape);
-                    element.appendChild(svg);
-                }
-                
-                element.dataset.fillColor = elData.shapeData.fillColor;
-                element.dataset.fillOpacity = elData.shapeData.fillOpacity;
-                element.dataset.borderColor = elData.shapeData.borderColor;
-                element.dataset.borderOpacity = elData.shapeData.borderOpacity;
-                element.dataset.borderWidth = elData.shapeData.borderWidth;
-                
-                applyShapeStyle(element);
-                
-                new ResizeObserver(() => {
+                if (element.dataset.mode === 'shape') {
                     applyShapeStyle(element);
-                }).observe(element);
-            } else if (elData.type === 'image') { // <-- ADDED: Handle image element type
-                element = document.createElement('img');
-                element.className = 'image-element';
-                element.contentEditable = false;
-                element.src = elData.content; 
+                    
+                    new ResizeObserver(() => {
+                        applyShapeStyle(element);
+                    }).observe(element);
+                }
             } else {
                 return; // Skip unknown element type
             }
-
+            
             Object.entries(elData.style).forEach(([prop, value]) => {
                 if (value) element.style[prop] = value;
             });
@@ -1113,14 +1125,13 @@ function hexToRgbA(hex, alpha) {
 }
 
 function applyShapeStyle(element = selectedElement) {
-    if (!element || !element.classList.contains('shape-element')) return;
+    if (!element || !element.classList.contains('frame-element')) return;
 
     const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
     if (!svgShape) return;
 
     const fillColorHex = element.dataset.fillColor || '#000000';
     const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
-    
     const borderColorHex = element.dataset.borderColor || '#000000';
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
@@ -1128,15 +1139,29 @@ function applyShapeStyle(element = selectedElement) {
     const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
-    svgShape.setAttribute('fill', fillRgba);
-    svgShape.setAttribute('stroke', borderRgba);
-    svgShape.setAttribute('stroke-width', borderWidth);
-    svgShape.parentElement.style.transform = '';
-    svgShape.parentElement.style.transformOrigin = '';
+    const mode = element.dataset.mode;
+    
+    if (mode === 'shape') {
+      const svgShape = element.querySelector('svg > *'); // Get the actual SVG shape
+      if (svgShape) {
+        svgShape.setAttribute('fill', fillRgba);
+        svgShape.setAttribute('stroke', borderRgba);
+        svgShape.setAttribute('stroke-width', borderWidth);
+        element.style.backgroundColor = 'transparent'; 
+        element.style.border = 'none';
+      }
+    } else { 
+      element.style.backgroundColor = fillRgba; 
+      if (borderWidth > 0) {
+          element.style.border = `${borderWidth}px solid ${borderRgba}`;
+      } else {
+          element.style.border = 'none';
+      }
+  }
 }
 
 function updateSelectedShapeStyle() {
-    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
+    if (!selectedElement || !selectedElement.classList.contains('frame-element')) return;
 
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
@@ -1161,24 +1186,20 @@ function updateSelectedShapeStyle() {
     selectedElement.dataset.borderWidth = borderWidth;
     
     applyShapeStyle(selectedElement);
-
+  
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
 
 function loadShapeStateToControls() {
-    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
+    if (!selectedElement || !selectedElement.classList.contains('frame-element')) return;
 
-    const fillColorInput = document.getElementById('shape-fill-color');
-    const fillOpacityInput = document.getElementById('shape-fill-opacity');
-    const borderWidthInput = document.getElementById('shape-border-width');
-    const borderColorInput = document.getElementById('shape-border-color');
-    const borderOpacityInput = document.getElementById('shape-border-opacity');
+    const isShape = selectedElement.dataset.mode === 'shape';
 
-    fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
+    fillColorInput.value = selectedElement.dataset.fillColor || (isShape ? '#3b82f6' : '#ffffff');
     fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
-    borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
-    borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
+    borderWidthInput.value = selectedElement.dataset.borderWidth || (isShape ? 4 : 0);
+    borderColorInput.value = selectedElement.dataset.borderColor || (isShape ? '#1e3a8a' : '#000000');
     borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
     
     updateSelectedShapeStyle();
@@ -1398,7 +1419,6 @@ if (saveLayoutBtn) saveLayoutBtn.addEventListener('click', showSaveLayoutModal);
 if (cancelSaveBtn) cancelSaveBtn.addEventListener('click', hideModal);
 if (confirmSaveBtn) confirmSaveBtn.addEventListener('click', saveLayout);
 
-// Import layout handlers
 if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
   // This would typically open a file picker
   // For simplicity, we'll just show a message
