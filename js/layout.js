@@ -58,8 +58,8 @@ const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
   a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthIN: 8.5, heightIN: 11 },
-  tabloid: { widthIN: 11, heightIN: 17 }
+  letter: { widthMM: 215.9, heightMM: 279.4 },
+  tabloid: { widthMM: 279.4, heightMM: 431.8 }
 };
 
 const maxWidthPx = 360;
@@ -73,14 +73,14 @@ function updateRectSize(key) {
     baseWidth = mmToPx(paperSizes.a4.widthMM);
     baseHeight = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    baseWidth = inToPx(paperSizes.letter.widthIN);
-    baseHeight = inToPx(paperSizes.letter.heightIN);
+    baseWidth = mmToPx(paperSizes.letter.widthMM);
+    baseHeight = mmToPx(paperSizes.letter.heightMM);
   } else if (key === 'tabloid') {
-    baseWidth = inToPx(paperSizes.tabloid.widthIN);
-    baseHeight = inToPx(paperSizes.tabloid.heightIN);
+    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
+    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
   } else {
-    baseWidth = mmToPx(paperSizes.a4.widthMM);
-    baseHeight = mmToPx(paperSizes.a4.heightMM);
+    handleCustomSize();
+    return;
   }
 
   let finalWidthPx = baseWidth;
@@ -105,6 +105,49 @@ function updateRectSize(key) {
   if (rulersVisible) drawRulers();
   window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
   window.addEventListener("resize", updateRectSizeOnResize); 
+}
+
+function handleCustomSize() {
+  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
+  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
+    alert("Invalid or cancelled width. Defaulting to A4.");
+    updateRectSize('a4');
+    return;
+  }
+  
+  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
+  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
+    alert("Invalid or cancelled height. Defaulting to A4.");
+    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
+    return;
+  }
+
+  const widthMM = parseFloat(customWidthMM);
+  const heightMM = parseFloat(customHeightMM);
+
+  let baseWidth = mmToPx(widthMM);
+  let baseHeight = mmToPx(heightMM);
+  
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
 }
 
 function updateRectSizeOnResize() {
