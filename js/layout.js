@@ -465,24 +465,24 @@ function addFrameElement(mode, shapeType = null) {
     let content;
     
     if (mode === 'image') {
-        content = document.createElement('img');
-        content.className = 'frame-content-image';
-        content.src = DEFAULT_IMAGE_SRC;
-        content.alt = 'User-defined image';
-        content.style.width = '100%';
-        content.style.height = '100%';
-        content.style.objectFit = 'cover';
-        content.contentEditable = false; 
+      content = document.createElement('img');
+      content.className = 'frame-content-image';
+      content.src = DEFAULT_IMAGE_SRC;
+      content.alt = 'User-defined image';
+      content.style.width = '100%';
+      content.style.height = '100%';
+      content.style.objectFit = 'cover';
+      content.contentEditable = false; 
     } else if (mode === 'shape' && shapeType) {
-        content = createShapeSVG(shapeType);
-        content.className = 'frame-content-shape';
-        
-        const shape = content.querySelector('circle, polygon');
-        if (shape) {
-            frame.dataset.fillColor = shape.getAttribute('fill');
-            frame.dataset.borderColor = shape.getAttribute('stroke');
-            frame.dataset.borderWidth = shape.getAttribute('stroke-width');
-        }
+      content = createShapeSVG(shapeType);
+      content.className = 'frame-content-shape';
+      
+      const shape = content.querySelector('circle, polygon');
+      if (shape) {
+        frame.dataset.fillColor = shape.getAttribute('fill') || '#3b82f6';
+        frame.dataset.borderColor = shape.getAttribute('stroke') || '#1e3a8a';
+        frame.dataset.borderWidth = shape.getAttribute('stroke-width') || '4';
+      }
     }
 
     if (content) {
@@ -492,6 +492,7 @@ function addFrameElement(mode, shapeType = null) {
     pageContent.appendChild(frame);
     makeElementDraggable(frame);
     makeRotatable(frame);
+    applyShapeStyle(frame);
     selectElement(frame);
 
     new ResizeObserver(() => {
