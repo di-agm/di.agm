@@ -74,17 +74,17 @@ function updateRectSize(key) {
     baseWidth = mmToPx(paperSizes.a4.widthMM);
     baseHeight = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    baseWidth = mmToPx(paperSizes.letter.widthMM);
-    baseHeight = mmToPx(paperSizes.letter.heightMM);
+    baseWidth = inToPx(paperSizes.letter.widthIN);
+    baseHeight = inToPx(paperSizes.letter.heightIN);
   } else if (key === 'tabloid') {
-    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
-    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
-  } else if (key === 'custom') { // Handle 'custom' key using stored values
+    baseWidth = inToPx(paperSizes.tabloid.widthMM);
+    baseHeight = inToPx(paperSizes.tabloid.heightMM);
+  } else if (key === 'custom') { 
     baseWidth = mmToPx(customSizeMM.width);
     baseHeight = mmToPx(customSizeMM.height);
   } else {
-    handleCustomSize();
-    return;
+    baseWidth = mmToPx(paperSizes.a4.widthMM);
+    baseHeight = mmToPx(paperSizes.a4.heightMM);
   }
 
   let finalWidthPx = baseWidth;
@@ -107,54 +107,32 @@ function updateRectSize(key) {
   }
 
   if (rulersVisible) drawRulers();
-  window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
+  window.removeEventListener("resize", updateRectSizeOnResize); 
   window.addEventListener("resize", updateRectSizeOnResize); 
 }
 
-function handleCustomSize() {
-  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
+function promptForCustomSize() {
+  const customWidthMM = prompt(`Enter Custom Page Width (in mm). Current: ${customSizeMM.width}mm`);
   if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
-    alert("Invalid or cancelled width. Defaulting to A4.");
+    selector.value = 'a4'; // You may need a global variable to store the PREVIOUS size
     updateRectSize('a4');
     return;
   }
   
-  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
+  const customHeightMM = prompt(`Enter Custom Page Height (in mm). Current: ${customSizeMM.height}mm`);
   if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
-    alert("Invalid or cancelled height. Defaulting to A4.");
-    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
+    selector.value = 'a4'; 
+    updateRectSize('a4');
     return;
   }
 
   const widthMM = parseFloat(customWidthMM);
   const heightMM = parseFloat(customHeightMM);
-
+  
   customSizeMM.width = widthMM;
   customSizeMM.height = heightMM;
 
-  let baseWidth = mmToPx(widthMM);
-  let baseHeight = mmToPx(heightMM);
-  
-  let finalWidthPx = baseWidth;
-  let finalHeightPx = baseHeight;
-
-  if (finalWidthPx > maxWidthPx) {
-    const scale = maxWidthPx / finalWidthPx;
-    finalWidthPx = finalWidthPx * scale;
-    finalHeightPx = finalHeightPx * scale;
-  }
-  
-  const pageElement = pages[currentPageIndex];
-  
-  if (!isPortrait) {
-    pageElement.style.width = `${finalHeightPx}px`;
-    pageElement.style.height = `${finalWidthPx}px`;
-  } else {
-    pageElement.style.width = `${finalWidthPx}px`;
-    pageElement.style.height = `${finalHeightPx}px`;
-  }
-
-  if (rulersVisible) drawRulers();
+  updateRectSize('custom'); 
 }
 
 function updateRectSizeOnResize() {
@@ -208,8 +186,7 @@ function duplicatePage(index) {
   const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
-    makeRotatable(element); // Ensure rotation handler is re-added
-    // Re-select handler
+    makeRotatable(element); 
     element.addEventListener('click', (e) => {
       e.stopPropagation();
       selectElement(element);
@@ -224,7 +201,6 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   pages.forEach(page => {
     if (rulersVisible) {
-      // Add rulers if not already present
       if (!page.querySelector('.page-ruler.horizontal.top')) {
         const top = document.createElement('div');
         top.className = 'page-ruler horizontal top';
@@ -271,8 +247,6 @@ function toggleMargins() {
   });
 }
 
-// layout.js
-
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
@@ -283,7 +257,6 @@ function togglePageNumbers() {
     }
     
     pages.forEach(page => {
-        // Get the page-content container
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
         const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
