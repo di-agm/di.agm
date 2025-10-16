@@ -946,10 +946,8 @@ function loadLayout(layoutIndex) {
                 svg.appendChild(document.createElementNS(svgNS, "defs")); // Add defs container
 
                 let shape;
-                // CORRECT: Accessing frame properties via frameData
                 const shapeType = elData.frameData.shapeType; 
 
-                // This shape recreation logic must match the creation logic in addframeElement
                 switch(shapeType) {
                     case 'circle':
                         shape = document.createElementNS(svgNS, "circle");
