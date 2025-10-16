@@ -1,6 +1,7 @@
 let pages = [];
 let currentPageIndex = 0;
 let isPortrait = true;
+let customSizeMM = { width: 210, height: 297 };
 let selectedElement = null;
 let savedLayouts = [];
 let rulersVisible = false;
@@ -78,6 +79,9 @@ function updateRectSize(key) {
   } else if (key === 'tabloid') {
     baseWidth = mmToPx(paperSizes.tabloid.widthMM);
     baseHeight = mmToPx(paperSizes.tabloid.heightMM);
+  } else if (key === 'custom') { // Handle 'custom' key using stored values
+    baseWidth = mmToPx(customSizeMM.width);
+    baseHeight = mmToPx(customSizeMM.height);
   } else {
     handleCustomSize();
     return;
@@ -124,6 +128,9 @@ function handleCustomSize() {
 
   const widthMM = parseFloat(customWidthMM);
   const heightMM = parseFloat(customHeightMM);
+
+  customSizeMM.width = widthMM;
+  customSizeMM.height = heightMM;
 
   let baseWidth = mmToPx(widthMM);
   let baseHeight = mmToPx(heightMM);
