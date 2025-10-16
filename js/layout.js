@@ -196,6 +196,7 @@ function toggleRulers() {
       page.querySelectorAll('.page-ruler').forEach(r => r.remove());
     }
   });
+  drawRulers();
 }
 
 function toggleMargins() {
@@ -233,6 +234,7 @@ function togglePageNumbers() {
         } 
     });
 }
+
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
   if (!rulersVisible) return;
@@ -293,11 +295,6 @@ function drawRulers() {
       vRuler.appendChild(label);
     }
   }
-}
-
-function toggleRulers() {
-  rulersVisible = !rulersVisible;
-  drawRulers();
 }
 
 const oldShowPage = showPage;
