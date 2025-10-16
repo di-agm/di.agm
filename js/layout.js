@@ -474,29 +474,25 @@ function selectElement(element) {
     let toolbar;
 
     if (element.classList.contains('text-element')) {
-        toolbar = textToolbar;
-        document.getElementById('textEditor').style.display = 'block';
+      toolbar = textToolbar;
+      document.getElementById('textEditor').style.display = 'block';
 
-        const fontSizeInput = document.getElementById('fontSizeInput');
-        if (fontSizeInput) {
-          fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-        }
-        const fontFamilySelect = document.getElementById('fontFamilySelect');
-        if (fontFamilySelect) {
-          fontFamilySelect.value = selectedElement.style.fontFamily || '';
-        }
-        const colorInput = document.getElementById('colorPickerInput');
-        if (colorInput) {
-          colorInput.value = selectedElement.style.color || '#000000';
-        }
-
-    } else if (element.classList.contains('frame-element')) {
+      const fontSizeInput = document.getElementById('fontSizeInput');
+      if (fontSizeInput) {
+        fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+      }
+      const fontFamilySelect = document.getElementById('fontFamilySelect');
+      if (fontFamilySelect) {
+        fontFamilySelect.value = selectedElement.style.fontFamily || '';
+      }
+      const colorInput = document.getElementById('colorPickerInput');
+      if (colorInput) {
+        colorInput.value = selectedElement.style.color || '#000000';
+      } else if (element.classList.contains('frame-element')) {
         toolbar = frameToolbar;
         document.getElementById('frameEditor').style.display = 'block';
-        
         initframeEditor();
         loadframeStateToControls();
-    
     } 
 
     if (toolbar) {
