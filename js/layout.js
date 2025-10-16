@@ -566,7 +566,7 @@ function selectElement(element) {
       } else if (mode === 'image') {
         toolbar = imageToolbar;
         document.getElementById('imageEditor').style.display = 'block';
-        
+        if (toolbar) toolbar.style.display = 'block';
         const imageUrlInput = document.getElementById('imageUrlInput');
         const imageContent = selectedElement.querySelector('.frame-content-image');
         
