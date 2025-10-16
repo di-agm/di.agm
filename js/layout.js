@@ -112,7 +112,7 @@ function updateRectSizeOnResize() {
     updateRectSize(selector.value); 
 }
 
-/*function updateOrientation() {
+function updateOrientation() {
   if (!pages[currentPageIndex]) return;
   
   const page = pages[currentPageIndex];
@@ -123,7 +123,7 @@ function updateRectSizeOnResize() {
   page.style.height = width;
   
   isPortrait = !isPortrait;
-}*/
+}
 
 function showPage(index) {
   rectContainer.innerHTML = '';
