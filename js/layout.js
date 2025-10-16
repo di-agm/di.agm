@@ -10,6 +10,17 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
+const DPI = 96;
+const MM_PER_INCH = 25.4;
+
+function inToPx(inches) {
+  return inches * DPI;
+}
+
+function mmToPx(mm) {
+  return (mm / MM_PER_INCH) * DPI;
+}
+
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
@@ -56,50 +67,52 @@ const maxWidthPx = 360;
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let widthPx, heightPx;
-  if (key === 'a4') {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
-  } else if (key === 'letter') {
-    widthPx = inToPx(paperSizes.letter.widthIN);
-    heightPx = inToPx(paperSizes.letter.heightIN);
-  } else if (key === 'tabloid') {
-    widthPx = inToPx(paperSizes.tabloid.widthIN);
-    heightPx = inToPx(paperSizes.tabloid.heightIN);
-  } else {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
-  }
-
-  if (widthPx > maxWidthPx) {
-    const scale = maxWidthPx / widthPx;
-    widthPx = widthPx * scale;
-    heightPx = heightPx * scale;
-}
-
-  const pageElement = pages[currentPageIndex];
-  pageElement.style.width = `${widthPx}px`;
-  pageElement.style.height = `${heightPx}px`;
-
-if (rulersVisible) drawRulers();
-window.addEventListener("resize", () => {
-  if (rulersVisible) drawRulers();
-});
+  let baseWidth, baseHeight; 
   
-  const page = pages[currentPageIndex];
-
-  // Apply the correct dimensions based on orientation
-  if (!isPortrait) {
-    // Swap for landscape
-    page.style.width = `${heightPx}px`;
-    page.style.height = `${widthPx}px`;
+  if (key === 'a4') {
+    baseWidth = mmToPx(paperSizes.a4.widthMM);
+    baseHeight = mmToPx(paperSizes.a4.heightMM);
+  } else if (key === 'letter') {
+    baseWidth = inToPx(paperSizes.letter.widthIN);
+    baseHeight = inToPx(paperSizes.letter.heightIN);
+  } else if (key === 'tabloid') {
+    baseWidth = inToPx(paperSizes.tabloid.widthIN);
+    baseHeight = inToPx(paperSizes.tabloid.heightIN);
   } else {
-    page.style.width = `${widthPx}px`;
-    page.style.height = `${heightPx}px`;
+    baseWidth = mmToPx(paperSizes.a4.widthMM);
+    baseHeight = mmToPx(paperSizes.a4.heightMM);
   }
+
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+  window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
+  window.addEventListener("resize", updateRectSizeOnResize); 
 }
 
-function updateOrientation() {
+function updateRectSizeOnResize() {
+    if (rulersVisible) drawRulers();
+    updateRectSize(selector.value); 
+}
+
+/*function updateOrientation() {
   if (!pages[currentPageIndex]) return;
   
   const page = pages[currentPageIndex];
@@ -110,7 +123,7 @@ function updateOrientation() {
   page.style.height = width;
   
   isPortrait = !isPortrait;
-}
+}*/
 
 function showPage(index) {
   rectContainer.innerHTML = '';
