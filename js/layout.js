@@ -488,7 +488,8 @@ function selectElement(element) {
       const colorInput = document.getElementById('colorPickerInput');
       if (colorInput) {
         colorInput.value = selectedElement.style.color || '#000000';
-      } else if (element.classList.contains('frame-element')) {
+      } 
+    } else if (element.classList.contains('frame-element')) {
         toolbar = frameToolbar;
         document.getElementById('frameEditor').style.display = 'block';
         initframeEditor();
