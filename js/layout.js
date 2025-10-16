@@ -114,15 +114,8 @@ function updateRectSizeOnResize() {
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
-  
-  const page = pages[currentPageIndex];
-  const width = page.style.width;
-  const height = page.style.height;
-  
-  page.style.width = height;
-  page.style.height = width;
-  
   isPortrait = !isPortrait;
+  updateRectSize(selector.value); 
 }
 
 function showPage(index) {
@@ -1274,9 +1267,7 @@ if (selector) {
 }
 
 if (orientationBtn) {
-  orientationBtn.addEventListener('click', () => {
-    updateOrientation();
-  });
+    orientationBtn.addEventListener('click', updateOrientation);
 }
 
 const prevPageBtn = document.getElementById('prevPageBtn');
