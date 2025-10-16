@@ -16,10 +16,12 @@
   <h1 align="center" id="hello">Hello</h1>
 
     <div class="ring-container">
+        <!-- Value ring behind all others -->
         <div class="value-ring" id="valueRing">
             <div class="ring-knob" id="valueKnob"></div>
         </div>
 
+        <!-- Hue ring on top -->
         <div class="color-ring" id="colorRing">
             <div class="ring-knob" id="ringKnob"></div>
         </div>
@@ -116,6 +118,7 @@
     </div>
   </div>
   
+  <!-- Right hamburger button -->  
   <div class="hamburger-menu" style="right: 20px;" id="rightMenuBtn">
     <div class="hamburger-icon">
       <span></span>
@@ -124,6 +127,7 @@
     </div>
   </div>
   
+  <!-- Left sidebar -->  
   <div class="sidebar left-sidebar" id="leftSidebar">
     <div class="sidebar-section">
       <h3>Page Setup</h3>
@@ -164,7 +168,10 @@
         <button id="addTitleBtn">𝐓</button>
         <button id="addSubtitleBtn">𝓢</button>
         <button id="addParagraphBtn">𝓟</button>
-        <button id="addframeBtn">🏖</button>
+        <button id="addImageBtn">🏖</button>
+        <button id="addCircleBtn">⬤</button>
+        <button id="addPolygonBtn">⬟</button>
+        <button id="addStarBtn">★</button>
       </div>
     </div>
     
@@ -203,53 +210,46 @@
         </select>
       </div>
         
-      <div id="frameEditor" class="sidebar-section" style="display: none;">
-        <h3>frame Properties</h3>
-    
-        <div class="control-group">
-            <label>Fill Type:</label>
-            <div class="toggle-switch-container">
-                <button id="fillTypeColorBtn" class="toggle-button active" data-type="color">Color</button>
-                <button id="fillTypeImageBtn" class="toggle-button" data-type="image">Image</button>
-            </div>
+      <div id="shapeEditor" class="editor-panel" style="display: none;">
+        <h2>Shape Editor</h2>
+
+        <!-- FILL CONTROLS -->
+        <h3 class="mt-4 text-sm font-semibold">Fill Style</h3>
+        <div class="editor-group mt-2">
+            <label for="shape-fill-color" class="block text-xs font-medium text-gray-700">Fill Color:</label>
+            <input type="color" id="shape-fill-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
         </div>
-    
-        <div id="colorFillControls" class="control-group">
-            <label for="frameFillColorInput">Fill Color:</label>
-            <input type="color" id="frameFillColorInput" value="#3b82f6" data-attr="fillColor">
-            
-            <label for="frameFillOpacityInput">Opacity:</label>
-            <input type="range" id="frameFillOpacityInput" min="0" max="1" step="0.05" value="1.0" data-attr="fillOpacity">
-            <span id="frameFillOpacityValue">100%</span>
+        <div class="editor-group mt-2">
+            <label for="shape-fill-opacity" class="block text-xs font-medium text-gray-700">Fill Opacity: <span id="fill-opacity-value">1.0</span></label>
+            <input type="range" id="shape-fill-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
         </div>
-    
-        <div id="imageFillControls" class="control-group" style="display: none;">
-            <label for="frameImageUrlInput">Image URL:</label>
-            <input type="text" id="frameImageUrlInput" placeholder="Enter image URL" data-attr="imageUrl">
-            <button id="frameImageUploadBtn">Upload/Select Image</button> 
-            </div>
-    
-        <hr>
+
+        <!-- BORDER CONTROLS -->
+        <h3 class="mt-4 text-sm font-semibold">Border Style</h3>
+        <div class="editor-group mt-2">
+            <label for="shape-border-color" class="block text-xs font-medium text-gray-700">Border Color:</label>
+            <input type="color" id="shape-border-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-border-opacity" class="block text-xs font-medium text-gray-700">Border Opacity: <span id="border-opacity-value">1.0</span></label>
+            <input type="range" id="shape-border-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-border-width" class="block text-xs font-medium text-gray-700">Border Width (px):</label>
+            <input type="number" id="shape-border-width" min="0" value="1" class="w-full border border-gray-300 rounded-md p-1">
+        </div>
+    </div>
+
+    <div id="imageEditor" style="display: none;" class="space-y-4">
+        <h3 class="font-semibold text-gray-600">Image Source</h3>
         
-        <h4>Border</h4>
-        <div class="control-group">
-            <label for="frameBorderWidthInput">Width (px):</label>
-            <input type="number" id="frameBorderWidthInput" min="0" max="50" value="4" data-attr="borderWidth">
-    
-            <label for="frameBorderColorInput">Color:</label>
-            <input type="color" id="frameBorderColorInput" value="#1e3a8a" data-attr="borderColor">
-            
-            <label for="frameBorderOpacityInput">Opacity:</label>
-            <input type="range" id="frameBorderOpacityInput" min="0" max="1" step="0.05" value="1.0" data-attr="borderOpacity">
-            <span id="frameBorderOpacityValue">100%</span>
-        </div>
-    
-        <hr>
+        <label class="block font-medium">Image URL:</label>
+        <input type="text" id="imageUrlInput" 
+               oninput="updateImageSource(this.value)"
+               placeholder="Enter image URL"
+               class="w-full border p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500">
         
-        <div class="control-group button-group">
-            <button id="rotateframe90Btn" class="small-btn">Rotate 90°</button>
-            <button id="deleteframeBtn" class="delete-btn">Delete frame</button>
-        </div>
+        <p class="text-xs text-gray-500 mt-2">Paste a direct link (e.g., ending in .jpg, .png)</p>
     </div>
         
       <div id="noElementSelected" style="opacity: 0; text-align: center; padding: 10px;">
@@ -270,6 +270,7 @@
       <p></p>
  </div>
   
+  <!-- Right sidebar -->  
   <div class="sidebar right-sidebar" id="rightSidebar">
     <div class="sidebar-section">
       <h3>Export</h3>
@@ -293,6 +294,7 @@
     </div>
   </div>
   
+  <!-- Save layout modal -->
   <div class="modal" id="saveLayoutModal">
     <div class="modal-content">
       <h3>Save Layout</h3>
@@ -320,7 +322,7 @@
       <button class="toolbar-btn" data-action="align">≡</button>
     </div>
 
-    <div id="frameToolbar" class="toolbar" style="
+    <div id="shapeToolbar" class="toolbar" style="
       position: absolute;
       display: none;
       gap: 8px;
@@ -331,6 +333,10 @@
       <button class="toolbar-btn" data-action="rotate">🗘</button>
     </div>
 
+    <div id="imageToolbar" class="floating-toolbar" style="display: none;">
+        <button class="toolbar-btn" data-action="delete">✖</button>
+    </div>
+    
     <div id="tt" style="display:none;">
     <div class="container">
         <h1>Generador de Horarios</h1>
