@@ -63,8 +63,6 @@ const paperSizes = {
   tabloid: { widthMM: 279.4, heightMM: 431.8 }
 };
 
-const maxWidthPx = 360;
-
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
@@ -86,25 +84,28 @@ function updateRectSize(key) {
     baseWidth = mmToPx(paperSizes.a4.widthMM);
     baseHeight = mmToPx(paperSizes.a4.heightMM);
   }
-
-  let finalWidthPx = baseWidth;
-  let finalHeightPx = baseHeight;
-
-  if (finalWidthPx > maxWidthPx) {
-    const scale = maxWidthPx / finalWidthPx;
-    finalWidthPx = finalWidthPx * scale;
-    finalHeightPx = finalHeightPx * scale;
-  }
   
+  const pageW = isPortrait ? baseWidth : baseHeight;
+  const pageH = isPortrait ? baseHeight : baseWidth;
+
+  const rectContainer = document.querySelector('.center-container'); 
+  const availableW = rectContainer.clientWidth - 40; 
+  const availableH = rectContainer.clientHeight - 40;
+  
+  let scale = 1;
+
+  if (pageW > availableW || pageH > availableH) {
+    const scaleW = availableW / pageW;
+    const scaleH = availableH / pageH;
+    scale = Math.min(scaleW, scaleH);
+  }
+
+  const finalWidthPx = pageW * scale;
+  const finalHeightPx = pageH * scale;
   const pageElement = pages[currentPageIndex];
   
-  if (!isPortrait) {
-    pageElement.style.width = `${finalHeightPx}px`;
-    pageElement.style.height = `${finalWidthPx}px`;
-  } else {
-    pageElement.style.width = `${finalWidthPx}px`;
-    pageElement.style.height = `${finalHeightPx}px`;
-  }
+  pageElement.style.width = `${finalWidthPx}px`;
+  pageElement.style.height = `${finalHeightPx}px`;
 
   if (rulersVisible) drawRulers();
   window.removeEventListener("resize", updateRectSizeOnResize); 
