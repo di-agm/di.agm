@@ -1336,15 +1336,15 @@ const addImageBtn = document.getElementById('addImageBtn');
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
 if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
+if (addImageBtn) addImageBtn.addEventListener('click', () => addFrameElement('image'));
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
 const addStarBtn = document.getElementById('addStarBtn');
 
-if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('circle'));
-if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
-if (addStarBtn) addStarBtn.addEventListener('click', () => addShapeElement('star'));
+if (addCircleBtn) addCircleBtn.addEventListener('click', () => addFrameElement('shape', 'circle'));
+if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addFrameElement('shape', 'polygon'));
+if (addStarBtn) addStarBtn.addEventListener('click', () => addFrameElement('shape', 'star'));
 
 const fontColorInput = document.getElementById('fontColorInput');
 
