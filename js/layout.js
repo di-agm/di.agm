@@ -72,11 +72,11 @@ function updateRectSize(key) {
     baseWidth = mmToPx(paperSizes.a4.widthMM);
     baseHeight = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    baseWidth = inToPx(paperSizes.letter.widthIN);
-    baseHeight = inToPx(paperSizes.letter.heightIN);
+    baseWidth = mmToPx(paperSizes.letter.widthMM);
+    baseHeight = mmToPx(paperSizes.letter.heightMM);
   } else if (key === 'tabloid') {
-    baseWidth = inToPx(paperSizes.tabloid.widthMM);
-    baseHeight = inToPx(paperSizes.tabloid.heightMM);
+    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
+    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
   } else if (key === 'custom') { 
     baseWidth = mmToPx(customSizeMM.width);
     baseHeight = mmToPx(customSizeMM.height);
@@ -276,7 +276,6 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
-  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
@@ -284,7 +283,6 @@ function drawRulers() {
   hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(hRuler);
 
-  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
@@ -292,12 +290,10 @@ function drawRulers() {
   vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing: every 50px in current unit
   const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
-  // Horizontal ticks
   for (let x = 0; x <= maxX; x += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -315,7 +311,6 @@ function drawRulers() {
     }
   }
 
-  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -339,7 +334,6 @@ function toggleRulers() {
   drawRulers();
 }
 
-// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
@@ -457,7 +451,7 @@ function addFrameElement(mode, shapeType = null) {
     frame.className = 'frame-element';
     frame.setAttribute('tabindex', '0');
     frame.dataset.mode = mode;
-    frame.dataset.shapeType = shapeType || 'none'; /
+    frame.dataset.shapeType = shapeType || 'none';
   
     frame.style.top = '50px';
     frame.style.left = '50px';
