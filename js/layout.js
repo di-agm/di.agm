@@ -384,166 +384,144 @@ function addTextElement(type) {
   selectElement(element);
 }
 
-  function addImageElement() {
-    // Ensure current page exists and is a DOM element with a querySelector method
-    if (!pages[currentPageIndex] || !pages[currentPageIndex].querySelector) return;
-    
-    const pageContent = pages[currentPageIndex].querySelector('.page-content');
-    const element = document.createElement('img');
-    
-    element.className = 'image-element';
-    element.src = DEFAULT_IMAGE_SRC;
-    element.alt = 'User-defined image';
-    element.contentEditable = false; 
-    
-    element.style.top = '50px';
-    element.style.left = '50px';
-    element.style.position = 'absolute';
-    element.style.width = '150px'; 
-    element.style.height = '100px';
-    element.style.objectFit = 'cover'; // Helps the image scale nicely within the bounds
-    
-    element.style.resize = 'both';
-    element.style.overflow = 'hidden'; // Hide parts of the image that might exceed bounds
+ function createShapeSVG(type) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.setAttribute("viewBox", "0 0 100 100");
 
-    pageContent.appendChild(element);
-    makeElementDraggable(element);
-    makeRotatable(element);
-    selectElement(element);
-}
+    let shape;
 
-function addShapeElement(type) {
-  if (!pages[currentPageIndex]) return;
+    switch(type) {
+        case 'circle':
+            shape = document.createElementNS(svgNS, "circle");
+            shape.setAttribute("cx", "50");
+            shape.setAttribute("cy", "50");
+            shape.setAttribute("r", "40");
+            break;
 
-  const pageContent = pages[currentPageIndex].querySelector('.page-content');
-  const element = document.createElement('div');
-  element.className = 'shape-element';
-  element.setAttribute('tabindex', '0');
-  element.style.top = '50px';
-  element.style.left = '50px';
-  element.style.position = 'absolute';
-  element.style.width = '100px';
-  element.style.height = '100px';
-  element.style.resize = 'both';
-  element.style.overflow = 'auto';
+        case 'polygon': {
+            let sides = parseInt(prompt("Enter number of sides:", "7"));
+            if (isNaN(sides) || sides < 3) sides = 7;
+            const points = [];
+            const radius = 40; 
+            
+            for (let i = 0; i < sides; i++) {
+                const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
+                const x = 50 + radius * Math.cos(angle); 
+                const y = 50 + radius * Math.sin(angle);
+                points.push(`${x},${y}`);
+            }
+            
+            shape = document.createElementNS(svgNS, "polygon");
+            shape.setAttribute("points", points.join(" "));
+            break;
+        }
 
-  // Create an SVG to hold the shape
-  const svgNS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("width", "100%");
-  svg.setAttribute("height", "100%");
-  svg.setAttribute("viewBox", "0 0 100 100");
-
-  let shape;
-
-  switch(type) {
-    case 'circle':
-      shape = document.createElementNS(svgNS, "circle");
-      shape.setAttribute("cx", "50");
-      shape.setAttribute("cy", "50");
-      shape.setAttribute("r", "40");
-      shape.setAttribute("fill", "#3b82f6"); // Default blue fill
-      shape.setAttribute("stroke", "#1e3a8a"); // Default dark blue border
-      shape.setAttribute("stroke-width", "4"); // Default border width
-      break;
-
-    case 'polygon': {
-      let sides = parseInt(prompt("Enter number of sides:", "7"));
-      if (isNaN(sides) || sides < 3) sides = 7; // default
-      const points = [];
-      
-      // FIX: A polygon uses a single radius, not alternating radii like a star.
-      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
-      
-      for (let i = 0; i < sides; i++) {
-        // Keeps the top point flat by starting the angle correctly
-        const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        
-        // Use the consistent radius for all points
-        const x = 50 + radius * Math.cos(angle); 
-        const y = 50 + radius * Math.sin(angle);
-        
-        points.push(`${x},${y}`);
-      }
-      
-      shape = document.createElementNS(svgNS, "polygon");
-      shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
-      break;
+        case 'star': {
+            let peaks = parseInt(prompt("Enter number of peaks:", "7"));
+            if (isNaN(peaks) || peaks < 3) peaks = 7;
+            const points = [];
+            const outerRadius = 40;
+            const innerRadius = 20;
+            for (let i = 0; i < 2 * peaks; i++) {
+                const angle = (Math.PI * i) / peaks - Math.PI / 2;
+                const r = i % 2 === 0 ? outerRadius : innerRadius;
+                const x = 50 + r * Math.cos(angle);
+                const y = 50 + r * Math.sin(angle);
+                points.push(`${x},${y}`);
+            }
+            shape = document.createElementNS(svgNS, "polygon");
+            shape.setAttribute("points", points.join(" "));
+            break;
+        }
+        default:
+            return null; // Should not happen
     }
-
-    case 'star': {
-      let peaks = parseInt(prompt("Enter number of peaks:", "7"));
-      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
-      const points = [];
-      const outerRadius = 40;
-      const innerRadius = 20;
-      for (let i = 0; i < 2 * peaks; i++) {
-        const angle = (Math.PI * i) / peaks - Math.PI / 2;
-        const r = i % 2 === 0 ? outerRadius : innerRadius;
-        const x = 50 + r * Math.cos(angle);
-        const y = 50 + r * Math.sin(angle);
-        points.push(`${x},${y}`);
-      }
-      shape = document.createElementNS(svgNS, "polygon");
-      shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
-      break;
-    }
-  }
-
-  if (shape) {
-    // Store style properties on the container element for persistence
-    element.dataset.fillColor = shape.getAttribute('fill');
-    element.dataset.fillOpacity = 1.0;
-    element.dataset.borderColor = shape.getAttribute('stroke');
-    element.dataset.borderOpacity = 1.0;
-    element.dataset.borderWidth = shape.getAttribute('stroke-width');
+    
+    shape.setAttribute("fill", "#3b82f6");
+    shape.setAttribute("stroke", "#1e3a8a");
+    shape.setAttribute("stroke-width", "4");
 
     svg.appendChild(shape);
-    element.appendChild(svg);
-  }
+    return svg;
+}
 
-  element.style.zIndex = '1';
+function addFrameElement(mode, shapeType = null) {
+    if (!pages[currentPageIndex]) return;
+    
+    const pageContent = pages[currentPageIndex].querySelector('.page-content');
+    
+    const frame = document.createElement('div');
+    frame.className = 'frame-element';
+    frame.setAttribute('tabindex', '0');
+    frame.dataset.mode = mode;
+    frame.dataset.shapeType = shapeType || 'none'; /
   
-  pageContent.appendChild(element);
-  makeElementDraggable(element);
-  makeRotatable(element);
-  selectElement(element);
+    frame.style.top = '50px';
+    frame.style.left = '50px';
+    frame.style.position = 'absolute';
+    frame.style.width = mode === 'image' ? '150px' : '100px'; 
+    frame.style.height = mode === 'image' ? '100px' : '100px';
+    frame.style.resize = 'both';
+    frame.style.overflow = 'hidden';
+    frame.style.zIndex = '1';
+  
+    let content;
+    
+    if (mode === 'image') {
+        content = document.createElement('img');
+        content.className = 'frame-content-image';
+        content.src = DEFAULT_IMAGE_SRC;
+        content.alt = 'User-defined image';
+        content.style.width = '100%';
+        content.style.height = '100%';
+        content.style.objectFit = 'cover';
+        content.contentEditable = false; 
+    } else if (mode === 'shape' && shapeType) {
+        content = createShapeSVG(shapeType);
+        content.className = 'frame-content-shape';
+        
+        const shape = content.querySelector('circle, polygon');
+        if (shape) {
+            frame.dataset.fillColor = shape.getAttribute('fill');
+            frame.dataset.borderColor = shape.getAttribute('stroke');
+            frame.dataset.borderWidth = shape.getAttribute('stroke-width');
+        }
+    }
 
-  // Re-apply style when element is resized (to ensure SVG scale/transform updates)
-  new ResizeObserver(() => {
-    updateSelectedShapeStyle(); 
-  }).observe(element);
+    if (content) {
+        frame.appendChild(content);
+    }
+
+    pageContent.appendChild(frame);
+    makeElementDraggable(frame);
+    makeRotatable(frame);
+    selectElement(frame);
+
+    new ResizeObserver(() => {
+        updateSelectedShapeStyle(); 
+    }).observe(frame);
 }
 
 function selectElement(element) {
-    document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
-        el.classList.remove('selected');
-        if (el.classList.contains('shape-element')) {
-            el.style.boxShadow = 'none';
-            el.style.border = 'none';
-        }
-        if (el.classList.contains('image-element')) {
-            el.style.border = 'none';
-        }
-    });
+    document.querySelectorAll('.text-element, .frame-element').forEach(el => {
+    el.classList.remove('selected');
+    el.style.boxShadow = 'none'; 
+    el.style.border = 'none';
+    el.style.outline = 'none';
+});
 
     selectedElement = element;
     selectedElement.classList.add('selected');
     
-    if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
-        selectedElement.style.border = '2px solid #3B82F6';
-        selectedElement.style.outline = '1px solid #ffffff';
-    }
-
-    if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
-        selectedElement.style.border = 'none'; // Ensure no box border
+    if (selectedElement.classList.contains('text-element')) {
+      selectedElement.style.border = '2px solid #3B82F6';
+      selectedElement.style.outline = '1px solid #ffffff';
+    } else if (selectedElement.classList.contains('frame-element')) {
+      selectedElement.style.border = '2px dashed #3B82F6';
+      selectedElement.style.outline = '1px solid #ffffff';
     }
 
     document.getElementById('textEditor').style.display = 'none';
@@ -580,21 +558,29 @@ function selectElement(element) {
           colorInput.value = selectedElement.style.color || '#000000';
         }
 
-    } else if (element.classList.contains('shape-element')) {
+    } else if (element.classList.contains('frame-element')) {
+      const mode = selectedElement.dataset.mode;
+      
+      if (mode === 'shape') {
         toolbar = shapeToolbar;
         document.getElementById('shapeEditor').style.display = 'block';
         
         initShapeEditor();
         loadShapeStateToControls();
-    
-    } else if (element.classList.contains('image-element')) { 
+        
+      } else if (mode === 'image') {
         toolbar = imageToolbar;
         document.getElementById('imageEditor').style.display = 'block';
         
         const imageUrlInput = document.getElementById('imageUrlInput');
-        if (imageUrlInput) {
-            imageUrlInput.value = selectedElement.src;
+        const imageContent = selectedElement.querySelector('.frame-content-image');
+        
+        if (imageUrlInput && imageContent) {
+            imageUrlInput.value = imageContent.src;
         }
+      }
+    } else {
+        document.getElementById('noElementSelected').style.display = 'block';
     }
 
     if (toolbar) {
@@ -604,9 +590,9 @@ function selectElement(element) {
         toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
         toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
         toolbar.style.display = 'flex';
-    } else if (!toolbar) {
+    } /*else if (!toolbar) {
         document.getElementById('noElementSelected').style.display = 'block';
-    }
+    }*/
 }
 
 function makeElementDraggable(el) {
