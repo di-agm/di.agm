@@ -1284,9 +1284,13 @@ function loadSavedLayouts() {
 }
 
 if (selector) {
-  selector.addEventListener('change', (e) => {
-    updateRectSize(e.target.value);
-  });
+    selector.addEventListener('change', () => {
+        if (selector.value === 'custom') {
+            promptForCustomSize();
+        } else {
+            updateRectSize(selector.value);
+        }
+    });
 }
 
 if (orientationBtn) {
