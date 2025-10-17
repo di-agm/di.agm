@@ -378,6 +378,11 @@ function addTextElement(type) {
   selectElement(element);
 }
 
+const shapeToolbar = document.getElementById('shapeToolbar');
+const shapeEditor = document.getElementById('shapeEditor');
+const imageToolbar = document.getElementById('imageToolbar');
+const imageEditor = document.getElementById('imageEditor');
+
  function createShapeSVG(type) {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
@@ -555,25 +560,22 @@ function selectElement(element) {
 
     } else if (element.classList.contains('frame-element')) {
       const mode = selectedElement.dataset.mode;
-      
       if (mode === 'shape') {
-        toolbar = shapeToolbar;
-        document.getElementById('shapeEditor').style.display = 'block';
-        
+        if (imageEditor) imageEditor.style.display = 'none';
+        if (imageToolbar) imageToolbar.style.display = 'none';
+    
+        if (shapeEditor) shapeEditor.style.display = 'block';
+        if (shapeToolbar) shapeToolbar.style.display = 'block'; // <<< CRITICAL LINE >>>
+    
         initShapeEditor();
         loadShapeStateToControls();
-        
-      } else if (mode === 'image') {
-        toolbar = imageToolbar;
-        document.getElementById('imageEditor').style.display = 'block';
-        if (toolbar) toolbar.style.display = 'block';
-        const imageUrlInput = document.getElementById('imageUrlInput');
-        const imageContent = selectedElement.querySelector('.frame-content-image');
-        
-        if (imageUrlInput && imageContent) {
-            imageUrlInput.value = imageContent.src;
-        }
-      }
+    
+    } else if (mode === 'image') {
+        if (shapeEditor) shapeEditor.style.display = 'none';
+        if (shapeToolbar) shapeToolbar.style.display = 'none';
+    
+        if (imageEditor) imageEditor.style.display = 'block';
+        if (imageToolbar) imageToolbar.style.display = 'block';
     } else {
         document.getElementById('noElementSelected').style.display = 'block';
     }
