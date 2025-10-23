@@ -1,7 +1,6 @@
 let pages = [];
 let currentPageIndex = 0;
 let isPortrait = true;
-let customSizeMM = { width: 210, height: 297 };
 let selectedElement = null;
 let savedLayouts = [];
 let rulersVisible = false;
@@ -10,17 +9,6 @@ let pageNumbersVisible = true;
 let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
-
-const DPI = 96;
-const MM_PER_INCH = 25.4;
-
-function inToPx(inches) {
-  return inches * DPI;
-}
-
-function mmToPx(mm) {
-  return (mm / MM_PER_INCH) * DPI;
-}
 
 function createPage(pageNumber) {
   const page = document.createElement('div');
@@ -59,92 +47,69 @@ const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
   a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthMM: 215.9, heightMM: 279.4 },
-  tabloid: { widthMM: 279.4, heightMM: 431.8 }
+  letter: { widthIN: 8.5, heightIN: 11 },
+  tabloid: { widthIN: 11, heightIN: 17 }
 };
+
+const maxWidthPx = 360;
 
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let baseWidth, baseHeight; 
-  
+  let widthPx, heightPx;
   if (key === 'a4') {
-    baseWidth = mmToPx(paperSizes.a4.widthMM);
-    baseHeight = mmToPx(paperSizes.a4.heightMM);
+    widthPx = mmToPx(paperSizes.a4.widthMM);
+    heightPx = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    baseWidth = mmToPx(paperSizes.letter.widthMM);
-    baseHeight = mmToPx(paperSizes.letter.heightMM);
+    widthPx = inToPx(paperSizes.letter.widthIN);
+    heightPx = inToPx(paperSizes.letter.heightIN);
   } else if (key === 'tabloid') {
-    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
-    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
-  } else if (key === 'custom') { 
-    baseWidth = mmToPx(customSizeMM.width);
-    baseHeight = mmToPx(customSizeMM.height);
+    widthPx = inToPx(paperSizes.tabloid.widthIN);
+    heightPx = inToPx(paperSizes.tabloid.heightIN);
   } else {
-    baseWidth = mmToPx(paperSizes.a4.widthMM);
-    baseHeight = mmToPx(paperSizes.a4.heightMM);
-  }
-  
-  const pageW = isPortrait ? baseWidth : baseHeight;
-  const pageH = isPortrait ? baseHeight : baseWidth;
-
-  const rectContainer = document.querySelector('.center-container'); 
-  const availableW = rectContainer.clientWidth - 40; 
-  const availableH = rectContainer.clientHeight - 40;
-  
-  let scale = 1;
-
-  if (pageW > availableW || pageH > availableH) {
-    const scaleW = availableW / pageW;
-    const scaleH = availableH / pageH;
-    scale = Math.min(scaleW, scaleH);
+    widthPx = mmToPx(paperSizes.a4.widthMM);
+    heightPx = mmToPx(paperSizes.a4.heightMM);
   }
 
-  const finalWidthPx = pageW * scale;
-  const finalHeightPx = pageH * scale;
+  if (widthPx > maxWidthPx) {
+    const scale = maxWidthPx / widthPx;
+    widthPx = widthPx * scale;
+    heightPx = heightPx * scale;
+}
+
   const pageElement = pages[currentPageIndex];
-  
-  pageElement.style.width = `${finalWidthPx}px`;
-  pageElement.style.height = `${finalHeightPx}px`;
+  pageElement.style.width = `${widthPx}px`;
+  pageElement.style.height = `${heightPx}px`;
 
+if (rulersVisible) drawRulers();
+window.addEventListener("resize", () => {
   if (rulersVisible) drawRulers();
-  window.removeEventListener("resize", updateRectSizeOnResize); 
-  window.addEventListener("resize", updateRectSizeOnResize); 
-}
-
-function promptForCustomSize() {
-  const customWidthMM = prompt(`Enter Custom Page Width (in mm). Current: ${customSizeMM.width}mm`);
-  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
-    selector.value = 'a4'; // You may need a global variable to store the PREVIOUS size
-    updateRectSize('a4');
-    return;
-  }
+});
   
-  const customHeightMM = prompt(`Enter Custom Page Height (in mm). Current: ${customSizeMM.height}mm`);
-  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
-    selector.value = 'a4'; 
-    updateRectSize('a4');
-    return;
+  const page = pages[currentPageIndex];
+
+  // Apply the correct dimensions based on orientation
+  if (!isPortrait) {
+    // Swap for landscape
+    page.style.width = `${heightPx}px`;
+    page.style.height = `${widthPx}px`;
+  } else {
+    page.style.width = `${widthPx}px`;
+    page.style.height = `${heightPx}px`;
   }
-
-  const widthMM = parseFloat(customWidthMM);
-  const heightMM = parseFloat(customHeightMM);
-  
-  customSizeMM.width = widthMM;
-  customSizeMM.height = heightMM;
-
-  updateRectSize('custom'); 
-}
-
-function updateRectSizeOnResize() {
-    if (rulersVisible) drawRulers();
-    updateRectSize(selector.value); 
 }
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
+  
+  const page = pages[currentPageIndex];
+  const width = page.style.width;
+  const height = page.style.height;
+  
+  page.style.width = height;
+  page.style.height = width;
+  
   isPortrait = !isPortrait;
-  updateRectSize(selector.value); 
 }
 
 function showPage(index) {
@@ -187,7 +152,8 @@ function duplicatePage(index) {
   const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
-    makeRotatable(element); 
+    makeRotatable(element); // Ensure rotation handler is re-added
+    // Re-select handler
     element.addEventListener('click', (e) => {
       e.stopPropagation();
       selectElement(element);
@@ -202,6 +168,7 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   pages.forEach(page => {
     if (rulersVisible) {
+      // Add rulers if not already present
       if (!page.querySelector('.page-ruler.horizontal.top')) {
         const top = document.createElement('div');
         top.className = 'page-ruler horizontal top';
@@ -248,6 +215,8 @@ function toggleMargins() {
   });
 }
 
+// layout.js
+
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
@@ -258,6 +227,7 @@ function togglePageNumbers() {
     }
     
     pages.forEach(page => {
+        // Get the page-content container
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
         const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
@@ -276,6 +246,7 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
+  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
@@ -283,6 +254,7 @@ function drawRulers() {
   hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(hRuler);
 
+  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
@@ -290,10 +262,12 @@ function drawRulers() {
   vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(vRuler);
 
+  // Tick spacing: every 50px in current unit
   const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
+  // Horizontal ticks
   for (let x = 0; x <= maxX; x += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -311,6 +285,7 @@ function drawRulers() {
     }
   }
 
+  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -334,6 +309,7 @@ function toggleRulers() {
   drawRulers();
 }
 
+// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
@@ -378,145 +354,166 @@ function addTextElement(type) {
   selectElement(element);
 }
 
- function createShapeSVG(type) {
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", "100%");
-    svg.setAttribute("height", "100%");
-    svg.setAttribute("viewBox", "0 0 100 100");
-
-    let shape;
-
-    switch(type) {
-        case 'circle':
-            shape = document.createElementNS(svgNS, "circle");
-            shape.setAttribute("cx", "50");
-            shape.setAttribute("cy", "50");
-            shape.setAttribute("r", "40");
-            break;
-
-        case 'polygon': {
-            let sides = parseInt(prompt("Enter number of sides:", "7"));
-            if (isNaN(sides) || sides < 3) sides = 7;
-            const points = [];
-            const radius = 40; 
-            
-            for (let i = 0; i < sides; i++) {
-                const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-                const x = 50 + radius * Math.cos(angle); 
-                const y = 50 + radius * Math.sin(angle);
-                points.push(`${x},${y}`);
-            }
-            
-            shape = document.createElementNS(svgNS, "polygon");
-            shape.setAttribute("points", points.join(" "));
-            break;
-        }
-
-        case 'star': {
-            let peaks = parseInt(prompt("Enter number of peaks:", "7"));
-            if (isNaN(peaks) || peaks < 3) peaks = 7;
-            const points = [];
-            const outerRadius = 40;
-            const innerRadius = 20;
-            for (let i = 0; i < 2 * peaks; i++) {
-                const angle = (Math.PI * i) / peaks - Math.PI / 2;
-                const r = i % 2 === 0 ? outerRadius : innerRadius;
-                const x = 50 + r * Math.cos(angle);
-                const y = 50 + r * Math.sin(angle);
-                points.push(`${x},${y}`);
-            }
-            shape = document.createElementNS(svgNS, "polygon");
-            shape.setAttribute("points", points.join(" "));
-            break;
-        }
-        default:
-            return null; // Should not happen
-    }
-    
-    shape.setAttribute("fill", "#3b82f6");
-    shape.setAttribute("stroke", "#1e3a8a");
-    shape.setAttribute("stroke-width", "4");
-
-    svg.appendChild(shape);
-    return svg;
-}
-
-function addFrameElement(mode, shapeType = null) {
-    if (!pages[currentPageIndex]) return;
+  function addImageElement() {
+    // Ensure current page exists and is a DOM element with a querySelector method
+    if (!pages[currentPageIndex] || !pages[currentPageIndex].querySelector) return;
     
     const pageContent = pages[currentPageIndex].querySelector('.page-content');
+    const element = document.createElement('img');
     
-    const frame = document.createElement('div');
-    frame.className = 'frame-element';
-    frame.setAttribute('tabindex', '0');
-    frame.dataset.mode = mode;
-    frame.dataset.shapeType = shapeType || 'none';
-  
-    frame.style.top = '50px';
-    frame.style.left = '50px';
-    frame.style.position = 'absolute';
-    frame.style.width = mode === 'image' ? '150px' : '100px'; 
-    frame.style.height = mode === 'image' ? '100px' : '100px';
-    frame.style.resize = 'both';
-    frame.style.overflow = 'hidden';
-    frame.style.zIndex = '1';
-  
-    let content;
+    element.className = 'image-element';
+    element.src = DEFAULT_IMAGE_SRC;
+    element.alt = 'User-defined image';
+    element.contentEditable = false; 
     
-    if (mode === 'image') {
-      content = document.createElement('img');
-      content.className = 'frame-content-image';
-      content.src = DEFAULT_IMAGE_SRC;
-      content.alt = 'User-defined image';
-      content.style.width = '100%';
-      content.style.height = '100%';
-      content.style.objectFit = 'cover';
-      content.contentEditable = false; 
-    } else if (mode === 'shape' && shapeType) {
-      content = createShapeSVG(shapeType);
-      content.className = 'frame-content-shape';
+    element.style.top = '50px';
+    element.style.left = '50px';
+    element.style.position = 'absolute';
+    element.style.width = '150px'; 
+    element.style.height = '100px';
+    element.style.objectFit = 'cover'; // Helps the image scale nicely within the bounds
+    
+    element.style.resize = 'both';
+    element.style.overflow = 'hidden'; // Hide parts of the image that might exceed bounds
+
+    pageContent.appendChild(element);
+    makeElementDraggable(element);
+    makeRotatable(element);
+    selectElement(element);
+}
+
+function addShapeElement(type) {
+  if (!pages[currentPageIndex]) return;
+
+  const pageContent = pages[currentPageIndex].querySelector('.page-content');
+  const element = document.createElement('div');
+  element.className = 'shape-element';
+  element.setAttribute('tabindex', '0');
+  element.style.top = '50px';
+  element.style.left = '50px';
+  element.style.position = 'absolute';
+  element.style.width = '100px';
+  element.style.height = '100px';
+  element.style.resize = 'both';
+  element.style.overflow = 'auto';
+
+  // Create an SVG to hold the shape
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", "100%");
+  svg.setAttribute("viewBox", "0 0 100 100");
+
+  let shape;
+
+  switch(type) {
+    case 'circle':
+      shape = document.createElementNS(svgNS, "circle");
+      shape.setAttribute("cx", "50");
+      shape.setAttribute("cy", "50");
+      shape.setAttribute("r", "40");
+      shape.setAttribute("fill", "#3b82f6"); // Default blue fill
+      shape.setAttribute("stroke", "#1e3a8a"); // Default dark blue border
+      shape.setAttribute("stroke-width", "4"); // Default border width
+      break;
+
+    case 'polygon': {
+      let sides = parseInt(prompt("Enter number of sides:", "7"));
+      if (isNaN(sides) || sides < 3) sides = 7; // default
+      const points = [];
       
-      const shape = content.querySelector('circle, polygon');
-      if (shape) {
-        frame.dataset.fillColor = shape.getAttribute('fill') || '#3b82f6';
-        frame.dataset.borderColor = shape.getAttribute('stroke') || '#1e3a8a';
-        frame.dataset.borderWidth = shape.getAttribute('stroke-width') || '4';
+      // FIX: A polygon uses a single radius, not alternating radii like a star.
+      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
+      
+      for (let i = 0; i < sides; i++) {
+        // Keeps the top point flat by starting the angle correctly
+        const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
+        
+        // Use the consistent radius for all points
+        const x = 50 + radius * Math.cos(angle); 
+        const y = 50 + radius * Math.sin(angle);
+        
+        points.push(`${x},${y}`);
       }
+      
+      shape = document.createElementNS(svgNS, "polygon");
+      shape.setAttribute("points", points.join(" "));
+      shape.setAttribute("fill", "#3b82f6");
+      shape.setAttribute("stroke", "#1e3a8a");
+      shape.setAttribute("stroke-width", "4");
+      break;
     }
 
-    if (content) {
-        frame.appendChild(content);
+    case 'star': {
+      let peaks = parseInt(prompt("Enter number of peaks:", "7"));
+      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
+      const points = [];
+      const outerRadius = 40;
+      const innerRadius = 20;
+      for (let i = 0; i < 2 * peaks; i++) {
+        const angle = (Math.PI * i) / peaks - Math.PI / 2;
+        const r = i % 2 === 0 ? outerRadius : innerRadius;
+        const x = 50 + r * Math.cos(angle);
+        const y = 50 + r * Math.sin(angle);
+        points.push(`${x},${y}`);
+      }
+      shape = document.createElementNS(svgNS, "polygon");
+      shape.setAttribute("points", points.join(" "));
+      shape.setAttribute("fill", "#3b82f6");
+      shape.setAttribute("stroke", "#1e3a8a");
+      shape.setAttribute("stroke-width", "4");
+      break;
     }
+  }
 
-    pageContent.appendChild(frame);
-    makeElementDraggable(frame);
-    makeRotatable(frame);
-    applyShapeStyle(frame);
-    selectElement(frame);
+  if (shape) {
+    // Store style properties on the container element for persistence
+    element.dataset.fillColor = shape.getAttribute('fill');
+    element.dataset.fillOpacity = 1.0;
+    element.dataset.borderColor = shape.getAttribute('stroke');
+    element.dataset.borderOpacity = 1.0;
+    element.dataset.borderWidth = shape.getAttribute('stroke-width');
 
-    new ResizeObserver(() => {
-        updateSelectedShapeStyle(); 
-    }).observe(frame);
+    svg.appendChild(shape);
+    element.appendChild(svg);
+  }
+
+  element.style.zIndex = '1';
+  
+  pageContent.appendChild(element);
+  makeElementDraggable(element);
+  makeRotatable(element);
+  selectElement(element);
+
+  // Re-apply style when element is resized (to ensure SVG scale/transform updates)
+  new ResizeObserver(() => {
+    updateSelectedShapeStyle(); 
+  }).observe(element);
 }
 
 function selectElement(element) {
-    document.querySelectorAll('.text-element, .frame-element').forEach(el => {
-    el.classList.remove('selected');
-    el.style.boxShadow = 'none'; 
-    el.style.border = 'none';
-    el.style.outline = 'none';
-});
+    document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
+        el.classList.remove('selected');
+        if (el.classList.contains('shape-element')) {
+            el.style.boxShadow = 'none';
+            el.style.border = 'none';
+        }
+        if (el.classList.contains('image-element')) {
+            el.style.border = 'none';
+        }
+    });
 
     selectedElement = element;
     selectedElement.classList.add('selected');
     
-    if (selectedElement.classList.contains('text-element')) {
-      selectedElement.style.border = '2px solid #3B82F6';
-      selectedElement.style.outline = '1px solid #ffffff';
-    } else if (selectedElement.classList.contains('frame-element')) {
-      selectedElement.style.border = '2px dashed #3B82F6';
-      selectedElement.style.outline = '1px solid #ffffff';
+    if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
+        selectedElement.style.border = '2px solid #3B82F6';
+        selectedElement.style.outline = '1px solid #ffffff';
+    }
+
+    if (selectedElement.classList.contains('shape-element')) {
+        selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
+        selectedElement.style.border = 'none'; // Ensure no box border
     }
 
     document.getElementById('textEditor').style.display = 'none';
@@ -553,29 +550,21 @@ function selectElement(element) {
           colorInput.value = selectedElement.style.color || '#000000';
         }
 
-    } else if (element.classList.contains('frame-element')) {
-      const mode = selectedElement.dataset.mode;
-      
-      if (mode === 'shape') {
+    } else if (element.classList.contains('shape-element')) {
         toolbar = shapeToolbar;
         document.getElementById('shapeEditor').style.display = 'block';
         
         initShapeEditor();
         loadShapeStateToControls();
-        
-      } else if (mode === 'image') {
+    
+    } else if (element.classList.contains('image-element')) { 
         toolbar = imageToolbar;
         document.getElementById('imageEditor').style.display = 'block';
-        if (toolbar) toolbar.style.display = 'block';
-        const imageUrlInput = document.getElementById('imageUrlInput');
-        const imageContent = selectedElement.querySelector('.frame-content-image');
         
-        if (imageUrlInput && imageContent) {
-            imageUrlInput.value = imageContent.src;
+        const imageUrlInput = document.getElementById('imageUrlInput');
+        if (imageUrlInput) {
+            imageUrlInput.value = selectedElement.src;
         }
-      }
-    } else {
-        document.getElementById('noElementSelected').style.display = 'block';
     }
 
     if (toolbar) {
@@ -585,9 +574,9 @@ function selectElement(element) {
         toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
         toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
         toolbar.style.display = 'flex';
-    } /*else if (!toolbar) {
+    } else if (!toolbar) {
         document.getElementById('noElementSelected').style.display = 'block';
-    }*/
+    }
 }
 
 function makeElementDraggable(el) {
@@ -641,19 +630,14 @@ function showToolbar(targetElement) {
     imageToolbar.style.display = 'none'; 
 
     const rect = targetElement.getBoundingClientRect();
-    let toolbar = null;
+    let toolbar;
 
     if (targetElement.classList.contains('text-element')) {
         toolbar = textToolbar;
-        
-    } else if (targetElement.classList.contains('frame-element')) {
-        const mode = targetElement.dataset.mode;
-        
-        if (mode === 'shape') {
-            toolbar = shapeToolbar;
-        } else if (mode === 'image') {
-            toolbar = imageToolbar;
-        }
+    } else if (targetElement.classList.contains('shape-element')) {
+        toolbar = shapeToolbar;
+    } else if (targetElement.classList.contains('image-element')) {
+        toolbar = imageToolbar;
     }
 
     if (toolbar) {
@@ -670,9 +654,13 @@ function deleteElement() {
         selectedElement = null;
         
         document.getElementById('textToolbar').style.display = 'none';
+        document.getElementById('shapeToolbar').style.display = 'none';
+        document.getElementById('imageToolbar').style.display = 'none'; 
+      
         document.getElementById('textEditor').style.display = 'none';
-        document.getElementById('frameToolbar').style.display = 'none';
-        document.getElementById('frameEditor').style.display = 'none';
+        document.getElementById('shapeEditor').style.display = 'none';
+        document.getElementById('imageEditor').style.display = 'none'; 
+      
         document.getElementById('noElementSelected').style.display = 'block';
     }
 }
@@ -696,7 +684,7 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-['textToolbar', 'frameToolbar'].forEach(toolbarId => {
+['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -711,23 +699,28 @@ function alignElement() {
   });
 });
 
+// Handle clicks on elements and outside
 document.addEventListener('click', (e) => {
-  const clickedElement = e.target.closest('.text-element, .frame-element');
+  const clickedElement = e.target.closest('.text-element, .shape-element');
 
   if (clickedElement) {
     if (selectedElement !== clickedElement) {
       selectElement(clickedElement);
     }
+    // No need to call showToolbar here if selectElement handles it
   } else if (
     !e.target.closest('#textEditor') &&
-    !e.target.closest('#frameEditor') &&
+    !e.target.closest('#shapeEditor') &&
+    !e.target.closest('#imageEditor') &&
     !e.target.closest('#textToolbar') &&
-    !e.target.closest('#frameToolbar') &&
+    !e.target.closest('#shapeToolbar') &&
+    !e.target.closest('#imageToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('frameToolbar').style.display = 'none';
+    document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('imageToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -772,32 +765,28 @@ function deselectElement() {
     if (selectedElement) {
         selectedElement.classList.remove('selected');
         
-        if (selectedElement.classList.contains('text-element')) {
+        if (selectedElement.classList.contains('text-element') || selectedElement.classList.contains('image-element')) {
             selectedElement.style.border = 'none';
             selectedElement.style.outline = 'none';
-            document.getElementById('textEditor').style.display = 'none';
-            document.getElementById('textToolbar').style.display = 'none';
         }
         
-        if (selectedElement.classList.contains('frame-element')) {
+        if (selectedElement.classList.contains('shape-element')) {
             selectedElement.style.boxShadow = 'none';
-            selectedElement.style.border = 'none'; 
-            
-            const mode = selectedElement.dataset.mode;
-            
-            if (mode === 'image') {
-                document.getElementById('imageEditor').style.display = 'none'; 
-                document.getElementById('imageToolbar').style.display = 'none'; 
-            } else if (mode === 'shape') {
-                document.getElementById('shapeEditor').style.display = 'none';
-                document.getElementById('shapeToolbar').style.display = 'none';
-            }
+            selectedElement.style.border = 'none';
         }
-        
+
         selectedElement = null;
     }
     
+    document.getElementById('textEditor').style.display = 'none';
+    document.getElementById('shapeEditor').style.display = 'none';
+    document.getElementById('imageEditor').style.display = 'none'; // MODIFICATION 1: Hide image editor
+    
     document.getElementById('noElementSelected').style.display = 'block';
+    
+    document.getElementById('textToolbar').style.display = 'none';
+    document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('imageToolbar').style.display = 'none'; // MODIFICATION 2: Hide image toolbar
 }
 
 function toggleLeftSidebar() {
@@ -815,6 +804,8 @@ function toggleRightSidebar() {
 }
 //Zoom
 const center = document.querySelector(".center-container");
+
+// Check if buttons exist before adding listeners
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const handBtn = document.getElementById("handBtn");
@@ -917,6 +908,7 @@ function exportAsPDF() {
   });
 }
 
+// Layout saving and loading functions
 function showSaveLayoutModal() {
   const modal = document.getElementById('saveLayoutModal');
   if (modal) {
@@ -956,24 +948,21 @@ function saveLayout() {
                 if (element.classList.contains('text-element')) {
                     elData.type = 'text';
                     elData.content = element.innerText;
-                } 
-                else if (element.classList.contains('frame-element')) {
-                    const mode = element.dataset.mode;
-                    elData.type = 'frame'; // Use a generic 'frame' type
-                    elData.mode = mode;    // Save the specific mode ('image' or 'shape')
+                } else if (element.classList.contains('shape-element')) {
+                    elData.type = 'shape';
+                    elData.shapeType = element.dataset.shapeType;
+                    elData.shapeData = {
+                        fillColor: element.dataset.fillColor,
+                        fillOpacity: element.dataset.fillOpacity,
+                        borderColor: element.dataset.borderColor,
+                        borderOpacity: element.dataset.borderOpacity,
+                        borderWidth: element.dataset.borderWidth,
+                    };
+                } else if (element.classList.contains('image-element')) {
+                    elData.type = 'image';
+                    elData.content = element.src; // Save the image URL in the content field
+                }
 
-                    if (mode === 'shape') {
-                        elData.shapeType = element.dataset.shapeType;
-                        elData.shapeData = {
-                            fillColor: element.dataset.fillColor,
-                            borderColor: element.dataset.borderColor,
-                            borderWidth: element.dataset.borderWidth,
-                        };
-                    } else if (mode === 'image') {
-                        const imageElement = element.querySelector('.frame-content-image');
-                        elData.content = imageElement ? imageElement.src : ''; // Save the image URL
-                    }
-                } 
                 return elData.type ? elData : null;
             }).filter(d => d !== null); // Filter out any null/unknown elements
 
@@ -983,9 +972,11 @@ function saveLayout() {
                 elements: elementsData
             };
         })
-    };    
+    };
+    
     console.log('Layout Data Saved:', layoutData);
     savedLayouts.push(layoutData);
+    
     hideModal(); // Hide the save modal
 }
 
@@ -1013,72 +1004,58 @@ function loadLayout(layoutIndex) {
                 element.className = 'text-element';
                 element.contentEditable = true;
                 element.innerText = elData.content;
-            } else if (elData.type === 'frame') {
+            } else if (elData.type === 'shape') {
                 element = document.createElement('div');
-                element.className = 'frame-element'; // Use the new class
-                element.setAttribute('tabindex', '0');
+                element.className = 'shape-element';
+                element.contentEditable = false;
                 
-                element.dataset.mode = elData.mode || 'image'; 
-                element.dataset.shapeType = elData.shapeType || 'none';
-                
-                if (elData.mode === 'image') {
-                    const img = document.createElement('img');
-                    img.className = 'frame-content-image';
-                    img.src = elData.content; // Content is the image URL
-                    img.alt = 'User-defined image';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    img.contentEditable = false; 
-                    element.appendChild(img);
-                
-                } else if (elData.mode === 'shape') {
-                    const svgNS = "http://www.w3.org/2000/svg";
-                    const svg = document.createElementNS(svgNS, "svg");
-                    svg.setAttribute("width", "100%");
-                    svg.setAttribute("height", "100%");
-                    svg.setAttribute("viewBox", "0 0 100 100");
-                    svg.className = 'frame-content-shape';
-                    
-                    let shape;
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("width", "100%");
+                svg.setAttribute("height", "100%");
+                svg.setAttribute("viewBox", "0 0 100 100");
+                let shape;
 
-                    switch(elData.shapeType) {
-                        case 'circle':
-                            shape = document.createElementNS(svgNS, "circle");
-                            shape.setAttribute("cx", "50");
-                            shape.setAttribute("cy", "50");
-                            shape.setAttribute("r", "40");
-                            break;
-                        case 'polygon':
-                        case 'star':
-                            shape = document.createElementNS(svgNS, "polygon");
-                            if (elData.shapeData && elData.shapeData.points) {
-                                shape.setAttribute("points", elData.shapeData.points);
-                            }
-                            break;
-                    }
-
-                    if (shape) {
-                        element.dataset.fillColor = elData.shapeData.fillColor;
-                        element.dataset.borderColor = elData.shapeData.borderColor;
-                        element.dataset.borderWidth = elData.shapeData.borderWidth;
-                        
-                        svg.appendChild(shape);
-                        element.appendChild(svg);
-                    }
+                switch(elData.shapeType) {
+                    case 'circle':
+                        shape = document.createElementNS(svgNS, "circle");
+                        shape.setAttribute("cx", "50");
+                        shape.setAttribute("cy", "50");
+                        shape.setAttribute("r", "40");
+                        break;
+                    case 'polygon':
+                        shape = document.createElementNS(svgNS, "polygon");
+                        if (elData.shapeData.points) {
+                            shape.setAttribute("points", elData.shapeData.points);
+                        }
+                        break;
                 }
 
-                if (element.dataset.mode === 'shape') {
+                if (shape) {
+                    svg.appendChild(shape);
+                    element.appendChild(svg);
+                }
+                
+                element.dataset.fillColor = elData.shapeData.fillColor;
+                element.dataset.fillOpacity = elData.shapeData.fillOpacity;
+                element.dataset.borderColor = elData.shapeData.borderColor;
+                element.dataset.borderOpacity = elData.shapeData.borderOpacity;
+                element.dataset.borderWidth = elData.shapeData.borderWidth;
+                
+                applyShapeStyle(element);
+                
+                new ResizeObserver(() => {
                     applyShapeStyle(element);
-                    
-                    new ResizeObserver(() => {
-                        applyShapeStyle(element);
-                    }).observe(element);
-                }
+                }).observe(element);
+            } else if (elData.type === 'image') { // <-- ADDED: Handle image element type
+                element = document.createElement('img');
+                element.className = 'image-element';
+                element.contentEditable = false;
+                element.src = elData.content; 
             } else {
                 return; // Skip unknown element type
             }
-            
+
             Object.entries(elData.style).forEach(([prop, value]) => {
                 if (value) element.style[prop] = value;
             });
@@ -1120,13 +1097,14 @@ function hexToRgbA(hex, alpha) {
 }
 
 function applyShapeStyle(element = selectedElement) {
-    if (!element || !element.classList.contains('frame-element')) return;
+    if (!element || !element.classList.contains('shape-element')) return;
 
     const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
     if (!svgShape) return;
 
     const fillColorHex = element.dataset.fillColor || '#000000';
     const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
+    
     const borderColorHex = element.dataset.borderColor || '#000000';
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
@@ -1134,29 +1112,15 @@ function applyShapeStyle(element = selectedElement) {
     const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
-    const mode = element.dataset.mode;
-    
-    if (mode === 'shape') {
-      const svgShape = element.querySelector('svg > *'); // Get the actual SVG shape
-      if (svgShape) {
-        svgShape.setAttribute('fill', fillRgba);
-        svgShape.setAttribute('stroke', borderRgba);
-        svgShape.setAttribute('stroke-width', borderWidth);
-        element.style.backgroundColor = 'transparent'; 
-        element.style.border = 'none';
-      }
-    } else { 
-      element.style.backgroundColor = fillRgba; 
-      if (borderWidth > 0) {
-          element.style.border = `${borderWidth}px solid ${borderRgba}`;
-      } else {
-          element.style.border = 'none';
-      }
-  }
+    svgShape.setAttribute('fill', fillRgba);
+    svgShape.setAttribute('stroke', borderRgba);
+    svgShape.setAttribute('stroke-width', borderWidth);
+    svgShape.parentElement.style.transform = '';
+    svgShape.parentElement.style.transformOrigin = '';
 }
 
 function updateSelectedShapeStyle() {
-    if (!selectedElement || !selectedElement.classList.contains('frame-element')) return;
+    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
@@ -1181,20 +1145,24 @@ function updateSelectedShapeStyle() {
     selectedElement.dataset.borderWidth = borderWidth;
     
     applyShapeStyle(selectedElement);
-  
+
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
 
 function loadShapeStateToControls() {
-    if (!selectedElement || !selectedElement.classList.contains('frame-element')) return;
+    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
-    const isShape = selectedElement.dataset.mode === 'shape';
+    const fillColorInput = document.getElementById('shape-fill-color');
+    const fillOpacityInput = document.getElementById('shape-fill-opacity');
+    const borderWidthInput = document.getElementById('shape-border-width');
+    const borderColorInput = document.getElementById('shape-border-color');
+    const borderOpacityInput = document.getElementById('shape-border-opacity');
 
-    fillColorInput.value = selectedElement.dataset.fillColor || (isShape ? '#3b82f6' : '#ffffff');
+    fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
     fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
-    borderWidthInput.value = selectedElement.dataset.borderWidth || (isShape ? 4 : 0);
-    borderColorInput.value = selectedElement.dataset.borderColor || (isShape ? '#1e3a8a' : '#000000');
+    borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
+    borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
     borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
     
     updateSelectedShapeStyle();
@@ -1287,17 +1255,15 @@ function loadSavedLayouts() {
 }
 
 if (selector) {
-    selector.addEventListener('change', () => {
-        if (selector.value === 'custom') {
-            promptForCustomSize();
-        } else {
-            updateRectSize(selector.value);
-        }
-    });
+  selector.addEventListener('change', (e) => {
+    updateRectSize(e.target.value);
+  });
 }
 
 if (orientationBtn) {
-    orientationBtn.addEventListener('click', updateOrientation);
+  orientationBtn.addEventListener('click', () => {
+    updateOrientation();
+  });
 }
 
 const prevPageBtn = document.getElementById('prevPageBtn');
@@ -1336,15 +1302,15 @@ const addImageBtn = document.getElementById('addImageBtn');
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
 if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addImageBtn) addImageBtn.addEventListener('click', () => addFrameElement('image'));
+if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
 const addStarBtn = document.getElementById('addStarBtn');
 
-if (addCircleBtn) addCircleBtn.addEventListener('click', () => addFrameElement('shape', 'circle'));
-if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addFrameElement('shape', 'polygon'));
-if (addStarBtn) addStarBtn.addEventListener('click', () => addFrameElement('shape', 'star'));
+if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('circle'));
+if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
+if (addStarBtn) addStarBtn.addEventListener('click', () => addShapeElement('star'));
 
 const fontColorInput = document.getElementById('fontColorInput');
 
@@ -1414,6 +1380,7 @@ if (saveLayoutBtn) saveLayoutBtn.addEventListener('click', showSaveLayoutModal);
 if (cancelSaveBtn) cancelSaveBtn.addEventListener('click', hideModal);
 if (confirmSaveBtn) confirmSaveBtn.addEventListener('click', saveLayout);
 
+// Import layout handlers
 if (importLayoutBtn) importLayoutBtn.addEventListener('click', () => {
   // This would typically open a file picker
   // For simplicity, we'll just show a message
