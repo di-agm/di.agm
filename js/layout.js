@@ -354,7 +354,35 @@ function addTextElement(type) {
   selectElement(element);
 }
 
-  function addShapeElement(type) {
+  function addImageElement() {
+    // Ensure current page exists and is a DOM element with a querySelector method
+    if (!pages[currentPageIndex] || !pages[currentPageIndex].querySelector) return;
+    
+    const pageContent = pages[currentPageIndex].querySelector('.page-content');
+    const element = document.createElement('img');
+    
+    element.className = 'image-element';
+    element.src = DEFAULT_IMAGE_SRC;
+    element.alt = 'User-defined image';
+    element.contentEditable = false; 
+    
+    element.style.top = '50px';
+    element.style.left = '50px';
+    element.style.position = 'absolute';
+    element.style.width = '150px'; 
+    element.style.height = '100px';
+    element.style.objectFit = 'cover'; // Helps the image scale nicely within the bounds
+    
+    element.style.resize = 'both';
+    element.style.overflow = 'hidden'; // Hide parts of the image that might exceed bounds
+
+    pageContent.appendChild(element);
+    makeElementDraggable(element);
+    makeRotatable(element);
+    selectElement(element);
+}
+
+function addShapeElement(type) {
   if (!pages[currentPageIndex]) return;
 
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
@@ -439,7 +467,7 @@ function addTextElement(type) {
   }
 
   if (shape) {
-    element.dataset.fillType = 'color'; // <--- ADD THIS
+    // Store style properties on the container element for persistence
     element.dataset.fillColor = shape.getAttribute('fill');
     element.dataset.fillOpacity = 1.0;
     element.dataset.borderColor = shape.getAttribute('stroke');
@@ -464,10 +492,13 @@ function addTextElement(type) {
 }
 
 function selectElement(element) {
-    document.querySelectorAll('.text-element, .shape-element).forEach(el => {
+    document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
         el.classList.remove('selected');
         if (el.classList.contains('shape-element')) {
             el.style.boxShadow = 'none';
+            el.style.border = 'none';
+        }
+        if (el.classList.contains('image-element')) {
             el.style.border = 'none';
         }
     });
@@ -475,6 +506,11 @@ function selectElement(element) {
     selectedElement = element;
     selectedElement.classList.add('selected');
     
+    if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
+        selectedElement.style.border = '2px solid #3B82F6';
+        selectedElement.style.outline = '1px solid #ffffff';
+    }
+
     if (selectedElement.classList.contains('shape-element')) {
         selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
         selectedElement.style.border = 'none'; // Ensure no box border
@@ -482,13 +518,16 @@ function selectElement(element) {
 
     document.getElementById('textEditor').style.display = 'none';
     document.getElementById('shapeEditor').style.display = 'none';
+    document.getElementById('imageEditor').style.display = 'none'; 
     document.getElementById('noElementSelected').style.display = 'none';
 
     const textToolbar = document.getElementById('textToolbar');
     const shapeToolbar = document.getElementById('shapeToolbar');
+    const imageToolbar = document.getElementById('imageToolbar');
 
     textToolbar.style.display = 'none';
     shapeToolbar.style.display = 'none';
+    if (imageToolbar) imageToolbar.style.display = 'none';
 
     const rect = element.getBoundingClientRect();
     const containerRect = document.body.getBoundingClientRect();
@@ -518,7 +557,15 @@ function selectElement(element) {
         initShapeEditor();
         loadShapeStateToControls();
     
-    } 
+    } else if (element.classList.contains('image-element')) { 
+        toolbar = imageToolbar;
+        document.getElementById('imageEditor').style.display = 'block';
+        
+        const imageUrlInput = document.getElementById('imageUrlInput');
+        if (imageUrlInput) {
+            imageUrlInput.value = selectedElement.src;
+        }
+    }
 
     if (toolbar) {
         if (toolbar.offsetWidth === undefined) {
@@ -574,11 +621,13 @@ function makeElementDraggable(el) {
 function showToolbar(targetElement) {
     const textToolbar = document.getElementById('textToolbar');
     const shapeToolbar = document.getElementById('shapeToolbar');
+    const imageToolbar = document.getElementById('imageToolbar'); 
 
-    if (!textToolbar || !shapeToolbar) return; 
+    if (!textToolbar || !shapeToolbar || !imageToolbar) return; 
   
     textToolbar.style.display = 'none';
     shapeToolbar.style.display = 'none';
+    imageToolbar.style.display = 'none'; 
 
     const rect = targetElement.getBoundingClientRect();
     let toolbar;
@@ -587,8 +636,10 @@ function showToolbar(targetElement) {
         toolbar = textToolbar;
     } else if (targetElement.classList.contains('shape-element')) {
         toolbar = shapeToolbar;
+    } else if (targetElement.classList.contains('image-element')) {
+        toolbar = imageToolbar;
     }
-  
+
     if (toolbar) {
         toolbar.style.display = 'flex';
         toolbar.style.position = 'absolute';
@@ -604,9 +655,11 @@ function deleteElement() {
         
         document.getElementById('textToolbar').style.display = 'none';
         document.getElementById('shapeToolbar').style.display = 'none';
+        document.getElementById('imageToolbar').style.display = 'none'; 
       
         document.getElementById('textEditor').style.display = 'none';
         document.getElementById('shapeEditor').style.display = 'none';
+        document.getElementById('imageEditor').style.display = 'none'; 
       
         document.getElementById('noElementSelected').style.display = 'block';
     }
@@ -631,7 +684,7 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-['textToolbar', 'shapeToolbar'].forEach(toolbarId => {
+['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -658,13 +711,16 @@ document.addEventListener('click', (e) => {
   } else if (
     !e.target.closest('#textEditor') &&
     !e.target.closest('#shapeEditor') &&
+    !e.target.closest('#imageEditor') &&
     !e.target.closest('#textToolbar') &&
     !e.target.closest('#shapeToolbar') &&
+    !e.target.closest('#imageToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('imageToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -709,7 +765,7 @@ function deselectElement() {
     if (selectedElement) {
         selectedElement.classList.remove('selected');
         
-        if (selectedElement.classList.contains('text-element')) {
+        if (selectedElement.classList.contains('text-element') || selectedElement.classList.contains('image-element')) {
             selectedElement.style.border = 'none';
             selectedElement.style.outline = 'none';
         }
@@ -724,11 +780,13 @@ function deselectElement() {
     
     document.getElementById('textEditor').style.display = 'none';
     document.getElementById('shapeEditor').style.display = 'none';
+    document.getElementById('imageEditor').style.display = 'none'; // MODIFICATION 1: Hide image editor
     
     document.getElementById('noElementSelected').style.display = 'block';
     
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
+    document.getElementById('imageToolbar').style.display = 'none'; // MODIFICATION 2: Hide image toolbar
 }
 
 function toggleLeftSidebar() {
@@ -900,6 +958,9 @@ function saveLayout() {
                         borderOpacity: element.dataset.borderOpacity,
                         borderWidth: element.dataset.borderWidth,
                     };
+                } else if (element.classList.contains('image-element')) {
+                    elData.type = 'image';
+                    elData.content = element.src; // Save the image URL in the content field
                 }
 
                 return elData.type ? elData : null;
@@ -977,8 +1038,6 @@ function loadLayout(layoutIndex) {
                 
                 element.dataset.fillColor = elData.shapeData.fillColor;
                 element.dataset.fillOpacity = elData.shapeData.fillOpacity;
-                element.dataset.fillType = elData.shapeData.fillType || 'color'; // <--- ADD THIS
-                element.dataset.fillImageSrc = elData.shapeData.fillImageSrc ||
                 element.dataset.borderColor = elData.shapeData.borderColor;
                 element.dataset.borderOpacity = elData.shapeData.borderOpacity;
                 element.dataset.borderWidth = elData.shapeData.borderWidth;
@@ -988,6 +1047,11 @@ function loadLayout(layoutIndex) {
                 new ResizeObserver(() => {
                     applyShapeStyle(element);
                 }).observe(element);
+            } else if (elData.type === 'image') { // <-- ADDED: Handle image element type
+                element = document.createElement('img');
+                element.className = 'image-element';
+                element.contentEditable = false;
+                element.src = elData.content; 
             } else {
                 return; // Skip unknown element type
             }
@@ -1032,8 +1096,28 @@ function hexToRgbA(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-element.dataset.fillType = elData.shapeData.fillType || 'color'; // <--- ADD THIS
-            element.dataset.fillImageSrc = elData.shapeData.fillImageSrc ||
+function applyShapeStyle(element = selectedElement) {
+    if (!element || !element.classList.contains('shape-element')) return;
+
+    const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
+    if (!svgShape) return;
+
+    const fillColorHex = element.dataset.fillColor || '#000000';
+    const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
+    
+    const borderColorHex = element.dataset.borderColor || '#000000';
+    const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
+    const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
+
+    const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
+    const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
+
+    svgShape.setAttribute('fill', fillRgba);
+    svgShape.setAttribute('stroke', borderRgba);
+    svgShape.setAttribute('stroke-width', borderWidth);
+    svgShape.parentElement.style.transform = '';
+    svgShape.parentElement.style.transformOrigin = '';
+}
 
 function updateSelectedShapeStyle() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
@@ -1218,6 +1302,7 @@ const addImageBtn = document.getElementById('addImageBtn');
 if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
 if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
 if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
+if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
