@@ -46,7 +46,7 @@ html, body {
 }
 
 #tt, #links {
-        min-height: 200px;
+        height: 100vh;
         overflow-y: auto;
 }
         
