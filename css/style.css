@@ -32,7 +32,6 @@ html, body {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        overflow: hidden; /* Prevent scrollbars */
 }
 
 #AM {
@@ -44,7 +43,6 @@ html, body {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        overflow: hidden; /* Prevent scrollbars */
 }
 
 #P {
@@ -168,7 +166,6 @@ html, body {
         pointer-events: auto;
         width: 60vmin;
         height: 60vmin;
-        overflow: hidden;
     }
 
     .ring-container:hover .color-ring-inner {
@@ -223,7 +220,6 @@ html, body {
         opacity: 0;
         transition: opacity 0.3s, visibility 0.3s;
         height: 0;
-        overflow: hidden;
     }
 
     .link-icon:hover .label {
