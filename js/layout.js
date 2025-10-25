@@ -1039,15 +1039,16 @@ function applyShapeStyle(element = selectedElement) {
             const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
             image.setAttribute('x', '0');
             image.setAttribute('y', '0');
-            image.setAttribute('width', '1');
-            image.setAttribute('height', '1');
-            image.setAttribute('preserveAspectRatio', 'xMidYMid slice'); 
+            image.setAttribute('width', '100%'); 
+            image.setAttribute('height', '100%'); 
+            image.setAttribute('preserveAspectRatio', 'xMidYMid slice');
             pattern.appendChild(image);
             defs.appendChild(pattern);
         }
 
         const imageEl = pattern.querySelector('image');
-        imageEl.setAttribute('href', imageUrl);
+        imageEl.setAttribute('xlink:href', imageUrl); 
+        imageEl.removeAttribute('href');
         
         svgShape.setAttribute('fill', 'url(#' + patternId + ')');
 
