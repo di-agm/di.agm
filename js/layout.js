@@ -1293,15 +1293,9 @@ const rightMenuBtn = document.getElementById('rightMenuBtn');
 if (leftMenuBtn) leftMenuBtn.addEventListener('click', toggleLeftSidebar);
 if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 
-const addTitleBtn = document.getElementById('addTitleBtn');
-const addSubtitleBtn = document.getElementById('addSubtitleBtn');
-const addParagraphBtn = document.getElementById('addParagraphBtn');
-const addImageBtn = document.getElementById('addImageBtn');
+const addTextBtn = document.getElementById('addTextBtn'); // Usa el ID de tu nuevo botón
 
-if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
-if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
-if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
+if (addTextBtn) addTextBtn.addEventListener('click', addTextElement);
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
