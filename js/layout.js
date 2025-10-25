@@ -1021,11 +1021,17 @@ function applyShapeStyle(element = selectedElement) {
             defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
             svg.prepend(defs); // Add at the start of the SVG
         }
-        
-        let pattern = defs.querySelector('#image-fill-pattern');
+
+        let patternId = element.dataset.patternId;
+        if (!patternId) {
+            patternId = 'pattern-' + Math.random().toString(36).substring(2, 9);
+            element.dataset.patternId = patternId;
+        }
+      
+        let pattern = defs.querySelector('#' + patternId);
         if (!pattern) {
             pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
-            pattern.setAttribute('id', 'image-fill-pattern');
+            pattern.setAttribute('id', patternId); // Establecer ID única
             pattern.setAttribute('patternUnits', 'objectBoundingBox'); 
             pattern.setAttribute('width', '1');
             pattern.setAttribute('height', '1');
@@ -1043,7 +1049,7 @@ function applyShapeStyle(element = selectedElement) {
         const imageEl = pattern.querySelector('image');
         imageEl.setAttribute('href', imageUrl);
         
-        svgShape.setAttribute('fill', 'url(#image-fill-pattern)');
+        svgShape.setAttribute('fill', 'url(#' + patternId + ')');
 
     } else { // Use Color Fill (Your existing logic)
         const fillColorHex = element.dataset.fillColor || '#000000';
