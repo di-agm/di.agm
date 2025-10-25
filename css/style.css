@@ -5,7 +5,7 @@
     }
     body {
         position: relative;
-        height: 100vh;
+        min-height: 100vh;
         font-family: 'Didact Gothic', sans-serif;
         text-align: center;
         padding: 2rem;
@@ -131,7 +131,6 @@ html, body {
         height: 60vmin;
     }
 
-    /* New value ring styles */
     .value-ring {
         position: absolute;
         top: 50%;
