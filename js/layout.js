@@ -215,8 +215,6 @@ function toggleMargins() {
   });
 }
 
-// layout.js
-
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
@@ -227,7 +225,6 @@ function togglePageNumbers() {
     }
     
     pages.forEach(page => {
-        // Get the page-content container
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
         const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
@@ -246,7 +243,6 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
-  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
@@ -254,7 +250,6 @@ function drawRulers() {
   hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(hRuler);
 
-  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
@@ -262,12 +257,10 @@ function drawRulers() {
   vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing: every 50px in current unit
   const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
-  // Horizontal ticks
   for (let x = 0; x <= maxX; x += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -285,7 +278,6 @@ function drawRulers() {
     }
   }
 
-  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -309,14 +301,13 @@ function toggleRulers() {
   drawRulers();
 }
 
-// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
   if (rulersVisible) drawRulers();
 };
 
-function addTextElement(type) {
+function addTextElement() { 
   if (!pages[currentPageIndex]) return;
   
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
@@ -327,23 +318,9 @@ function addTextElement(type) {
   element.style.top = '50px';
   element.style.left = '50px';
   element.style.position = 'absolute';
-
-  switch(type) {
-    case 'title':
-      element.style.fontSize = '24px';
-      element.style.fontWeight = 'bold';
-      element.textContent = 'Title';
-      break;
-    case 'subtitle':
-      element.style.fontSize = '18px';
-      element.style.fontWeight = 'bold';
-      element.textContent = 'Subtitle';
-      break;
-    case 'paragraph':
-      element.style.fontSize = '14px';
-      element.textContent = 'Add your text here';
-      break;
-  }
+  element.style.fontSize = '14px';
+  element.style.fontWeight = 'normal'; // Es bueno ser explícito
+  element.textContent = 'Lorem Ipsum';
     
   element.style.resize = 'both';
   element.style.overflow = 'auto';
