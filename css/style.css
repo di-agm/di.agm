@@ -23,7 +23,7 @@ html, body {
         height: 100%;
 }
 
- #home, #menu, {
+ #home, #menu {
         margin-top: 0%;
         margin-left: 20%;
         margin-right: 20%;
@@ -45,7 +45,7 @@ html, body {
         align-items: center;
 }
 
-#tt {
+#tt, #links {
         min-height: 100vh;
         overflow-y: auto;
 }
