@@ -10,6 +10,17 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
+const DPI = 96;
+const MM_PER_INCH = 25.4;
+
+function inToPx(inches) {
+  return inches * DPI;
+}
+
+function mmToPx(mm) {
+  return (mm / MM_PER_INCH) * DPI;
+}
+
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
@@ -47,8 +58,8 @@ const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
   a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthIN: 8.5, heightIN: 11 },
-  tabloid: { widthIN: 11, heightIN: 17 }
+  letter: { widthMM: 215.9, heightMM: 279.4 },
+  tabloid: { widthMM: 279.4, heightMM: 431.8 }
 };
 
 const maxWidthPx = 360;
@@ -56,60 +67,98 @@ const maxWidthPx = 360;
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let widthPx, heightPx;
+  let baseWidth, baseHeight; 
+  
   if (key === 'a4') {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
+    baseWidth = mmToPx(paperSizes.a4.widthMM);
+    baseHeight = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    widthPx = inToPx(paperSizes.letter.widthIN);
-    heightPx = inToPx(paperSizes.letter.heightIN);
+    baseWidth = mmToPx(paperSizes.letter.widthMM);
+    baseHeight = mmToPx(paperSizes.letter.heightMM);
   } else if (key === 'tabloid') {
-    widthPx = inToPx(paperSizes.tabloid.widthIN);
-    heightPx = inToPx(paperSizes.tabloid.heightIN);
+    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
+    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
   } else {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
+    handleCustomSize();
+    return;
   }
 
-  if (widthPx > maxWidthPx) {
-    const scale = maxWidthPx / widthPx;
-    widthPx = widthPx * scale;
-    heightPx = heightPx * scale;
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+  window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
+  window.addEventListener("resize", updateRectSizeOnResize); 
 }
 
-  const pageElement = pages[currentPageIndex];
-  pageElement.style.width = `${widthPx}px`;
-  pageElement.style.height = `${heightPx}px`;
-
-if (rulersVisible) drawRulers();
-window.addEventListener("resize", () => {
-  if (rulersVisible) drawRulers();
-});
-  
-  const page = pages[currentPageIndex];
-
-  // Apply the correct dimensions based on orientation
-  if (!isPortrait) {
-    // Swap for landscape
-    page.style.width = `${heightPx}px`;
-    page.style.height = `${widthPx}px`;
-  } else {
-    page.style.width = `${widthPx}px`;
-    page.style.height = `${heightPx}px`;
+function handleCustomSize() {
+  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
+  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
+    alert("Invalid or cancelled width. Defaulting to A4.");
+    updateRectSize('a4');
+    return;
   }
+  
+  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
+  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
+    alert("Invalid or cancelled height. Defaulting to A4.");
+    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
+    return;
+  }
+
+  const widthMM = parseFloat(customWidthMM);
+  const heightMM = parseFloat(customHeightMM);
+
+  let baseWidth = mmToPx(widthMM);
+  let baseHeight = mmToPx(heightMM);
+  
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+}
+
+function updateRectSizeOnResize() {
+    if (rulersVisible) drawRulers();
+    updateRectSize(selector.value); 
 }
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
-  
-  const page = pages[currentPageIndex];
-  const width = page.style.width;
-  const height = page.style.height;
-  
-  page.style.width = height;
-  page.style.height = width;
-  
   isPortrait = !isPortrait;
+  updateRectSize(selector.value); 
 }
 
 function showPage(index) {
