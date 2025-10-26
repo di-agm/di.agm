@@ -1014,6 +1014,9 @@ function applyShapeStyle(element = selectedElement) {
 
     const fillType = element.dataset.fillType || 'color';
     const imageUrl = element.dataset.fillImageUrl;
+    
+    // Get fill opacity once, to be applied below using fill-opacity attribute
+    const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0; 
 
     if (fillType === 'image' && imageUrl) {
         let defs = svg.querySelector('defs');
@@ -1031,7 +1034,7 @@ function applyShapeStyle(element = selectedElement) {
         let pattern = defs.querySelector('#' + patternId);
         if (!pattern) {
             pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
-            pattern.setAttribute('id', patternId); // Establecer ID única
+            pattern.setAttribute('id', patternId); // Set unique ID
             pattern.setAttribute('patternUnits', 'objectBoundingBox'); 
             pattern.setAttribute('width', '1');
             pattern.setAttribute('height', '1');
@@ -1047,22 +1050,25 @@ function applyShapeStyle(element = selectedElement) {
         }
 
         const imageEl = pattern.querySelector('image');
-        imageEl.setAttribute('href', imageUrl);
+        imageEl.setAttribute('href', imageUrl); 
         imageEl.setAttribute('xlink:href', imageUrl); 
-        //imageEl.removeAttribute('href');
         
         svgShape.setAttribute('fill', 'url(#' + patternId + ')');
 
-    } else { // Use Color Fill (Your existing logic)
+    } else { // Use Color Fill 
         const fillColorHex = element.dataset.fillColor || '#000000';
-        const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
-        const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
-        svgShape.setAttribute('fill', fillRgba);
+        // Set fill to opaque color, and rely on fill-opacity below for transparency
+        const opaqueFillColor = hexToRgbA(fillColorHex, 1.0);
+        svgShape.setAttribute('fill', opaqueFillColor);
     }
 
+    // Apply fill-opacity to the SVG shape itself (works for both color and pattern fill)
+    svgShape.setAttribute('fill-opacity', fillOpacity);
+    
     const borderColorHex = element.dataset.borderColor || '#000000';
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
+    
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
     svgShape.setAttribute('stroke', borderRgba);
