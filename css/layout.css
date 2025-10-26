@@ -109,6 +109,7 @@ button:hover {
 }
 
 .shape-element {
+  display: block;
   position: absolute;
   top: 50px;
   left: 50px;
@@ -120,6 +121,7 @@ button:hover {
   justify-content: flex-start;
   resize: both;
   overflow: hidden;
+  cursor: move;
 }
 
 #pageNumber {
