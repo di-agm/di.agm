@@ -391,6 +391,7 @@ function addShapeElement(type, content) {
     element.setAttribute('height', '100px');
     element.setAttribute('viewBox', '0 0 100 100'); // Standardized internal viewbox
 
+    element.style.display = 'block';
     element.style.position = 'absolute';
     element.style.left = '50px';
     element.style.top = '50px';
