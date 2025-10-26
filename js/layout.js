@@ -1047,8 +1047,9 @@ function applyShapeStyle(element = selectedElement) {
         }
 
         const imageEl = pattern.querySelector('image');
+        imageEl.setAttribute('href', imageUrl);
         imageEl.setAttribute('xlink:href', imageUrl); 
-        imageEl.removeAttribute('href');
+        //imageEl.removeAttribute('href');
         
         svgShape.setAttribute('fill', 'url(#' + patternId + ')');
 
