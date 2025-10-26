@@ -331,127 +331,68 @@ function addTextElement() {
   selectElement(element);
 }
 
-function addShapeElement(type) {
-  if (!pages[currentPageIndex]) return;
+function addShapeElement(type, content) {
+    const currentPage = getCurrentPage();
+    if (!currentPage) return;
 
-  const pageContent = pages[currentPageIndex].querySelector('.page-content');
-  const element = document.createElement('div');
-  element.className = 'shape-element';
-  element.setAttribute('tabindex', '0');
-  element.style.top = '50px';
-  element.style.left = '50px';
-  element.style.position = 'absolute';
-  element.style.width = '100px';
-  element.style.height = '100px';
-  element.style.resize = 'both';
-  element.style.overflow = 'auto';
+    const element = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    element.className = 'shape-element selected-element'; // Selection class on SVG
+    element.setAttribute('data-type', type);
+    element.setAttribute('width', '100px'); // Default size
+    element.setAttribute('height', '100px');
+    element.setAttribute('viewBox', '0 0 100 100'); // Standardized internal viewbox
 
-  // Create an SVG to hold the shape
-  const svgNS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("width", "100%");
-  svg.setAttribute("height", "100%");
-  svg.setAttribute("viewBox", "0 0 100 100");
+    element.style.position = 'absolute';
+    element.style.left = '50px';
+    element.style.top = '50px';
+    element.style.cursor = 'move';
+    element.style.zIndex = '1';
+    element.style.overflow = 'visible'; // Allow handles/shadows outside the box
 
-  let shape;
-
-  switch(type) {
-    case 'circle':
-      shape = document.createElementNS(svgNS, "circle");
-      shape.setAttribute("cx", "50");
-      shape.setAttribute("cy", "50");
-      shape.setAttribute("r", "40");
-      shape.setAttribute("fill", "#3b82f6"); // Default blue fill
-      shape.setAttribute("stroke", "#1e3a8a"); // Default dark blue border
-      shape.setAttribute("stroke-width", "4"); // Default border width
-      break;
-
-    case 'polygon': {
-      let sides = parseInt(prompt("Enter number of sides:", "7"));
-      if (isNaN(sides) || sides < 3) sides = 7; // default
-      const points = [];
-      
-      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
-      
-      for (let i = 0; i < sides; i++) {
-        const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        
-        const x = 50 + radius * Math.cos(angle); 
-        const y = 50 + radius * Math.sin(angle);
-        
-        points.push(`${x},${y}`);
-      }
-      
-      shape = document.createElementNS(svgNS, "polygon");
-      shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
-      break;
-    }
-
-    case 'star': {
-      let peaks = parseInt(prompt("Enter number of peaks:", "7"));
-      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
-      const points = [];
-      const outerRadius = 40;
-      const innerRadius = 20;
-      for (let i = 0; i < 2 * peaks; i++) {
-        const angle = (Math.PI * i) / peaks - Math.PI / 2;
-        const r = i % 2 === 0 ? outerRadius : innerRadius;
-        const x = 50 + r * Math.cos(angle);
-        const y = 50 + r * Math.sin(angle);
-        points.push(`${x},${y}`);
-      }
-      shape = document.createElementNS(svgNS, "polygon");
-      shape.setAttribute("points", points.join(" "));
-      shape.setAttribute("fill", "#3b82f6");
-      shape.setAttribute("stroke", "#1e3a8a");
-      shape.setAttribute("stroke-width", "4");
-      break;
-    }
-  }
-
-  if (shape) {
     element.dataset.fillType = 'color';
-    element.dataset.fillImageUrl = '';
-    element.dataset.fillColor = shape.getAttribute('fill');
-    element.dataset.fillOpacity = 1.0;
-    element.dataset.borderColor = shape.getAttribute('stroke');
-    element.dataset.borderOpacity = 1.0;
-    element.dataset.borderWidth = shape.getAttribute('stroke-width');
+    element.dataset.fillColor = '#3b82f6';
+    element.dataset.fillOpacity = '1.0';
+    element.dataset.borderColor = '#000000';
+    element.dataset.borderWidth = '0';
+    element.dataset.borderOpacity = '1.0';
+    element.dataset.rotation = '0';
 
-    svg.appendChild(shape);
-    element.appendChild(svg);
-  }
+    element.innerHTML = content;
 
-  element.style.zIndex = '1';
-  
-  pageContent.appendChild(element);
-  makeElementDraggable(element);
-  makeRotatable(element);
-  selectElement(element);
+    currentPage.querySelector('.page-content').appendChild(element);
+    
+    makeElementDraggable(element);
+    makeElementSelectable(element);
 
-  new ResizeObserver(() => {
-    updateSelectedShapeStyle(); 
-  }).observe(element);
+    selectElement(element);
 }
 
 function selectElement(element) {
     document.querySelectorAll('.text-element, .shape-element').forEach(el => {
         el.classList.remove('selected');
-        if (el.classList.contains('shape-element')) {
+
+        if (el.classList.contains('shape-element') || el.classList.contains('text-element')) {
             el.style.boxShadow = 'none';
             el.style.border = 'none';
         }
     });
 
+    if (!element) {
+        selectedElement = null;
+        document.getElementById('textEditor').style.display = 'none';
+        document.getElementById('shapeEditor').style.display = 'none';
+        document.getElementById('textToolbar').style.display = 'none';
+        document.getElementById('shapeToolbar').style.display = 'none';
+        document.getElementById('noElementSelected').style.display = 'block';
+        return;
+    }
+
     selectedElement = element;
     selectedElement.classList.add('selected');
 
-    if (selectedElement.classList.contains('shape-element')) {
+    if (selectedElement.classList.contains('shape-element') || selectedElement.classList.contains('text-element')) {
         selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
-        selectedElement.style.border = 'none'; // Ensure no box border
+        selectedElement.style.border = 'none';
     }
 
     document.getElementById('textEditor').style.display = 'none';
@@ -460,7 +401,6 @@ function selectElement(element) {
 
     const textToolbar = document.getElementById('textToolbar');
     const shapeToolbar = document.getElementById('shapeToolbar');
-
     textToolbar.style.display = 'none';
     shapeToolbar.style.display = 'none';
 
@@ -474,15 +414,15 @@ function selectElement(element) {
 
         const fontSizeInput = document.getElementById('fontSizeInput');
         if (fontSizeInput) {
-          fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
+            fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
         }
         const fontFamilySelect = document.getElementById('fontFamilySelect');
         if (fontFamilySelect) {
-          fontFamilySelect.value = selectedElement.style.fontFamily || '';
+            fontFamilySelect.value = selectedElement.style.fontFamily || '';
         }
         const colorInput = document.getElementById('colorPickerInput');
         if (colorInput) {
-          colorInput.value = selectedElement.style.color || '#000000';
+            colorInput.value = selectedElement.style.color || '#000000';
         }
 
     } else if (element.classList.contains('shape-element')) {
@@ -491,7 +431,6 @@ function selectElement(element) {
         
         initShapeEditor();
         loadShapeStateToControls();
-    
     }
 
     if (toolbar) {
@@ -501,7 +440,7 @@ function selectElement(element) {
         toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
         toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
         toolbar.style.display = 'flex';
-    } else if (!toolbar) {
+    } else { // Should only hit this if an unknown element type is clicked
         document.getElementById('noElementSelected').style.display = 'block';
     }
 }
