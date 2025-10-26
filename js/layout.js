@@ -499,7 +499,7 @@ function selectElement(element) {
     selectedElement.classList.add('selected');
 
     if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
+        selectedElement.style.boxShadow = 'none'; // Blue glow
         selectedElement.style.border = 'none'; // Ensure no box border
     }
 
