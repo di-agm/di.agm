@@ -469,6 +469,15 @@ function addShapeElement(type) {
     element.dataset.borderColor = shape.getAttribute('stroke');
     element.dataset.borderOpacity = 1.0;
     element.dataset.borderWidth = shape.getAttribute('stroke-width');
+    const initialBorderWidth = parseFloat(element.dataset.borderWidth); // 4
+    const buffer = initialBorderWidth * 2; // 8
+    const bufferPx = `${buffer}px`;
+
+    element.style.resize = 'both';
+    element.style.overflow = 'hidden'; // Essential for 'resize: both' to work
+    element.style.padding = bufferPx; 
+    
+    svg.style.margin = `-${bufferPx}`;
 
     svg.appendChild(shape);
     element.appendChild(svg);
@@ -1063,6 +1072,25 @@ function applyShapeStyle(element = selectedElement) {
 
     const fillType = element.dataset.fillType || 'color';
     const imageUrl = element.dataset.fillImageUrl;
+    const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
+      
+      if (borderWidth > 0) {
+          const buffer = borderWidth * 2;
+          const bufferPx = `${buffer}px`;
+          
+          element.style.padding = bufferPx; 
+          
+          const svg = element.querySelector('svg');
+          if (svg) {
+              svg.style.margin = `-${bufferPx}`;
+          }
+      } else {
+          element.style.padding = '0';
+          const svg = element.querySelector('svg');
+          if (svg) {
+              svg.style.margin = '0';
+          }
+      }
 
     if (fillType === 'image' && imageUrl) {
         let defs = svg.querySelector('defs');
