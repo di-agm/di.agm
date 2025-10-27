@@ -1151,7 +1151,6 @@ function updateSelectedShapeStyle() {
 
     document.getElementById('shape-color-controls').style.display = (fillTypeSelect.value === 'color') ? 'block' : 'none';
     document.getElementById('shape-image-controls').style.display = (fillTypeSelect.value === 'image') ? 'block' : 'none';
-    document.getElementById('shape-border-controls').style.display = 'block' : 'none';
     
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
@@ -1180,8 +1179,8 @@ function loadShapeStateToControls() {
 
     document.getElementById('shape-color-controls').style.display = (fillType === 'color') ? 'block' : 'none';
     document.getElementById('shape-image-controls').style.display = (fillType === 'image') ? 'block' : 'none';
-    document.getElementById('shape-border-controls').style.display = 'block' : 'none';
-    //updateSelectedShapeStyle();
+  
+    updateSelectedShapeStyle();
 }
 
 function initShapeEditor() {
