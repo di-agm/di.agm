@@ -1180,8 +1180,8 @@ function loadShapeStateToControls() {
 
     document.getElementById('shape-color-controls').style.display = (fillType === 'color') ? 'block' : 'none';
     document.getElementById('shape-image-controls').style.display = (fillType === 'image') ? 'block' : 'none';
-  
-    updateSelectedShapeStyle();
+    document.getElementById('shape-border-controls').style.display = 'block' : 'none';
+    //updateSelectedShapeStyle();
 }
 
 function initShapeEditor() {
