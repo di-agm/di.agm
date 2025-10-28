@@ -546,7 +546,7 @@ function selectElement(element) {
     if (toolbar) {
         toolbar.style.display = 'flex';
         const toolbarWidth = toolbar.offsetWidth;
-        toolbar.style.left = `${rect.left + rect.width / 2 - toolbarWidth / 2}px`;
+        toolbar.style.left = `${rect.left - containerRect.left + rect.width / 2 - toolbarWidth / 2}px`;
         toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;        
     } else if (!toolbar) {
         document.getElementById('noElementSelected').style.display = 'block';
