@@ -10,6 +10,17 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
+const DPI = 96;
+const MM_PER_INCH = 25.4;
+
+function inToPx(inches) {
+  return inches * DPI;
+}
+
+function mmToPx(mm) {
+  return (mm / MM_PER_INCH) * DPI;
+}
+
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
@@ -47,8 +58,8 @@ const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
   a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthIN: 8.5, heightIN: 11 },
-  tabloid: { widthIN: 11, heightIN: 17 }
+  letter: { widthMM: 215.9, heightMM: 279.4 },
+  tabloid: { widthMM: 279.4, heightMM: 431.8 }
 };
 
 const maxWidthPx = 360;
@@ -56,60 +67,98 @@ const maxWidthPx = 360;
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let widthPx, heightPx;
+  let baseWidth, baseHeight; 
+  
   if (key === 'a4') {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
+    baseWidth = mmToPx(paperSizes.a4.widthMM);
+    baseHeight = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    widthPx = inToPx(paperSizes.letter.widthIN);
-    heightPx = inToPx(paperSizes.letter.heightIN);
+    baseWidth = mmToPx(paperSizes.letter.widthMM);
+    baseHeight = mmToPx(paperSizes.letter.heightMM);
   } else if (key === 'tabloid') {
-    widthPx = inToPx(paperSizes.tabloid.widthIN);
-    heightPx = inToPx(paperSizes.tabloid.heightIN);
+    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
+    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
   } else {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
+    handleCustomSize();
+    return;
   }
 
-  if (widthPx > maxWidthPx) {
-    const scale = maxWidthPx / widthPx;
-    widthPx = widthPx * scale;
-    heightPx = heightPx * scale;
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+  window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
+  window.addEventListener("resize", updateRectSizeOnResize); 
 }
 
-  const pageElement = pages[currentPageIndex];
-  pageElement.style.width = `${widthPx}px`;
-  pageElement.style.height = `${heightPx}px`;
-
-if (rulersVisible) drawRulers();
-window.addEventListener("resize", () => {
-  if (rulersVisible) drawRulers();
-});
-  
-  const page = pages[currentPageIndex];
-
-  // Apply the correct dimensions based on orientation
-  if (!isPortrait) {
-    // Swap for landscape
-    page.style.width = `${heightPx}px`;
-    page.style.height = `${widthPx}px`;
-  } else {
-    page.style.width = `${widthPx}px`;
-    page.style.height = `${heightPx}px`;
+function handleCustomSize() {
+  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
+  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
+    alert("Invalid or cancelled width. Defaulting to A4.");
+    updateRectSize('a4');
+    return;
   }
+  
+  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
+  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
+    alert("Invalid or cancelled height. Defaulting to A4.");
+    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
+    return;
+  }
+
+  const widthMM = parseFloat(customWidthMM);
+  const heightMM = parseFloat(customHeightMM);
+
+  let baseWidth = mmToPx(widthMM);
+  let baseHeight = mmToPx(heightMM);
+  
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+}
+
+function updateRectSizeOnResize() {
+    if (rulersVisible) drawRulers();
+    updateRectSize(selector.value); 
 }
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
-  
-  const page = pages[currentPageIndex];
-  const width = page.style.width;
-  const height = page.style.height;
-  
-  page.style.width = height;
-  page.style.height = width;
-  
   isPortrait = !isPortrait;
+  updateRectSize(selector.value); 
 }
 
 function showPage(index) {
@@ -1008,12 +1057,45 @@ function hexToRgbA(hex, alpha) {
 function applyShapeStyle(element = selectedElement) {
     if (!element || !element.classList.contains('shape-element')) return;
 
+    const dataType = element.dataset.type;
+    let clipPathValue = 'none';
+  if (dataType === 'circle' || svgShape.tagName === 'circle') {
+        clipPathValue = 'circle(50% at 50% 50%)';
+    } 
+    else if (dataType === 'rect' || svgShape.tagName === 'rect') {
+         clipPathValue = 'inset(0)'; // This makes it a simple rectangle (no clipping)
+    }
+
+    if (clipPathValue === 'none') {
+        let pathData = '';
+
+        if (svgShape.tagName === 'path') {
+            pathData = svgShape.getAttribute('d');
+        } else if (svgShape.tagName === 'polygon' || svgShape.tagName === 'polyline') {
+            const points = svgShape.getAttribute('points').trim().split(/\s+|,/);
+            const percentagePoints = [];
+            for (let i = 0; i < points.length; i += 2) {
+                percentagePoints.push(`${points[i]}% ${points[i+1]}%`);
+            }
+            clipPathValue = `polygon(${percentagePoints.join(', ')})`;
+        }
+        
+        if (pathData) {
+            clipPathValue = `path('${pathData}')`;
+        }
+    }
+
+    element.style.clipPath = clipPathValue;
+    element.style.webkitClipPath = clipPathValue;
+  
     const svg = element.querySelector('svg');
     const svgShape = svg.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
     if (!svgShape) return;
 
     const fillType = element.dataset.fillType || 'color';
     const imageUrl = element.dataset.fillImageUrl;
+    
+    const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0; 
 
     if (fillType === 'image' && imageUrl) {
         let defs = svg.querySelector('defs');
@@ -1031,7 +1113,7 @@ function applyShapeStyle(element = selectedElement) {
         let pattern = defs.querySelector('#' + patternId);
         if (!pattern) {
             pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
-            pattern.setAttribute('id', patternId); // Establecer ID única
+            pattern.setAttribute('id', patternId); // Set unique ID
             pattern.setAttribute('patternUnits', 'objectBoundingBox'); 
             pattern.setAttribute('width', '1');
             pattern.setAttribute('height', '1');
@@ -1047,21 +1129,25 @@ function applyShapeStyle(element = selectedElement) {
         }
 
         const imageEl = pattern.querySelector('image');
+        imageEl.setAttribute('href', imageUrl); 
         imageEl.setAttribute('xlink:href', imageUrl); 
-        imageEl.removeAttribute('href');
         
         svgShape.setAttribute('fill', 'url(#' + patternId + ')');
 
-    } else { // Use Color Fill (Your existing logic)
+    } else { // Use Color Fill 
         const fillColorHex = element.dataset.fillColor || '#000000';
-        const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
-        const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
-        svgShape.setAttribute('fill', fillRgba);
+        // Set fill to opaque color, and rely on fill-opacity below for transparency
+        const opaqueFillColor = hexToRgbA(fillColorHex, 1.0);
+        svgShape.setAttribute('fill', opaqueFillColor);
     }
 
+    // Apply fill-opacity to the SVG shape itself (works for both color and pattern fill)
+    svgShape.setAttribute('fill-opacity', fillOpacity);
+    
     const borderColorHex = element.dataset.borderColor || '#000000';
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
+    
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
     svgShape.setAttribute('stroke', borderRgba);
