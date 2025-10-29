@@ -545,8 +545,11 @@ function selectElement(element) {
 
     if (toolbar) {
         toolbar.style.display = 'flex'; 
-        toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-        toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+        requestAnimationFrame(() => {
+          const rect = element.getBoundingClientRect();
+          toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+          toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+        });
     } else {
         document.getElementById('noElementSelected').style.display = 'block';
     }
