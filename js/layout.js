@@ -10,6 +10,17 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
+const DPI = 96;
+const MM_PER_INCH = 25.4;
+
+function inToPx(inches) {
+  return inches * DPI;
+}
+
+function mmToPx(mm) {
+  return (mm / MM_PER_INCH) * DPI;
+}
+
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
@@ -47,8 +58,8 @@ const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
   a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthIN: 8.5, heightIN: 11 },
-  tabloid: { widthIN: 11, heightIN: 17 }
+  letter: { widthMM: 215.9, heightMM: 279.4 },
+  tabloid: { widthMM: 279.4, heightMM: 431.8 }
 };
 
 const maxWidthPx = 360;
@@ -56,60 +67,98 @@ const maxWidthPx = 360;
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let widthPx, heightPx;
+  let baseWidth, baseHeight; 
+  
   if (key === 'a4') {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
+    baseWidth = mmToPx(paperSizes.a4.widthMM);
+    baseHeight = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    widthPx = inToPx(paperSizes.letter.widthIN);
-    heightPx = inToPx(paperSizes.letter.heightIN);
+    baseWidth = mmToPx(paperSizes.letter.widthMM);
+    baseHeight = mmToPx(paperSizes.letter.heightMM);
   } else if (key === 'tabloid') {
-    widthPx = inToPx(paperSizes.tabloid.widthIN);
-    heightPx = inToPx(paperSizes.tabloid.heightIN);
+    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
+    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
   } else {
-    widthPx = mmToPx(paperSizes.a4.widthMM);
-    heightPx = mmToPx(paperSizes.a4.heightMM);
+    handleCustomSize();
+    return;
   }
 
-  if (widthPx > maxWidthPx) {
-    const scale = maxWidthPx / widthPx;
-    widthPx = widthPx * scale;
-    heightPx = heightPx * scale;
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+  window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
+  window.addEventListener("resize", updateRectSizeOnResize); 
 }
 
-  const pageElement = pages[currentPageIndex];
-  pageElement.style.width = `${widthPx}px`;
-  pageElement.style.height = `${heightPx}px`;
-
-if (rulersVisible) drawRulers();
-window.addEventListener("resize", () => {
-  if (rulersVisible) drawRulers();
-});
-  
-  const page = pages[currentPageIndex];
-
-  // Apply the correct dimensions based on orientation
-  if (!isPortrait) {
-    // Swap for landscape
-    page.style.width = `${heightPx}px`;
-    page.style.height = `${widthPx}px`;
-  } else {
-    page.style.width = `${widthPx}px`;
-    page.style.height = `${heightPx}px`;
+function handleCustomSize() {
+  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
+  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
+    alert("Invalid or cancelled width. Defaulting to A4.");
+    updateRectSize('a4');
+    return;
   }
+  
+  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
+  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
+    alert("Invalid or cancelled height. Defaulting to A4.");
+    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
+    return;
+  }
+
+  const widthMM = parseFloat(customWidthMM);
+  const heightMM = parseFloat(customHeightMM);
+
+  let baseWidth = mmToPx(widthMM);
+  let baseHeight = mmToPx(heightMM);
+  
+  let finalWidthPx = baseWidth;
+  let finalHeightPx = baseHeight;
+
+  if (finalWidthPx > maxWidthPx) {
+    const scale = maxWidthPx / finalWidthPx;
+    finalWidthPx = finalWidthPx * scale;
+    finalHeightPx = finalHeightPx * scale;
+  }
+  
+  const pageElement = pages[currentPageIndex];
+  
+  if (!isPortrait) {
+    pageElement.style.width = `${finalHeightPx}px`;
+    pageElement.style.height = `${finalWidthPx}px`;
+  } else {
+    pageElement.style.width = `${finalWidthPx}px`;
+    pageElement.style.height = `${finalHeightPx}px`;
+  }
+
+  if (rulersVisible) drawRulers();
+}
+
+function updateRectSizeOnResize() {
+    if (rulersVisible) drawRulers();
+    updateRectSize(selector.value); 
 }
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
-  
-  const page = pages[currentPageIndex];
-  const width = page.style.width;
-  const height = page.style.height;
-  
-  page.style.width = height;
-  page.style.height = width;
-  
   isPortrait = !isPortrait;
+  updateRectSize(selector.value); 
 }
 
 function showPage(index) {
@@ -215,8 +264,6 @@ function toggleMargins() {
   });
 }
 
-// layout.js
-
 function togglePageNumbers() {
     pageNumbersVisible = !pageNumbersVisible; // Toggle the state
 
@@ -227,7 +274,6 @@ function togglePageNumbers() {
     }
     
     pages.forEach(page => {
-        // Get the page-content container
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
         const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
@@ -246,7 +292,6 @@ function drawRulers() {
 
   const pageRect = page.getBoundingClientRect();
 
-  // Horizontal ruler
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
@@ -254,7 +299,6 @@ function drawRulers() {
   hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(hRuler);
 
-  // Vertical ruler
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
@@ -262,12 +306,10 @@ function drawRulers() {
   vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
   page.parentElement.appendChild(vRuler);
 
-  // Tick spacing: every 50px in current unit
   const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
   const maxX = pageRect.width;
   const maxY = pageRect.height;
 
-  // Horizontal ticks
   for (let x = 0; x <= maxX; x += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -285,7 +327,6 @@ function drawRulers() {
     }
   }
 
-  // Vertical ticks
   for (let y = 0; y <= maxY; y += spacing) {
     const tick = document.createElement("div");
     tick.className = "tick";
@@ -309,14 +350,13 @@ function toggleRulers() {
   drawRulers();
 }
 
-// Re-draw rulers when page changes
 const oldShowPage = showPage;
 showPage = function(index) {
   oldShowPage(index);
   if (rulersVisible) drawRulers();
 };
 
-function addTextElement(type) {
+function addTextElement() { 
   if (!pages[currentPageIndex]) return;
   
   const pageContent = pages[currentPageIndex].querySelector('.page-content');
@@ -327,23 +367,9 @@ function addTextElement(type) {
   element.style.top = '50px';
   element.style.left = '50px';
   element.style.position = 'absolute';
-
-  switch(type) {
-    case 'title':
-      element.style.fontSize = '24px';
-      element.style.fontWeight = 'bold';
-      element.textContent = 'Title';
-      break;
-    case 'subtitle':
-      element.style.fontSize = '18px';
-      element.style.fontWeight = 'bold';
-      element.textContent = 'Subtitle';
-      break;
-    case 'paragraph':
-      element.style.fontSize = '14px';
-      element.textContent = 'Add your text here';
-      break;
-  }
+  element.style.fontSize = '14px';
+  element.style.fontWeight = 'normal'; // Es bueno ser explícito
+  element.textContent = 'Lorem Ipsum';
     
   element.style.resize = 'both';
   element.style.overflow = 'auto';
@@ -352,34 +378,6 @@ function addTextElement(type) {
   makeElementDraggable(element);
   makeRotatable(element);
   selectElement(element);
-}
-
-  function addImageElement() {
-    // Ensure current page exists and is a DOM element with a querySelector method
-    if (!pages[currentPageIndex] || !pages[currentPageIndex].querySelector) return;
-    
-    const pageContent = pages[currentPageIndex].querySelector('.page-content');
-    const element = document.createElement('img');
-    
-    element.className = 'image-element';
-    element.src = DEFAULT_IMAGE_SRC;
-    element.alt = 'User-defined image';
-    element.contentEditable = false; 
-    
-    element.style.top = '50px';
-    element.style.left = '50px';
-    element.style.position = 'absolute';
-    element.style.width = '150px'; 
-    element.style.height = '100px';
-    element.style.objectFit = 'cover'; // Helps the image scale nicely within the bounds
-    
-    element.style.resize = 'both';
-    element.style.overflow = 'hidden'; // Hide parts of the image that might exceed bounds
-
-    pageContent.appendChild(element);
-    makeElementDraggable(element);
-    makeRotatable(element);
-    selectElement(element);
 }
 
 function addShapeElement(type) {
@@ -422,14 +420,11 @@ function addShapeElement(type) {
       if (isNaN(sides) || sides < 3) sides = 7; // default
       const points = [];
       
-      // FIX: A polygon uses a single radius, not alternating radii like a star.
       const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
       
       for (let i = 0; i < sides; i++) {
-        // Keeps the top point flat by starting the angle correctly
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
         
-        // Use the consistent radius for all points
         const x = 50 + radius * Math.cos(angle); 
         const y = 50 + radius * Math.sin(angle);
         
@@ -467,7 +462,8 @@ function addShapeElement(type) {
   }
 
   if (shape) {
-    // Store style properties on the container element for persistence
+    element.dataset.fillType = 'color';
+    element.dataset.fillImageUrl = '';
     element.dataset.fillColor = shape.getAttribute('fill');
     element.dataset.fillOpacity = 1.0;
     element.dataset.borderColor = shape.getAttribute('stroke');
@@ -485,49 +481,37 @@ function addShapeElement(type) {
   makeRotatable(element);
   selectElement(element);
 
-  // Re-apply style when element is resized (to ensure SVG scale/transform updates)
   new ResizeObserver(() => {
     updateSelectedShapeStyle(); 
   }).observe(element);
 }
 
 function selectElement(element) {
-    document.querySelectorAll('.text-element, .shape-element, .image-element').forEach(el => {
+    document.querySelectorAll('.text-element, .shape-element').forEach(el => {
         el.classList.remove('selected');
         if (el.classList.contains('shape-element')) {
             el.style.boxShadow = 'none';
-            el.style.border = 'none';
-        }
-        if (el.classList.contains('image-element')) {
             el.style.border = 'none';
         }
     });
 
     selectedElement = element;
     selectedElement.classList.add('selected');
-    
-    if (selectedElement.classList.contains('image-element') || selectedElement.classList.contains('text-element')) {
-        selectedElement.style.border = '2px solid #3B82F6';
-        selectedElement.style.outline = '1px solid #ffffff';
-    }
 
     if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
+        selectedElement.style.boxShadow = 'none'; // Blue glow
         selectedElement.style.border = 'none'; // Ensure no box border
     }
 
     document.getElementById('textEditor').style.display = 'none';
     document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; 
     document.getElementById('noElementSelected').style.display = 'none';
 
     const textToolbar = document.getElementById('textToolbar');
     const shapeToolbar = document.getElementById('shapeToolbar');
-    const imageToolbar = document.getElementById('imageToolbar');
 
     textToolbar.style.display = 'none';
     shapeToolbar.style.display = 'none';
-    if (imageToolbar) imageToolbar.style.display = 'none';
 
     const rect = element.getBoundingClientRect();
     const containerRect = document.body.getBoundingClientRect();
@@ -557,24 +541,16 @@ function selectElement(element) {
         initShapeEditor();
         loadShapeStateToControls();
     
-    } else if (element.classList.contains('image-element')) { 
-        toolbar = imageToolbar;
-        document.getElementById('imageEditor').style.display = 'block';
-        
-        const imageUrlInput = document.getElementById('imageUrlInput');
-        if (imageUrlInput) {
-            imageUrlInput.value = selectedElement.src;
-        }
     }
 
     if (toolbar) {
-        if (toolbar.offsetWidth === undefined) {
-            toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
-        }
-        toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-        toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-        toolbar.style.display = 'flex';
-    } else if (!toolbar) {
+        toolbar.style.display = 'flex'; 
+        requestAnimationFrame(() => {
+          const rect = element.getBoundingClientRect();
+          toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+          toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+        });
+    } else {
         document.getElementById('noElementSelected').style.display = 'block';
     }
 }
@@ -621,13 +597,11 @@ function makeElementDraggable(el) {
 function showToolbar(targetElement) {
     const textToolbar = document.getElementById('textToolbar');
     const shapeToolbar = document.getElementById('shapeToolbar');
-    const imageToolbar = document.getElementById('imageToolbar'); 
 
-    if (!textToolbar || !shapeToolbar || !imageToolbar) return; 
+    if (!textToolbar || !shapeToolbar) return; 
   
     textToolbar.style.display = 'none';
     shapeToolbar.style.display = 'none';
-    imageToolbar.style.display = 'none'; 
 
     const rect = targetElement.getBoundingClientRect();
     let toolbar;
@@ -636,8 +610,6 @@ function showToolbar(targetElement) {
         toolbar = textToolbar;
     } else if (targetElement.classList.contains('shape-element')) {
         toolbar = shapeToolbar;
-    } else if (targetElement.classList.contains('image-element')) {
-        toolbar = imageToolbar;
     }
 
     if (toolbar) {
@@ -655,11 +627,9 @@ function deleteElement() {
         
         document.getElementById('textToolbar').style.display = 'none';
         document.getElementById('shapeToolbar').style.display = 'none';
-        document.getElementById('imageToolbar').style.display = 'none'; 
       
         document.getElementById('textEditor').style.display = 'none';
-        document.getElementById('shapeEditor').style.display = 'none';
-        document.getElementById('imageEditor').style.display = 'none'; 
+        document.getElementById('shapeEditor').style.display = 'none'; 
       
         document.getElementById('noElementSelected').style.display = 'block';
     }
@@ -684,7 +654,7 @@ function alignElement() {
   selectedElement.style.textAlign = alignments[nextIndex];
 }
 
-['textToolbar', 'shapeToolbar', 'imageToolbar'].forEach(toolbarId => {
+['textToolbar', 'shapeToolbar'].forEach(toolbarId => {
   const toolbar = document.getElementById(toolbarId);
   if (!toolbar) return;
 
@@ -711,16 +681,13 @@ document.addEventListener('click', (e) => {
   } else if (
     !e.target.closest('#textEditor') &&
     !e.target.closest('#shapeEditor') &&
-    !e.target.closest('#imageEditor') &&
     !e.target.closest('#textToolbar') &&
     !e.target.closest('#shapeToolbar') &&
-    !e.target.closest('#imageToolbar') &&
     !e.target.closest('.sidebar-btn') &&
     !e.target.closest('.modal') // Don't deselect if clicking modal
   ) {
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none';
     deselectElement();
   }
 });
@@ -765,11 +732,6 @@ function deselectElement() {
     if (selectedElement) {
         selectedElement.classList.remove('selected');
         
-        if (selectedElement.classList.contains('text-element') || selectedElement.classList.contains('image-element')) {
-            selectedElement.style.border = 'none';
-            selectedElement.style.outline = 'none';
-        }
-        
         if (selectedElement.classList.contains('shape-element')) {
             selectedElement.style.boxShadow = 'none';
             selectedElement.style.border = 'none';
@@ -780,13 +742,11 @@ function deselectElement() {
     
     document.getElementById('textEditor').style.display = 'none';
     document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('imageEditor').style.display = 'none'; // MODIFICATION 1: Hide image editor
     
     document.getElementById('noElementSelected').style.display = 'block';
     
     document.getElementById('textToolbar').style.display = 'none';
     document.getElementById('shapeToolbar').style.display = 'none';
-    document.getElementById('imageToolbar').style.display = 'none'; // MODIFICATION 2: Hide image toolbar
 }
 
 function toggleLeftSidebar() {
@@ -805,7 +765,6 @@ function toggleRightSidebar() {
 //Zoom
 const center = document.querySelector(".center-container");
 
-// Check if buttons exist before adding listeners
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const handBtn = document.getElementById("handBtn");
@@ -952,6 +911,8 @@ function saveLayout() {
                     elData.type = 'shape';
                     elData.shapeType = element.dataset.shapeType;
                     elData.shapeData = {
+                        fillType: element.dataset.fillType,
+                        fillImageUrl: element.dataset.fillImageUrl,
                         fillColor: element.dataset.fillColor,
                         fillOpacity: element.dataset.fillOpacity,
                         borderColor: element.dataset.borderColor,
@@ -1036,6 +997,8 @@ function loadLayout(layoutIndex) {
                     element.appendChild(svg);
                 }
                 
+                element.dataset.fillType = elData.shapeData.fillType;
+                element.dataset.fillImageUrl = elData.shapeData.fillImageUrl;
                 element.dataset.fillColor = elData.shapeData.fillColor;
                 element.dataset.fillOpacity = elData.shapeData.fillOpacity;
                 element.dataset.borderColor = elData.shapeData.borderColor;
@@ -1047,11 +1010,6 @@ function loadLayout(layoutIndex) {
                 new ResizeObserver(() => {
                     applyShapeStyle(element);
                 }).observe(element);
-            } else if (elData.type === 'image') { // <-- ADDED: Handle image element type
-                element = document.createElement('img');
-                element.className = 'image-element';
-                element.contentEditable = false;
-                element.src = elData.content; 
             } else {
                 return; // Skip unknown element type
             }
@@ -1099,29 +1057,72 @@ function hexToRgbA(hex, alpha) {
 function applyShapeStyle(element = selectedElement) {
     if (!element || !element.classList.contains('shape-element')) return;
 
-    const svgShape = element.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
+    const svg = element.querySelector('svg');
+    const svgShape = svg.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
     if (!svgShape) return;
 
-    const fillColorHex = element.dataset.fillColor || '#000000';
-    const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
-    
+    const fillType = element.dataset.fillType || 'color';
+    const imageUrl = element.dataset.fillImageUrl;
+
+    if (fillType === 'image' && imageUrl) {
+        let defs = svg.querySelector('defs');
+        if (!defs) {
+            defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            svg.prepend(defs); // Add at the start of the SVG
+        }
+
+        let patternId = element.dataset.patternId;
+        if (!patternId) {
+            patternId = 'pattern-' + Math.random().toString(36).substring(2, 9);
+            element.dataset.patternId = patternId;
+        }
+      
+        let pattern = defs.querySelector('#' + patternId);
+        if (!pattern) {
+            pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+            pattern.setAttribute('id', patternId); // Establecer ID única
+            pattern.setAttribute('patternUnits', 'objectBoundingBox'); 
+            pattern.setAttribute('width', '1');
+            pattern.setAttribute('height', '1');
+            
+            const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+            image.setAttribute('x', '0');
+            image.setAttribute('y', '0');
+            image.setAttribute('width', '100%'); 
+            image.setAttribute('height', '100%'); 
+            image.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+            pattern.appendChild(image);
+            defs.appendChild(pattern);
+        }
+
+        const imageEl = pattern.querySelector('image');
+        imageEl.setAttribute('href', imageUrl);
+        imageEl.setAttribute('xlink:href', imageUrl); 
+        //imageEl.removeAttribute('href');
+        
+        svgShape.setAttribute('fill', 'url(#' + patternId + ')');
+
+    } else { // Use Color Fill (Your existing logic)
+        const fillColorHex = element.dataset.fillColor || '#000000';
+        const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
+        const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
+        svgShape.setAttribute('fill', fillRgba);
+    }
+
     const borderColorHex = element.dataset.borderColor || '#000000';
     const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
     const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
-
-    const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
     const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
 
-    svgShape.setAttribute('fill', fillRgba);
     svgShape.setAttribute('stroke', borderRgba);
     svgShape.setAttribute('stroke-width', borderWidth);
-    svgShape.parentElement.style.transform = '';
-    svgShape.parentElement.style.transformOrigin = '';
 }
 
 function updateSelectedShapeStyle() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
+    const fillTypeSelect = document.getElementById('shape-fill-type');
+    const imageUrlInput = document.getElementById('shape-image-url');
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
@@ -1138,14 +1139,19 @@ function updateSelectedShapeStyle() {
     const borderOpacity = parseFloat(borderOpacityInput.value);
     const borderWidth = Math.max(0, parseFloat(borderWidthInput.value));
 
-    selectedElement.dataset.fillColor = fillColorHex;
-    selectedElement.dataset.fillOpacity = fillOpacity;
+    selectedElement.dataset.fillType = fillTypeSelect.value;
+    selectedElement.dataset.fillImageUrl = imageUrlInput.value;
+    selectedElement.dataset.fillColor = fillColorInput.value;
+    selectedElement.dataset.fillOpacity = fillOpacityInput.value;
     selectedElement.dataset.borderColor = borderColorHex;
     selectedElement.dataset.borderOpacity = borderOpacity;
     selectedElement.dataset.borderWidth = borderWidth;
     
     applyShapeStyle(selectedElement);
 
+    document.getElementById('shape-color-controls').style.display = (fillTypeSelect.value === 'color') ? 'block' : 'none';
+    document.getElementById('shape-image-controls').style.display = (fillTypeSelect.value === 'image') ? 'block' : 'none';
+    
     if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
     if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
 }
@@ -1153,18 +1159,27 @@ function updateSelectedShapeStyle() {
 function loadShapeStateToControls() {
     if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
+    const fillTypeSelect = document.getElementById('shape-fill-type');
+    const imageUrlInput = document.getElementById('shape-image-url');
     const fillColorInput = document.getElementById('shape-fill-color');
     const fillOpacityInput = document.getElementById('shape-fill-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
 
+    const fillType = selectedElement.dataset.fillType || 'color';
+    fillTypeSelect.value = fillType;
+    imageUrlInput.value = selectedElement.dataset.fillImageUrl || '';
+    
     fillColorInput.value = selectedElement.dataset.fillColor || '#3b82f6';
     fillOpacityInput.value = selectedElement.dataset.fillOpacity || 1.0;
     borderWidthInput.value = selectedElement.dataset.borderWidth || 4;
     borderColorInput.value = selectedElement.dataset.borderColor || '#1e3a8a';
     borderOpacityInput.value = selectedElement.dataset.borderOpacity || 1.0;
-    
+
+    document.getElementById('shape-color-controls').style.display = (fillType === 'color') ? 'block' : 'none';
+    document.getElementById('shape-image-controls').style.display = (fillType === 'image') ? 'block' : 'none';
+  
     updateSelectedShapeStyle();
 }
 
@@ -1176,7 +1191,17 @@ function initShapeEditor() {
     const borderColorInput = document.getElementById('shape-border-color');
     const borderOpacityInput = document.getElementById('shape-border-opacity');
     const borderWidthInput = document.getElementById('shape-border-width');
-    
+
+    const fillTypeSelect = document.getElementById('shape-fill-type');
+    if (fillTypeSelect) {
+        fillTypeSelect.addEventListener('change', updateSelectedShapeStyle);
+    }
+
+    const imageUrlInput = document.getElementById('shape-image-url');
+    if (imageUrlInput) {
+        imageUrlInput.addEventListener('input', updateSelectedShapeStyle);
+    }
+  
     if (fillColorInput) {
         fillColorInput.addEventListener('input', updateSelectedShapeStyle);
     }
@@ -1254,6 +1279,37 @@ function loadSavedLayouts() {
   }
 }
 
+document.addEventListener('paste', handleImagePaste);
+
+function handleImagePaste(e) {
+  if (!selectedElement || !selectedElement.classList.contains('shape-element')) {
+    return;
+  }
+
+  if (e.clipboardData && e.clipboardData.files) {
+    const file = e.clipboardData.files[0];
+
+    if (file && file.type.startsWith('image/')) {
+      e.preventDefault(); // Stop the browser from pasting the image elsewhere
+
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        const dataUrl = event.target.result;
+        
+        selectedElement.dataset.fillType = 'image';
+        selectedElement.dataset.fillImageUrl = dataUrl;
+        
+        applyShapeStyle(selectedElement);
+        
+        loadShapeStateToControls();
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  }
+}
+
 if (selector) {
   selector.addEventListener('change', (e) => {
     updateRectSize(e.target.value);
@@ -1294,15 +1350,9 @@ const rightMenuBtn = document.getElementById('rightMenuBtn');
 if (leftMenuBtn) leftMenuBtn.addEventListener('click', toggleLeftSidebar);
 if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 
-const addTitleBtn = document.getElementById('addTitleBtn');
-const addSubtitleBtn = document.getElementById('addSubtitleBtn');
-const addParagraphBtn = document.getElementById('addParagraphBtn');
-const addImageBtn = document.getElementById('addImageBtn');
+const addTextBtn = document.getElementById('addTextBtn'); // Usa el ID de tu nuevo botón
 
-if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
-if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
-if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
-if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
+if (addTextBtn) addTextBtn.addEventListener('click', addTextElement);
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
@@ -1395,7 +1445,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadSavedLayouts();
     
-    // Add html2canvas library for image export if not already present
     if (typeof html2canvas === 'undefined') {
       const html2canvasScript = document.createElement('script');
       html2canvasScript.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
