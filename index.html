@@ -93,9 +93,9 @@
 <div id="AM" align="justify">
   <h2 class="AM"></h2>
   <p>¡Hola! Esto es <strong>di.agm</strong>, apasionada diseñadora industrial.</p>
-  <p>Me especializo en diseño asistido por computadora: CAD, y amo el diseño universal. Hay cosas que realmente me apasionan, aunque siempre me gusta experimentar cosas nuevas mientras.</p>
+  <p>Me especializo en diseño asistido por computadora: CAD, y amo el diseño universal. Siempre me gusta experimentar cosas nuevas.</p>
   <p>También me encanta la ilustración, leer y escribir, o experimentar con programación.</p>
-  <p>Quiero trabajar con los Objetivos de Desarrollo Sostenible utilizando el diseño industrial. Mi sueño es trabajar con y ayudar a personas en situación de discapacidad.</p>
+  <p>Mi sueño es trabajar con y ayudar a personas en situación de discapacidad.</p>
 </div>
 
 <div id="P" align="justify">
@@ -166,6 +166,9 @@
       <h3>Elements</h3>
       <div class="sidebar-buttons">
         <button id="addTitleBtn">𝐓</button>
+        <button id="addSubtitleBtn">𝓢</button>
+        <button id="addParagraphBtn">𝓟</button>
+        <button id="addImageBtn">🏖</button>
         <button id="addCircleBtn">⬤</button>
         <button id="addPolygonBtn">⬟</button>
         <button id="addStarBtn">★</button>
@@ -237,6 +240,18 @@
         </div>
     </div>
 
+    <div id="imageEditor" style="display: none;" class="space-y-4">
+        <h3 class="font-semibold text-gray-600">Image Source</h3>
+        
+        <label class="block font-medium">Image URL:</label>
+        <input type="text" id="imageUrlInput" 
+               oninput="updateImageSource(this.value)"
+               placeholder="Enter image URL"
+               class="w-full border p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        
+        <p class="text-xs text-gray-500 mt-2">Paste a direct link (e.g., ending in .jpg, .png)</p>
+    </div>
+        
       <div id="noElementSelected" style="opacity: 0; text-align: center; padding: 10px;">
         Select an element to edit
       </div>
