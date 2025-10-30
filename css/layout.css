@@ -498,6 +498,11 @@ button:hover {
   gap: 5px;                 /* Spacing between buttons */
 }
 
+#shapeToolbar {
+  position: absolute;
+  z-index: 9999;
+}
+
 .toolbar-button {
   width: 30px;
   height: 30px;
