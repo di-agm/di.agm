@@ -109,7 +109,6 @@ button:hover {
 }
 
 .shape-element {
-  display: block;
   position: absolute;
   top: 50px;
   left: 50px;
@@ -121,7 +120,6 @@ button:hover {
   justify-content: flex-start;
   resize: both;
   overflow: hidden;
-  cursor: move;
 }
 
 #pageNumber {
@@ -496,11 +494,6 @@ button:hover {
   display: flex;
   flex-direction: row;  /* buttons in a row */
   gap: 5px;                 /* Spacing between buttons */
-}
-
-#shapeToolbar {
-  position: absolute;
-  z-index: 9999;
 }
 
 .toolbar-button {
