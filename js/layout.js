@@ -672,7 +672,6 @@ document.addEventListener('click', (e) => {
     if (selectedElement !== clickedElement) {
       selectElement(clickedElement);
     }
-    // No need to call showToolbar here if selectElement handles it
   } else if (
     !e.target.closest('#textEditor') &&
     !e.target.closest('#shapeEditor') &&
@@ -685,25 +684,6 @@ document.addEventListener('click', (e) => {
     document.getElementById('shapeToolbar').style.display = 'none';
     deselectElement();
   }
-});
-
-document.addEventListener('click', (event) => {
-    const textToolbar = document.getElementById('textToolbar');
-    const shapeToolbar = document.getElementById('shapeToolbar');
-    
-    if (!selectedElement) {
-        return;
-    }
-
-    const isClickOnElement = selectedElement.contains(event.target);
-    const isClickOnToolbar = (textToolbar && textToolbar.contains(event.target)) || 
-                             (shapeToolbar && shapeToolbar.contains(event.target));
-    const isClickOnSidebar = document.getElementById('leftSidebar').contains(event.target) || 
-                             document.getElementById('rightSidebar').contains(event.target);
-
-    if (!isClickOnElement && !isClickOnToolbar && !isClickOnSidebar) {
-        deselectElement();
-    }
 });
 
 function makeRotatable(el) {
@@ -726,7 +706,6 @@ function makeRotatable(el) {
       const dy = ev.clientY - centerY;
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-      // preserve other transforms
       const existing = el.style.transform.replace(/rotate\([^)]*\)/, '');
       el.style.transform = `${existing} rotate(${angle}deg)`;
     }
@@ -776,7 +755,26 @@ function toggleRightSidebar() {
   sidebar.classList.toggle('open');
   hamburger.classList.toggle('open');
 }
-//Zoom
+
+document.addEventListener('click', (event) => {
+    const textToolbar = document.getElementById('textToolbar');
+    const shapeToolbar = document.getElementById('shapeToolbar');
+    
+    if (!selectedElement) {
+        return;
+    }
+
+    const isClickOnElement = selectedElement.contains(event.target);
+    const isClickOnToolbar = (textToolbar && textToolbar.contains(event.target)) || 
+                             (shapeToolbar && shapeToolbar.contains(event.target));
+    const isClickOnSidebar = document.getElementById('leftSidebar').contains(event.target) || 
+                             document.getElementById('rightSidebar').contains(event.target);
+
+    if (!isClickOnElement && !isClickOnToolbar && !isClickOnSidebar) {
+        deselectElement();
+    }
+});
+
 const center = document.querySelector(".center-container");
 
 const zoomInBtn = document.getElementById("zoomInBtn");
