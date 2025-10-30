@@ -165,7 +165,7 @@
     <div class="sidebar-section">
       <h3>Elements</h3>
       <div class="sidebar-buttons">
-        <button id="addTextBtn">𝐓</button>
+        <button id="addTitleBtn">𝐓</button>
         <button id="addCircleBtn">⬤</button>
         <button id="addPolygonBtn">⬟</button>
         <button id="addStarBtn">★</button>
@@ -207,38 +207,34 @@
         </select>
       </div>
         
-  <div id="shapeEditor" class="editor-panel" style="display: none;">
-    <h2>Shape Editor</h2>
+      <div id="shapeEditor" class="editor-panel" style="display: none;">
+        <h2>Shape Editor</h2>
 
-    <div class="editor-group mt-2">
-        <label for="shape-fill-type" class="block text-xs font-medium text-gray-700">Fill Type</label>
-        <select id="shape-fill-type" class="w-full border border-gray-300 rounded-md p-1">
-            <option value="color">Color</option>
-            <option value="image">Image</option>
-        </select>
-    </div>
-
-    <h3 class="mt-4 text-sm font-semibold">Fill Style</h3>
-
-    <div id="shape-color-controls">
+        <!-- FILL CONTROLS -->
+        <h3 class="mt-4 text-sm font-semibold">Fill Style</h3>
         <div class="editor-group mt-2">
             <label for="shape-fill-color" class="block text-xs font-medium text-gray-700">Fill Color:</label>
-            <input type="color" id="shape-fill-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5" value="#3b82f6">
+            <input type="color" id="shape-fill-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
         </div>
-    </div>
-
-    <div class="editor-group mt-2" id="shape-fill-opacity-control">
-        <label for="shape-fill-opacity" class="block text-xs font-medium text-gray-700">Fill Opacity: <span id="fill-opacity-value">1.0</span></label>
-        <input type="range" id="shape-fill-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
-    </div>
-
-    <div id="shape-image-controls" style="display: none;">
         <div class="editor-group mt-2">
-            <label for="shape-image-url" class="block text-xs font-medium text-gray-700">Image URL:</label>
-            <input type="text" id="shape-image-url" placeholder="Paste image or enter URL" class="w-full border border-gray-300 rounded-md p-1">
+            <label for="shape-fill-opacity" class="block text-xs font-medium text-gray-700">Fill Opacity: <span id="fill-opacity-value">1.0</span></label>
+            <input type="range" id="shape-fill-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
         </div>
-    </div>
-    <h3 class="mt-4 text-sm font-semibold">Border Style</h3>
+
+        <!-- BORDER CONTROLS -->
+        <h3 class="mt-4 text-sm font-semibold">Border Style</h3>
+        <div class="editor-group mt-2">
+            <label for="shape-border-color" class="block text-xs font-medium text-gray-700">Border Color:</label>
+            <input type="color" id="shape-border-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-border-opacity" class="block text-xs font-medium text-gray-700">Border Opacity: <span id="border-opacity-value">1.0</span></label>
+            <input type="range" id="shape-border-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
+        </div>
+        <div class="editor-group mt-2">
+            <label for="shape-border-width" class="block text-xs font-medium text-gray-700">Border Width (px):</label>
+            <input type="number" id="shape-border-width" min="0" value="1" class="w-full border border-gray-300 rounded-md p-1">
+        </div>
     </div>
 
       <div id="noElementSelected" style="opacity: 0; text-align: center; padding: 10px;">
@@ -307,6 +303,7 @@
     ">
       <button class="toolbar-btn" data-action="edit">✎</button>
       <button class="toolbar-btn" data-action="delete">✖</button>
+      <button class="toolbar-btn" data-action="rotate">🗘</button>
       <button class="toolbar-btn" data-action="align">≡</button>
     </div>
 
@@ -318,8 +315,13 @@
       z-index: 1000;
     ">
       <button class="toolbar-btn" data-action="delete">✖</button>
+      <button class="toolbar-btn" data-action="rotate">🗘</button>
     </div>
 
+    <div id="imageToolbar" class="floating-toolbar" style="display: none;">
+        <button class="toolbar-btn" data-action="delete">✖</button>
+    </div>
+    
     <div id="tt" style="display:none;">
     <div class="container">
         <h1>Generador de Horarios</h1>
