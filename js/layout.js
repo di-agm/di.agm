@@ -462,6 +462,7 @@ function addShapeElement(type) {
   }
 
   if (shape) {
+    element.dataset.shapeType = type;
     element.dataset.fillType = 'color';
     element.dataset.fillImageUrl = '';
     element.dataset.fillColor = shape.getAttribute('fill');
