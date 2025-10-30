@@ -10,17 +10,6 @@ let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 
-const DPI = 96;
-const MM_PER_INCH = 25.4;
-
-function inToPx(inches) {
-  return inches * DPI;
-}
-
-function mmToPx(mm) {
-  return (mm / MM_PER_INCH) * DPI;
-}
-
 function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'rect';
@@ -58,8 +47,8 @@ const pageNumberDisplay = document.getElementById('pageNumber');
 
 const paperSizes = {
   a4: { widthMM: 210, heightMM: 297 },
-  letter: { widthMM: 215.9, heightMM: 279.4 },
-  tabloid: { widthMM: 279.4, heightMM: 431.8 }
+  letter: { widthIN: 8.5, heightIN: 11 },
+  tabloid: { widthIN: 11, heightIN: 17 }
 };
 
 const maxWidthPx = 360;
@@ -67,98 +56,60 @@ const maxWidthPx = 360;
 function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
-  let baseWidth, baseHeight; 
-  
+  let widthPx, heightPx;
   if (key === 'a4') {
-    baseWidth = mmToPx(paperSizes.a4.widthMM);
-    baseHeight = mmToPx(paperSizes.a4.heightMM);
+    widthPx = mmToPx(paperSizes.a4.widthMM);
+    heightPx = mmToPx(paperSizes.a4.heightMM);
   } else if (key === 'letter') {
-    baseWidth = mmToPx(paperSizes.letter.widthMM);
-    baseHeight = mmToPx(paperSizes.letter.heightMM);
+    widthPx = inToPx(paperSizes.letter.widthIN);
+    heightPx = inToPx(paperSizes.letter.heightIN);
   } else if (key === 'tabloid') {
-    baseWidth = mmToPx(paperSizes.tabloid.widthMM);
-    baseHeight = mmToPx(paperSizes.tabloid.heightMM);
+    widthPx = inToPx(paperSizes.tabloid.widthIN);
+    heightPx = inToPx(paperSizes.tabloid.heightIN);
   } else {
-    handleCustomSize();
-    return;
+    widthPx = mmToPx(paperSizes.a4.widthMM);
+    heightPx = mmToPx(paperSizes.a4.heightMM);
   }
 
-  let finalWidthPx = baseWidth;
-  let finalHeightPx = baseHeight;
-
-  if (finalWidthPx > maxWidthPx) {
-    const scale = maxWidthPx / finalWidthPx;
-    finalWidthPx = finalWidthPx * scale;
-    finalHeightPx = finalHeightPx * scale;
-  }
-  
-  const pageElement = pages[currentPageIndex];
-  
-  if (!isPortrait) {
-    pageElement.style.width = `${finalHeightPx}px`;
-    pageElement.style.height = `${finalWidthPx}px`;
-  } else {
-    pageElement.style.width = `${finalWidthPx}px`;
-    pageElement.style.height = `${finalHeightPx}px`;
-  }
-
-  if (rulersVisible) drawRulers();
-  window.removeEventListener("resize", updateRectSizeOnResize); // Prevent multiple listeners
-  window.addEventListener("resize", updateRectSizeOnResize); 
+  if (widthPx > maxWidthPx) {
+    const scale = maxWidthPx / widthPx;
+    widthPx = widthPx * scale;
+    heightPx = heightPx * scale;
 }
 
-function handleCustomSize() {
-  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
-  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
-    alert("Invalid or cancelled width. Defaulting to A4.");
-    updateRectSize('a4');
-    return;
-  }
-  
-  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
-  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
-    alert("Invalid or cancelled height. Defaulting to A4.");
-    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
-    return;
-  }
-
-  const widthMM = parseFloat(customWidthMM);
-  const heightMM = parseFloat(customHeightMM);
-
-  let baseWidth = mmToPx(widthMM);
-  let baseHeight = mmToPx(heightMM);
-  
-  let finalWidthPx = baseWidth;
-  let finalHeightPx = baseHeight;
-
-  if (finalWidthPx > maxWidthPx) {
-    const scale = maxWidthPx / finalWidthPx;
-    finalWidthPx = finalWidthPx * scale;
-    finalHeightPx = finalHeightPx * scale;
-  }
-  
   const pageElement = pages[currentPageIndex];
-  
-  if (!isPortrait) {
-    pageElement.style.width = `${finalHeightPx}px`;
-    pageElement.style.height = `${finalWidthPx}px`;
-  } else {
-    pageElement.style.width = `${finalWidthPx}px`;
-    pageElement.style.height = `${finalHeightPx}px`;
-  }
+  pageElement.style.width = `${widthPx}px`;
+  pageElement.style.height = `${heightPx}px`;
 
+if (rulersVisible) drawRulers();
+window.addEventListener("resize", () => {
   if (rulersVisible) drawRulers();
-}
+});
+  
+  const page = pages[currentPageIndex];
 
-function updateRectSizeOnResize() {
-    if (rulersVisible) drawRulers();
-    updateRectSize(selector.value); 
+  // Apply the correct dimensions based on orientation
+  if (!isPortrait) {
+    // Swap for landscape
+    page.style.width = `${heightPx}px`;
+    page.style.height = `${widthPx}px`;
+  } else {
+    page.style.width = `${widthPx}px`;
+    page.style.height = `${heightPx}px`;
+  }
 }
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
+  
+  const page = pages[currentPageIndex];
+  const width = page.style.width;
+  const height = page.style.height;
+  
+  page.style.width = height;
+  page.style.height = width;
+  
   isPortrait = !isPortrait;
-  updateRectSize(selector.value); 
 }
 
 function showPage(index) {
@@ -499,7 +450,7 @@ function selectElement(element) {
     selectedElement.classList.add('selected');
 
     if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = 'none'; // Blue glow
+        selectedElement.style.boxShadow = '0 0 10px rgba(66, 153, 225, 0.8)'; // Blue glow
         selectedElement.style.border = 'none'; // Ensure no box border
     }
 
@@ -544,13 +495,13 @@ function selectElement(element) {
     }
 
     if (toolbar) {
-        toolbar.style.display = 'flex'; 
-        requestAnimationFrame(() => {
-          const rect = element.getBoundingClientRect();
-          toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-          toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
-        });
-    } else {
+        if (toolbar.offsetWidth === undefined) {
+            toolbar.style.display = 'flex'; // Make visible temporarily to calculate offset
+        }
+        toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
+        toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+        toolbar.style.display = 'flex';
+    } else if (!toolbar) {
         document.getElementById('noElementSelected').style.display = 'block';
     }
 }
@@ -1070,17 +1021,11 @@ function applyShapeStyle(element = selectedElement) {
             defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
             svg.prepend(defs); // Add at the start of the SVG
         }
-
-        let patternId = element.dataset.patternId;
-        if (!patternId) {
-            patternId = 'pattern-' + Math.random().toString(36).substring(2, 9);
-            element.dataset.patternId = patternId;
-        }
-      
-        let pattern = defs.querySelector('#' + patternId);
+        
+        let pattern = defs.querySelector('#image-fill-pattern');
         if (!pattern) {
             pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
-            pattern.setAttribute('id', patternId); // Establecer ID única
+            pattern.setAttribute('id', 'image-fill-pattern');
             pattern.setAttribute('patternUnits', 'objectBoundingBox'); 
             pattern.setAttribute('width', '1');
             pattern.setAttribute('height', '1');
@@ -1088,19 +1033,17 @@ function applyShapeStyle(element = selectedElement) {
             const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
             image.setAttribute('x', '0');
             image.setAttribute('y', '0');
-            image.setAttribute('width', '100%'); 
-            image.setAttribute('height', '100%'); 
-            image.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+            image.setAttribute('width', '1');
+            image.setAttribute('height', '1');
+            image.setAttribute('preserveAspectRatio', 'xMidYMid slice'); 
             pattern.appendChild(image);
             defs.appendChild(pattern);
         }
 
         const imageEl = pattern.querySelector('image');
         imageEl.setAttribute('href', imageUrl);
-        imageEl.setAttribute('xlink:href', imageUrl); 
-        //imageEl.removeAttribute('href');
         
-        svgShape.setAttribute('fill', 'url(#' + patternId + ')');
+        svgShape.setAttribute('fill', 'url(#image-fill-pattern)');
 
     } else { // Use Color Fill (Your existing logic)
         const fillColorHex = element.dataset.fillColor || '#000000';
@@ -1350,9 +1293,15 @@ const rightMenuBtn = document.getElementById('rightMenuBtn');
 if (leftMenuBtn) leftMenuBtn.addEventListener('click', toggleLeftSidebar);
 if (rightMenuBtn) rightMenuBtn.addEventListener('click', toggleRightSidebar);
 
-const addTextBtn = document.getElementById('addTextBtn'); // Usa el ID de tu nuevo botón
+const addTitleBtn = document.getElementById('addTitleBtn');
+const addSubtitleBtn = document.getElementById('addSubtitleBtn');
+const addParagraphBtn = document.getElementById('addParagraphBtn');
+const addImageBtn = document.getElementById('addImageBtn');
 
-if (addTextBtn) addTextBtn.addEventListener('click', addTextElement);
+if (addTitleBtn) addTitleBtn.addEventListener('click', () => addTextElement('title'));
+if (addSubtitleBtn) addSubtitleBtn.addEventListener('click', () => addTextElement('subtitle'));
+if (addParagraphBtn) addParagraphBtn.addEventListener('click', () => addTextElement('paragraph'));
+if (addImageBtn) addImageBtn.addEventListener('click', () => addTextElement('image'));
 
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
