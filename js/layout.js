@@ -687,6 +687,25 @@ document.addEventListener('click', (e) => {
   }
 });
 
+document.addEventListener('click', (event) => {
+    const textToolbar = document.getElementById('textToolbar');
+    const shapeToolbar = document.getElementById('shapeToolbar');
+    
+    if (!selectedElement) {
+        return;
+    }
+
+    const isClickOnElement = selectedElement.contains(event.target);
+    const isClickOnToolbar = (textToolbar && textToolbar.contains(event.target)) || 
+                             (shapeToolbar && shapeToolbar.contains(event.target));
+    const isClickOnSidebar = document.getElementById('leftSidebar').contains(event.target) || 
+                             document.getElementById('rightSidebar').contains(event.target);
+
+    if (!isClickOnElement && !isClickOnToolbar && !isClickOnSidebar) {
+        deselectElement();
+    }
+});
+
 function makeRotatable(el) {
   let rotating = false;
 
