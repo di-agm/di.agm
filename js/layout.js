@@ -589,32 +589,6 @@ function makeElementDraggable(el) {
   }
 }
 
-function showToolbar(targetElement) {
-    const textToolbar = document.getElementById('textToolbar');
-    const shapeToolbar = document.getElementById('shapeToolbar');
-
-    if (!textToolbar || !shapeToolbar) return; 
-  
-    textToolbar.style.display = 'none';
-    shapeToolbar.style.display = 'none';
-
-    const rect = targetElement.getBoundingClientRect();
-    let toolbar;
-
-    if (targetElement.classList.contains('text-element')) {
-        toolbar = textToolbar;
-    } else if (targetElement.classList.contains('shape-element')) {
-        toolbar = shapeToolbar;
-    }
-
-    if (toolbar) {
-        toolbar.style.display = 'flex';
-        toolbar.style.position = 'absolute';
-        toolbar.style.top = window.scrollY + rect.bottom + 'px';
-        toolbar.style.left = window.scrollX + rect.left + 'px';
-    }
-}
-
 function deleteElement() {
     if (selectedElement) {
         selectedElement.remove();
