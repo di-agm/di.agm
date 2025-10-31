@@ -535,6 +535,7 @@ function selectElement(element) {
     }
   
   } else if (element.classList.contains('shape-element')) {
+    console.log('Shape element selected:', element); // Debug log to confirm branch runs
     toolbar = shapeToolbar;
     document.getElementById('shapeEditor').style.display = 'block';
   
