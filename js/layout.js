@@ -510,57 +510,54 @@ function selectElement(element) {
 
   const textToolbar = document.getElementById('textToolbar');
   const shapeToolbar = document.getElementById('shapeToolbar');
-
-  textToolbar.style.display = 'none';
-  textToolbar.setAttribute('aria-hidden', 'true');
-  shapeToolbar.style.display = 'none';
-  shapeToolbar.setAttribute('aria-hidden', 'true');
-
-  let toolbar = null;
-
+  
+  if (element.tagName === 'svg' && element.parentElement.classList.contains('shape-element')) {
+    element = element.parentElement;
+  }
+  
   if (element.classList.contains('text-element')) {
     toolbar = textToolbar;
     document.getElementById('textEditor').style.display = 'block';
-
+  
     const fontSizeInput = document.getElementById('fontSizeInput');
     if (fontSizeInput) {
       fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize) || 16;
     }
-
+  
     const fontFamilySelect = document.getElementById('fontFamilySelect');
     if (fontFamilySelect) {
       fontFamilySelect.value = selectedElement.style.fontFamily || '';
     }
-
-    const colorInput = document.getElementById('fontColorInput'); // fixed ID typo here
+  
+    const colorInput = document.getElementById('fontColorInput');
     if (colorInput) {
       colorInput.value = selectedElement.style.color || '#000000';
     }
-
+  
   } else if (element.classList.contains('shape-element')) {
     toolbar = shapeToolbar;
     document.getElementById('shapeEditor').style.display = 'block';
-
+  
     if (typeof initShapeEditor === 'function') initShapeEditor();
     if (typeof loadShapeStateToControls === 'function') loadShapeStateToControls();
   }
-
+  
   if (toolbar) {
     toolbar.style.display = 'flex';
     toolbar.setAttribute('aria-hidden', 'false');
     toolbar.style.position = 'fixed';
     toolbar.style.zIndex = '10000';
-
+  
     requestAnimationFrame(() => {
       const rect = element.getBoundingClientRect();
       const centeredLeft = rect.left + rect.width / 2 - toolbar.offsetWidth / 2;
       const topAbove = rect.top - toolbar.offsetHeight - 8;
       const topBelow = rect.bottom + 8;
       let finalTop = topAbove >= 8 ? topAbove : topBelow;
-
+  
       const clampLeft = Math.min(Math.max(8, centeredLeft), window.innerWidth - toolbar.offsetWidth - 8);
       finalTop = Math.min(Math.max(8, finalTop), window.innerHeight - toolbar.offsetHeight - 8);
-
+  
       toolbar.style.left = `${clampLeft}px`;
       toolbar.style.top = `${finalTop}px`;
     });
