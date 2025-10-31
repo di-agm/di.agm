@@ -546,8 +546,6 @@ function selectElement(element) {
 
     if (toolbar) {
       toolbar.style.display = 'flex';
-      toolbar.style.position = 'fixed';
-      toolbar.style.zIndex = '10000';
       requestAnimationFrame(() => {
         const rect = element.getBoundingClientRect();
         toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
