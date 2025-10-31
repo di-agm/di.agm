@@ -498,6 +498,14 @@ button:hover {
   gap: 5px;                 /* Spacing between buttons */
 }
 
+.toolbar {
+  position: fixed !important;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  z-index: 10000 !important;
+}
+
 .toolbar-button {
   width: 30px;
   height: 30px;
