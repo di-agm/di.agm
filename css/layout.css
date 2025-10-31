@@ -500,11 +500,11 @@ button:hover {
 
 .toolbar {
   position: fixed !important;
-  display: flex;
+  display: none;           /* hidden until JS shows it */
   flex-direction: row;
-  gap: 5px;
+  gap: 8px;
   z-index: 10000 !important;
-  align: center;
+  pointer-events: auto;    /* allow clicks on toolbar buttons */
 }
 
 .toolbar-button {
