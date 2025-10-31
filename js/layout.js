@@ -546,10 +546,10 @@ function selectElement(element) {
 
     if (toolbar) {
       toolbar.style.display = 'flex';
-      toolbar.style.position = 'absolute';
+      toolbar.style.position = 'fixed';
+      toolbar.style.zIndex = '10000';
       requestAnimationFrame(() => {
         const rect = element.getBoundingClientRect();
-        const containerRect = document.body.getBoundingClientRect();
         toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
         toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
       });
