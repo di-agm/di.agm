@@ -504,6 +504,7 @@ button:hover {
   flex-direction: row;
   gap: 5px;
   z-index: 10000 !important;
+  align: center;
 }
 
 .toolbar-button {
