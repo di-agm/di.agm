@@ -488,80 +488,83 @@ function addShapeElement(type) {
 }
 
 function selectElement(element) {
-    document.querySelectorAll('.text-element, .shape-element').forEach(el => {
-        el.classList.remove('selected');
-        if (el.classList.contains('shape-element')) {
-            el.style.boxShadow = 'none';
-            el.style.border = 'none';
-        }
+  document.querySelectorAll('.text-element, .shape-element').forEach(el => {
+    el.classList.remove('selected');
+    if (el.classList.contains('shape-element')) {
+      el.style.boxShadow = 'none';
+      el.style.border = 'none';
+    }
+  });
+
+  selectedElement = element;
+  selectedElement.classList.add('selected');
+
+  if (selectedElement.classList.contains('shape-element')) {
+    selectedElement.style.boxShadow = 'none'; // keep consistent with your design
+    selectedElement.style.border = 'none';
+  }
+
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'none';
+
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+
+  textToolbar.style.display = 'none';
+  textToolbar.setAttribute('aria-hidden', 'true');
+  shapeToolbar.style.display = 'none';
+  shapeToolbar.setAttribute('aria-hidden', 'true');
+
+  let toolbar = null;
+
+  if (element.classList.contains('text-element')) {
+    toolbar = textToolbar;
+    document.getElementById('textEditor').style.display = 'block';
+
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) {
+      fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize) || 16;
+    }
+
+    const fontFamilySelect = document.getElementById('fontFamilySelect');
+    if (fontFamilySelect) {
+      fontFamilySelect.value = selectedElement.style.fontFamily || '';
+    }
+
+    const colorInput = document.getElementById('fontColorInput'); // fixed ID typo here
+    if (colorInput) {
+      colorInput.value = selectedElement.style.color || '#000000';
+    }
+
+  } else if (element.classList.contains('shape-element')) {
+    toolbar = shapeToolbar;
+    document.getElementById('shapeEditor').style.display = 'block';
+
+    if (typeof initShapeEditor === 'function') initShapeEditor();
+    if (typeof loadShapeStateToControls === 'function') loadShapeStateToControls();
+  }
+
+  if (toolbar) {
+    toolbar.style.display = 'flex';
+    toolbar.setAttribute('aria-hidden', 'false');
+    toolbar.style.position = 'fixed';
+    toolbar.style.zIndex = '10000';
+
+    requestAnimationFrame(() => {
+      const rect = element.getBoundingClientRect();
+      const centeredLeft = rect.left + rect.width / 2 - toolbar.offsetWidth / 2;
+      const topAbove = rect.top - toolbar.offsetHeight - 8;
+      const topBelow = rect.bottom + 8;
+      let finalTop = topAbove >= 8 ? topAbove : topBelow;
+
+      const clampLeft = Math.min(Math.max(8, centeredLeft), window.innerWidth - toolbar.offsetWidth - 8);
+      finalTop = Math.min(Math.max(8, finalTop), window.innerHeight - toolbar.offsetHeight - 8);
+
+      toolbar.style.left = `${clampLeft}px`;
+      toolbar.style.top = `${finalTop}px`;
     });
-
-    selectedElement = element;
-    selectedElement.classList.add('selected');
-
-    if (selectedElement.classList.contains('shape-element')) {
-        selectedElement.style.boxShadow = 'none'; // Blue glow
-        selectedElement.style.border = 'none'; // Ensure no box border
-    }
-
-    document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    document.getElementById('noElementSelected').style.display = 'none';
-
-    const textToolbar = document.getElementById('textToolbar');
-    const shapeToolbar = document.getElementById('shapeToolbar');
-
-    textToolbar.style.display = 'none';
-    shapeToolbar.style.display = 'none';
-
-    const rect = element.getBoundingClientRect();
-    const containerRect = document.body.getBoundingClientRect();
-    let toolbar;
-
-    if (element.classList.contains('text-element')) {
-        toolbar = textToolbar;
-        document.getElementById('textEditor').style.display = 'block';
-
-        const fontSizeInput = document.getElementById('fontSizeInput');
-        if (fontSizeInput) {
-          fontSizeInput.value = parseInt(window.getComputedStyle(selectedElement).fontSize);
-        }
-        const fontFamilySelect = document.getElementById('fontFamilySelect');
-        if (fontFamilySelect) {
-          fontFamilySelect.value = selectedElement.style.fontFamily || '';
-        }
-        const colorInput = document.getElementById('colorPickerInput');
-        if (colorInput) {
-          colorInput.value = selectedElement.style.color || '#000000';
-        }
-
-    } else if (element.classList.contains('shape-element')) {
-        toolbar = shapeToolbar;
-        document.getElementById('shapeEditor').style.display = 'block';
-        
-        initShapeEditor();
-        loadShapeStateToControls();
-    
-    }
-
-    if (toolbar) {
-      toolbar.style.display = 'flex';
-      toolbar.setAttribute('aria-hidden', 'false');
-      toolbar.style.position = 'fixed';
-      toolbar.style.zIndex = '10000';
-      requestAnimationFrame(() => {
-        const rect = element.getBoundingClientRect();
-        const centeredLeft = rect.left + rect.width / 2 - toolbar.offsetWidth / 2;
-        let topAbove = rect.top - toolbar.offsetHeight - 8;   // 8px gap
-        let topBelow = rect.bottom + 8;
-        let finalTop = topAbove >= 8 ? topAbove : topBelow;
-        const clampLeft = Math.min(Math.max(8, centeredLeft), window.innerWidth - toolbar.offsetWidth - 8);
-        finalTop = Math.min(Math.max(8, finalTop), window.innerHeight - toolbar.offsetHeight - 8);
-    
-        toolbar.style.left = `${clampLeft}px`;
-        toolbar.style.top = `${finalTop}px`;
-      });
-    }
+  }
 }
 
 function makeElementDraggable(el) {
