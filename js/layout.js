@@ -546,10 +546,20 @@ function selectElement(element) {
 
     if (toolbar) {
       toolbar.style.display = 'flex';
+      toolbar.setAttribute('aria-hidden', 'false');
+      toolbar.style.position = 'fixed';
+      toolbar.style.zIndex = '10000';
       requestAnimationFrame(() => {
         const rect = element.getBoundingClientRect();
-        toolbar.style.left = `${rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
-        toolbar.style.top = `${rect.bottom - containerRect.top + 5}px`;
+        const centeredLeft = rect.left + rect.width / 2 - toolbar.offsetWidth / 2;
+        let topAbove = rect.top - toolbar.offsetHeight - 8;   // 8px gap
+        let topBelow = rect.bottom + 8;
+        let finalTop = topAbove >= 8 ? topAbove : topBelow;
+        const clampLeft = Math.min(Math.max(8, centeredLeft), window.innerWidth - toolbar.offsetWidth - 8);
+        finalTop = Math.min(Math.max(8, finalTop), window.innerHeight - toolbar.offsetHeight - 8);
+    
+        toolbar.style.left = `${clampLeft}px`;
+        toolbar.style.top = `${finalTop}px`;
       });
     }
 }
@@ -700,24 +710,28 @@ function makeRotatable(el) {
 }
 
 function deselectElement() {
-    if (selectedElement) {
-        selectedElement.classList.remove('selected');
-        
-        if (selectedElement.classList.contains('shape-element')) {
-            selectedElement.style.boxShadow = 'none';
-            selectedElement.style.border = 'none';
-        }
-
-        selectedElement = null;
+  if (selectedElement) {
+    selectedElement.classList.remove('selected');
+    if (selectedElement.classList.contains('shape-element')) {
+      selectedElement.style.boxShadow = 'none';
+      selectedElement.style.border = 'none';
     }
-    
-    document.getElementById('textEditor').style.display = 'none';
-    document.getElementById('shapeEditor').style.display = 'none';
-    
-    document.getElementById('noElementSelected').style.display = 'block';
-    
-    document.getElementById('textToolbar').style.display = 'none';
-    document.getElementById('shapeToolbar').style.display = 'none';
+    selectedElement = null;
+  }
+  document.getElementById('textEditor').style.display = 'none';
+  document.getElementById('shapeEditor').style.display = 'none';
+  document.getElementById('noElementSelected').style.display = 'block';
+  const textToolbar = document.getElementById('textToolbar');
+  const shapeToolbar = document.getElementById('shapeToolbar');
+
+  if (textToolbar) {
+    textToolbar.style.display = 'none';
+    textToolbar.setAttribute('aria-hidden', 'true');
+  }
+  if (shapeToolbar) {
+    shapeToolbar.style.display = 'none';
+    shapeToolbar.setAttribute('aria-hidden', 'true');
+  }
 }
 
 function toggleLeftSidebar() {
