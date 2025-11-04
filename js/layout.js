@@ -9,6 +9,8 @@ let pageNumbersVisible = true;
 let zoomLevel = 1;
 let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
+let customPageWidthMM = null;
+let customPageHeightMM = null;
 
 const DPI = 96;
 const MM_PER_INCH = 25.4;
@@ -79,7 +81,7 @@ function updateRectSize(key) {
     baseWidth = mmToPx(paperSizes.tabloid.widthMM);
     baseHeight = mmToPx(paperSizes.tabloid.heightMM);
   } else {
-    handleCustomSize();
+    handleCustomSize(false);
     return;
   }
 
@@ -107,44 +109,50 @@ function updateRectSize(key) {
   window.addEventListener("resize", updateRectSizeOnResize); 
 }
 
-function handleCustomSize() {
-  const customWidthMM = prompt("Enter Custom Page Width (in mm):");
-  if (customWidthMM === null || isNaN(parseFloat(customWidthMM))) {
-    alert("Invalid or cancelled width. Defaulting to A4.");
-    updateRectSize('a4');
-    return;
-  }
-  
-  const customHeightMM = prompt("Enter Custom Page Height (in mm):");
-  if (customHeightMM === null || isNaN(parseFloat(customHeightMM))) {
-    alert("Invalid or cancelled height. Defaulting to A4.");
-    updateRectSize('a4'); // Revert to A4 if input is invalid or cancelled
+function handleCustomSize(forcePrompt = false) {
+  if (!forcePrompt && customPageWidthMM && customPageHeightMM) {
+    applyCustomSize(customPageWidthMM, customPageHeightMM);
     return;
   }
 
-  const widthMM = parseFloat(customWidthMM);
-  const heightMM = parseFloat(customHeightMM);
+  const inputWidth = prompt("Enter Custom Page Width (in mm):", customPageWidthMM || "210");
+  const inputHeight = prompt("Enter Custom Page Height (in mm):", customPageHeightMM || "297");
 
+  if (!inputWidth || !inputHeight || isNaN(inputWidth) || isNaN(inputHeight)) {
+    alert("Invalid input. Defaulting to A4.");
+    updateRectSize("a4");
+    return;
+  }
+
+  customPageWidthMM = parseFloat(inputWidth);
+  customPageHeightMM = parseFloat(inputHeight);
+
+  applyCustomSize(customPageWidthMM, customPageHeightMM);
+}
+
+function applyCustomSize(widthMM, heightMM) {
   let baseWidth = mmToPx(widthMM);
   let baseHeight = mmToPx(heightMM);
-  
+
   let finalWidthPx = baseWidth;
   let finalHeightPx = baseHeight;
 
+  const maxWidthPx = 360;
   if (finalWidthPx > maxWidthPx) {
     const scale = maxWidthPx / finalWidthPx;
-    finalWidthPx = finalWidthPx * scale;
-    finalHeightPx = finalHeightPx * scale;
+    finalWidthPx *= scale;
+    finalHeightPx *= scale;
   }
-  
-  const pageElement = pages[currentPageIndex];
-  
-  if (!isPortrait) {
-    pageElement.style.width = `${finalHeightPx}px`;
-    pageElement.style.height = `${finalWidthPx}px`;
+
+  const page = pages[currentPageIndex];
+  if (!page) return;
+
+  if (isPortrait) {
+    page.style.width = `${finalWidthPx}px`;
+    page.style.height = `${finalHeightPx}px`;
   } else {
-    pageElement.style.width = `${finalWidthPx}px`;
-    pageElement.style.height = `${finalHeightPx}px`;
+    page.style.width = `${finalHeightPx}px`;
+    page.style.height = `${finalWidthPx}px`;
   }
 
   if (rulersVisible) drawRulers();
