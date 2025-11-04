@@ -868,7 +868,6 @@ function exportAsPDF() {
   });
 }
 
-// Layout saving and loading functions
 function showSaveLayoutModal() {
   const modal = document.getElementById('saveLayoutModal');
   if (modal) {
@@ -1056,105 +1055,104 @@ function hexToRgbA(hex, alpha) {
 }
 
 function applyShapeStyle(element = selectedElement) {
-    if (!element || !element.classList.contains('shape-element')) return;
+  if (!element || !element.classList.contains('shape-element')) return;
 
-    const svg = element.querySelector('svg');
-    const svgShape = svg.querySelector('svg > *'); // Get the actual shape (circle, polygon, etc.)
-    if (!svgShape) return;
+  const svg = element.querySelector('svg');
+  if (!svg) return;
 
-    const fillType = element.dataset.fillType || 'color';
-    const imageUrl = element.dataset.fillImageUrl;
+  const svgShape = svg.querySelector('circle, polygon, rect, path');
+  if (!svgShape) return;
 
-    if (fillType === 'image' && imageUrl) {
-        let defs = svg.querySelector('defs');
-        if (!defs) {
-            defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-            svg.prepend(defs); // Add at the start of the SVG
-        }
+  const fillType = element.dataset.fillType || 'color';
+  const imageUrl = element.dataset.fillImageUrl || '';
+  const fillColor = element.dataset.fillColor || '#3b82f6';
+  const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
+  const borderColor = element.dataset.borderColor || '#1e3a8a';
+  const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
+  const borderWidth = parseFloat(element.dataset.borderWidth) || 4;
 
-        let patternId = element.dataset.patternId;
-        if (!patternId) {
-            patternId = 'pattern-' + Math.random().toString(36).substring(2, 9);
-            element.dataset.patternId = patternId;
-        }
-      
-        let pattern = defs.querySelector('#' + patternId);
-        if (!pattern) {
-            pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
-            pattern.setAttribute('id', patternId); // Establecer ID única
-            pattern.setAttribute('patternUnits', 'objectBoundingBox'); 
-            pattern.setAttribute('width', '1');
-            pattern.setAttribute('height', '1');
-            
-            const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
-            image.setAttribute('x', '0');
-            image.setAttribute('y', '0');
-            image.setAttribute('width', '100%'); 
-            image.setAttribute('height', '100%'); 
-            image.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-            pattern.appendChild(image);
-            defs.appendChild(pattern);
-        }
-
-        const imageEl = pattern.querySelector('image');
-        imageEl.setAttribute('href', imageUrl);
-        imageEl.setAttribute('xlink:href', imageUrl); 
-        //imageEl.removeAttribute('href');
-        
-        svgShape.setAttribute('fill', 'url(#' + patternId + ')');
-
-    } else { // Use Color Fill (Your existing logic)
-        const fillColorHex = element.dataset.fillColor || '#000000';
-        const fillOpacity = parseFloat(element.dataset.fillOpacity) || 1.0;
-        const fillRgba = hexToRgbA(fillColorHex, fillOpacity);
-        svgShape.setAttribute('fill', fillRgba);
+  if (fillType === 'image' && imageUrl) {
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svg.prepend(defs);
     }
 
-    const borderColorHex = element.dataset.borderColor || '#000000';
-    const borderOpacity = parseFloat(element.dataset.borderOpacity) || 1.0;
-    const borderWidth = parseFloat(element.dataset.borderWidth) || 0;
-    const borderRgba = hexToRgbA(borderColorHex, borderOpacity);
+    let patternId = element.dataset.patternId;
+    if (!patternId) {
+      patternId = 'pattern-' + Math.random().toString(36).substring(2, 9);
+      element.dataset.patternId = patternId;
+    }
 
-    svgShape.setAttribute('stroke', borderRgba);
-    svgShape.setAttribute('stroke-width', borderWidth);
+    let pattern = defs.querySelector('#' + patternId);
+    if (!pattern) {
+      pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+      pattern.setAttribute('id', patternId);
+      pattern.setAttribute('patternUnits', 'objectBoundingBox');
+      pattern.setAttribute('width', '1');
+      pattern.setAttribute('height', '1');
+
+      const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      image.setAttribute('width', '100%');
+      image.setAttribute('height', '100%');
+      image.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      pattern.appendChild(image);
+      defs.appendChild(pattern);
+    }
+
+    const imageEl = pattern.querySelector('image');
+    imageEl.setAttribute('href', imageUrl);
+
+    svgShape.setAttribute('fill', `url(#${patternId})`);
+  } else {
+    svgShape.setAttribute('fill', `rgba(${hexToRgb(fillColor)}, ${fillOpacity})`);
+  }
+
+  svgShape.setAttribute('stroke', `rgba(${hexToRgb(borderColor)}, ${borderOpacity})`);
+  svgShape.setAttribute('stroke-width', borderWidth);
+}
+
+function hexToRgb(hex) {
+  const shorthand = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthand, (m, r, g, b) => r + r + g + g + b + b);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+    : '0,0,0';
 }
 
 function updateSelectedShapeStyle() {
-    if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
+  if (!selectedElement || !selectedElement.classList.contains('shape-element')) return;
 
-    const fillTypeSelect = document.getElementById('shape-fill-type');
-    const imageUrlInput = document.getElementById('shape-image-url');
-    const fillColorInput = document.getElementById('shape-fill-color');
-    const fillOpacityInput = document.getElementById('shape-fill-opacity');
-    const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
+  const fillTypeSelect = document.getElementById('shape-fill-type');
+  const imageUrlInput = document.getElementById('shape-image-url');
+  const fillColorInput = document.getElementById('shape-fill-color');
+  const fillOpacityInput = document.getElementById('shape-fill-opacity');
+  const fillOpacityValueSpan = document.getElementById('fill-opacity-value');
 
-    const borderColorInput = document.getElementById('shape-border-color');
-    const borderOpacityInput = document.getElementById('shape-border-opacity');
-    const borderOpacityValueSpan = document.getElementById('border-opacity-value');
-    const borderWidthInput = document.getElementById('shape-border-width');
+  const borderColorInput = document.getElementById('shape-border-color');
+  const borderOpacityInput = document.getElementById('shape-border-opacity');
+  const borderOpacityValueSpan = document.getElementById('border-opacity-value');
+  const borderWidthInput = document.getElementById('shape-border-width');
 
-    const fillColorHex = fillColorInput.value;
-    const fillOpacity = parseFloat(fillOpacityInput.value);
-    
-    const borderColorHex = borderColorInput.value;
-    const borderOpacity = parseFloat(borderOpacityInput.value);
-    const borderWidth = Math.max(0, parseFloat(borderWidthInput.value));
+  const fillType = fillTypeSelect.value;
+  const imageUrl = imageUrlInput.value || selectedElement.dataset.fillImageUrl || '';
 
-    selectedElement.dataset.fillType = fillTypeSelect.value;
-    selectedElement.dataset.fillImageUrl = imageUrlInput.value;
-    selectedElement.dataset.fillColor = fillColorInput.value;
-    selectedElement.dataset.fillOpacity = fillOpacityInput.value;
-    selectedElement.dataset.borderColor = borderColorHex;
-    selectedElement.dataset.borderOpacity = borderOpacity;
-    selectedElement.dataset.borderWidth = borderWidth;
-    
-    applyShapeStyle(selectedElement);
+  selectedElement.dataset.fillType = fillType;
+  selectedElement.dataset.fillImageUrl = imageUrl;
+  selectedElement.dataset.fillColor = fillColorInput.value || selectedElement.dataset.fillColor || '#3b82f6';
+  selectedElement.dataset.fillOpacity = fillOpacityInput.value || selectedElement.dataset.fillOpacity || 1.0;
+  selectedElement.dataset.borderColor = borderColorInput.value || selectedElement.dataset.borderColor || '#1e3a8a';
+  selectedElement.dataset.borderOpacity = borderOpacityInput.value || selectedElement.dataset.borderOpacity || 1.0;
+  selectedElement.dataset.borderWidth = borderWidthInput.value || selectedElement.dataset.borderWidth || 4;
 
-    document.getElementById('shape-color-controls').style.display = (fillTypeSelect.value === 'color') ? 'block' : 'none';
-    document.getElementById('shape-image-controls').style.display = (fillTypeSelect.value === 'image') ? 'block' : 'none';
-    
-    if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = fillOpacity.toFixed(2);
-    if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = borderOpacity.toFixed(2);
+  applyShapeStyle(selectedElement);
+
+  document.getElementById('shape-color-controls').style.display = (fillType === 'color') ? 'block' : 'none';
+  document.getElementById('shape-image-controls').style.display = (fillType === 'image') ? 'block' : 'none';
+
+  if (fillOpacityValueSpan) fillOpacityValueSpan.textContent = parseFloat(selectedElement.dataset.fillOpacity).toFixed(2);
+  if (borderOpacityValueSpan) borderOpacityValueSpan.textContent = parseFloat(selectedElement.dataset.borderOpacity).toFixed(2);
 }
 
 function loadShapeStateToControls() {
