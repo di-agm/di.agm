@@ -31,8 +31,8 @@ function createPage(pageNumber) {
   page.style.boxShadow = '0 8px 20px rgba(2,6,23,0.15)';
   page.style.userSelect = 'none';
   page.style.transition = 'width 0.4s ease, height 0.4s ease';
-  page.style.width = '374px';
-  page.style.height = '529px'; // A4 ratio initially
+  //page.style.width = '374px';
+  //page.style.height = '529px';
   page.style.overflow = 'hidden';
   
   const content = document.createElement('div');
@@ -189,6 +189,15 @@ function updatePageNumbers() {
 
 function addPage() {
   const newPage = createPage(pages.length + 1);
+  if (pages.length > 0 && pages[currentPageIndex]) {
+    const currentPageElement = pages[currentPageIndex];
+    newPage.style.width = currentPageElement.style.width;
+    newPage.style.height = currentPageElement.style.height;
+  } else {
+    newPage.style.width = '374px';
+    newPage.style.height = '529px';
+  }
+  
   pages.push(newPage);
   showPage(pages.length - 1);
 }
@@ -291,6 +300,7 @@ function togglePageNumbers() {
         } 
     });
 }
+
 function drawRulers() {
   document.querySelectorAll(".ruler").forEach(r => r.remove());
   if (!rulersVisible) return;
