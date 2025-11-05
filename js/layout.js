@@ -11,9 +11,6 @@ let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 let customPageWidthMM = null;
 let customPageHeightMM = null;
-let lastPageWidth = null;
-let lastPageHeight = null;
-let lastPageOrientation = true;
 
 const DPI = 96;
 const MM_PER_INCH = 25.4;
@@ -69,7 +66,7 @@ const paperSizes = {
 
 const maxWidthPx = 360;
 
-function RectSize(key) {
+function updateRectSize(key) {
   if (!pages[currentPageIndex]) return;
   
   let baseWidth, baseHeight; 
@@ -131,7 +128,6 @@ function handleCustomSize(forcePrompt = false) {
   customPageHeightMM = parseFloat(inputHeight);
 
   applyCustomSize(customPageWidthMM, customPageHeightMM);
-  rememberPageSettings(pages[currentPageIndex]);
 }
 
 function applyCustomSize(widthMM, heightMM) {
@@ -159,28 +155,18 @@ function applyCustomSize(widthMM, heightMM) {
     page.style.height = `${finalWidthPx}px`;
   }
 
-  rememberPageSettings(page);
   if (rulersVisible) drawRulers();
 }
 
 function updateRectSizeOnResize() {
-  if (rulersVisible) drawRulers();
-  updateRectSize(selector.value); 
-  rememberPageSettings(pages[currentPageIndex]);
+    if (rulersVisible) drawRulers();
+    updateRectSize(selector.value); 
 }
 
 function updateOrientation() {
   if (!pages[currentPageIndex]) return;
   isPortrait = !isPortrait;
   updateRectSize(selector.value); 
-  rememberPageSettings(pages[currentPageIndex]);
-}
-
-function rememberPageSettings(page) {
-  if (!page) return;
-  lastPageWidth = parseFloat(page.style.width);
-  lastPageHeight = parseFloat(page.style.height);
-  lastPageOrientation = isPortrait;
 }
 
 function showPage(index) {
@@ -203,21 +189,8 @@ function updatePageNumbers() {
 
 function addPage() {
   const newPage = createPage(pages.length + 1);
-
-  if (lastPageWidth && lastPageHeight) {
-    newPage.style.width = `${lastPageWidth}px`;
-    newPage.style.height = `${lastPageHeight}px`;
-    isPortrait = lastPageOrientation;
-  } else {
-    newPage.style.width = '210mm';
-    newPage.style.height = '297mm';
-    isPortrait = true;
-  }
-
   pages.push(newPage);
-  document.querySelector('.center-container').appendChild(newPage);
   showPage(pages.length - 1);
-  currentPageIndex = pages.length - 1;
 }
 
 function removePage(index) {
@@ -236,7 +209,8 @@ function duplicatePage(index) {
   const clonedElements = clone.querySelectorAll('.text-element, .shape-element');
   clonedElements.forEach(element => {
     makeElementDraggable(element);
-    makeRotatable(element); 
+    makeRotatable(element); // Ensure rotation handler is re-added
+    // Re-select handler
     element.addEventListener('click', (e) => {
       e.stopPropagation();
       selectElement(element);
@@ -251,6 +225,7 @@ function toggleRulers() {
   rulersVisible = !rulersVisible;
   pages.forEach(page => {
     if (rulersVisible) {
+      // Add rulers if not already present
       if (!page.querySelector('.page-ruler.horizontal.top')) {
         const top = document.createElement('div');
         top.className = 'page-ruler horizontal top';
@@ -428,6 +403,7 @@ function addShapeElement(type) {
   element.style.resize = 'both';
   element.style.overflow = 'auto';
 
+  // Create an SVG to hold the shape
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", "100%");
