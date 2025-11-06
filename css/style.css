@@ -46,7 +46,7 @@ html, body {
         align-items: center;
 }
 
-#tt, #links {
+#tt, #links, #stores {
         height: 100vh;
         overflow-y: auto;
 }
