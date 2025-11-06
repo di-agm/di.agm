@@ -35,7 +35,7 @@ function addActivity() {
             <label>Veces por semana:</label>
             <input type="number" class="activity-frequency" min="1" value="3">
         </div>
-        <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">Eliminar</button>
+        <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">✖</button>
         <hr>
     `;
     container.appendChild(activityDiv);
@@ -60,7 +60,7 @@ function addBlock() {
             <label>Rango de hora (HH:MM - HH:MM):</label>
             <input type="text" class="block-time-range" placeholder="Ej: 12:00 - 13:00">
         </div>
-        <button type="button" class="remove-btn" onclick="removeElement('block-${blockCount}')">Eliminar</button>
+        <button type="button" class="remove-btn" onclick="removeElement('block-${blockCount}')">✖</button>
         <hr>
     `;
     container.appendChild(blockDiv);
@@ -75,20 +75,16 @@ function removeElement(id) {
 
 function generateSchedule() {
     const scheduleTable = document.getElementById('scheduleTable');
-    scheduleTable.innerHTML = ''; // Limpiar resultados anteriores
-    
-    // 1. Recolección y Validación de Parámetros Generales
+    scheduleTable.innerHTML = ''; 
     const numDaysInput = document.getElementById('numDays').value.trim();
     const timeRangeInput = document.getElementById('timeRange').value.trim();
     const startDayValue = parseInt(document.getElementById('startDay').value);
 
-    // Validación básica de los parámetros
     if (!numDaysInput || !timeRangeInput) {
         alert("Por favor, rellena el 'Número de días' y el 'Rango de hora'.");
         return;
     }
 
-    // Procesar número de días (Ej: "7" o "5+2")
     const parts = numDaysInput.split('+');
     const totalDays = parts.reduce((sum, part) => sum + parseInt(part.trim() || 0), 0);
     const workDays = parseInt(parts[0].trim() || 0);
@@ -98,7 +94,6 @@ function generateSchedule() {
         return;
     }
 
-    // Procesar rango de tiempo (Ej: "08:00 - 18:00")
     const timeParts = timeRangeInput.split('-').map(t => t.trim());
     if (timeParts.length !== 2) {
         alert("El 'Rango de hora' debe tener el formato HH:MM - HH:MM.");
@@ -113,7 +108,6 @@ function generateSchedule() {
         return;
     }
 
-    // 2. Recolección de Actividades
     const activities = [];
     document.querySelectorAll('.activity-group').forEach(group => {
         const name = group.querySelector('.activity-name').value.trim();
@@ -130,7 +124,6 @@ function generateSchedule() {
          return;
     }
 
-    // 3. Recolección de Bloques No Accesibles (para futura lógica)
     const blocks = [];
     document.querySelectorAll('.block-group').forEach(group => {
         const day = parseInt(group.querySelector('.block-day').value);
