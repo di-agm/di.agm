@@ -40,6 +40,7 @@ function createPage(pageNumber) {
   page.appendChild(content);
   
   const pageNumberLabel = document.createElement('div');
+  pageNumberLabel.className = 'page-number-label';
   pageNumberLabel.style.position = 'absolute';
   pageNumberLabel.style.bottom = '8px';
   pageNumberLabel.style.right = '12px';
@@ -180,7 +181,7 @@ function showPage(index) {
 
 function updatePageNumbers() {
   pages.forEach((page, i) => {
-    const pageNumberLabel = page.querySelector('div:last-child');
+    const pageNumberLabel = page.querySelector('.page-number-label');
     if (pageNumberLabel) {
       pageNumberLabel.textContent = i + 1;
     }
