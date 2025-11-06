@@ -190,7 +190,7 @@ function updatePageNumbers() {
   });
 
   if (typeof pageNumberDisplay !== 'undefined' && pageNumberDisplay) {
-    pageNumberDisplay.textContent = `Page ${currentPageIndex + 1}`;
+    pageNumberDisplay.textContent = `${currentPageIndex + 1}`;
   }
 }
 
