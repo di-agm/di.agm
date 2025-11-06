@@ -434,15 +434,15 @@ function addShapeElement(type) {
   const element = document.createElement('div');
   element.className = 'shape-element';
   element.setAttribute('tabindex', '0');
+  element.style.position = 'absolute';
   element.style.top = '50px';
   element.style.left = '50px';
-  element.style.position = 'absolute';
   element.style.width = '100px';
   element.style.height = '100px';
   element.style.resize = 'both';
-  element.style.overflow = 'auto';
+  element.style.overflow = 'hidden';
+  element.style.zIndex = '1';
 
-  // Create an SVG to hold the shape
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", "100%");
@@ -451,33 +451,28 @@ function addShapeElement(type) {
 
   let shape;
 
-  switch(type) {
+  switch (type) {
     case 'circle':
       shape = document.createElementNS(svgNS, "circle");
       shape.setAttribute("cx", "50");
       shape.setAttribute("cy", "50");
       shape.setAttribute("r", "40");
-      shape.setAttribute("fill", "#3b82f6"); // Default blue fill
-      shape.setAttribute("stroke", "#1e3a8a"); // Default dark blue border
-      shape.setAttribute("stroke-width", "4"); // Default border width
+      shape.setAttribute("fill", "#3b82f6");
+      shape.setAttribute("stroke", "#1e3a8a");
+      shape.setAttribute("stroke-width", "4");
       break;
 
     case 'polygon': {
       let sides = parseInt(prompt("Enter number of sides:", "7"));
-      if (isNaN(sides) || sides < 3) sides = 7; // default
+      if (isNaN(sides) || sides < 3) sides = 7;
       const points = [];
-      
-      const radius = 40; // Use a consistent radius (e.g., 40, to match your star's outer radius)
-      
+      const radius = 40;
       for (let i = 0; i < sides; i++) {
         const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
-        
-        const x = 50 + radius * Math.cos(angle); 
+        const x = 50 + radius * Math.cos(angle);
         const y = 50 + radius * Math.sin(angle);
-        
         points.push(`${x},${y}`);
       }
-      
       shape = document.createElementNS(svgNS, "polygon");
       shape.setAttribute("points", points.join(" "));
       shape.setAttribute("fill", "#3b82f6");
@@ -488,7 +483,7 @@ function addShapeElement(type) {
 
     case 'star': {
       let peaks = parseInt(prompt("Enter number of peaks:", "7"));
-      if (isNaN(peaks) || peaks < 3) peaks = 7; // default
+      if (isNaN(peaks) || peaks < 3) peaks = 7;
       const points = [];
       const outerRadius = 40;
       const innerRadius = 20;
@@ -506,32 +501,73 @@ function addShapeElement(type) {
       shape.setAttribute("stroke-width", "4");
       break;
     }
+
+    // 🖼️ NEW: Adaptive image rectangle
+    case 'image-rect': {
+      const imageUrl = prompt("Enter image URL:");
+      if (!imageUrl) return;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        const aspect = img.naturalWidth / img.naturalHeight;
+        const maxDim = 300;
+        let width = maxDim;
+        let height = maxDim / aspect;
+        if (height > maxDim) {
+          height = maxDim;
+          width = maxDim * aspect;
+        }
+        element.style.width = `${width}px`;
+        element.style.height = `${height}px`;
+
+        svg.setAttribute("viewBox", `0 0 ${img.naturalWidth} ${img.naturalHeight}`);
+
+        const imageShape = document.createElementNS(svgNS, "image");
+        imageShape.setAttribute("href", imageUrl);
+        imageShape.setAttribute("x", "0");
+        imageShape.setAttribute("y", "0");
+        imageShape.setAttribute("width", img.naturalWidth);
+        imageShape.setAttribute("height", img.naturalHeight);
+        imageShape.setAttribute("preserveAspectRatio", "xMidYMid slice");
+
+        svg.appendChild(imageShape);
+        element.appendChild(svg);
+
+        element.dataset.shapeType = 'image-rect';
+        element.dataset.fillType = 'image';
+        element.dataset.fillImageUrl = imageUrl;
+
+        pageContent.appendChild(element);
+        makeElementDraggable(element);
+        makeRotatable(element);
+        selectElement(element);
+      };
+      img.onerror = () => alert('Failed to load image.');
+      img.src = imageUrl;
+      return; // Stop here; rest handled in onload
+    }
   }
 
   if (shape) {
     element.dataset.shapeType = type;
     element.dataset.fillType = 'color';
-    element.dataset.fillImageUrl = '';
     element.dataset.fillColor = shape.getAttribute('fill');
     element.dataset.fillOpacity = 1.0;
     element.dataset.borderColor = shape.getAttribute('stroke');
-    element.dataset.borderOpacity = 1.0;
     element.dataset.borderWidth = shape.getAttribute('stroke-width');
 
     svg.appendChild(shape);
     element.appendChild(svg);
+    pageContent.appendChild(element);
+    makeElementDraggable(element);
+    makeRotatable(element);
+    selectElement(element);
+
+    new ResizeObserver(() => {
+      updateSelectedShapeStyle();
+    }).observe(element);
   }
-
-  element.style.zIndex = '1';
-  
-  pageContent.appendChild(element);
-  makeElementDraggable(element);
-  makeRotatable(element);
-  selectElement(element);
-
-  new ResizeObserver(() => {
-    updateSelectedShapeStyle(); 
-  }).observe(element);
 }
 
 function selectElement(element) {
@@ -1403,6 +1439,9 @@ if (addTextBtn) addTextBtn.addEventListener('click', addTextElement);
 const addCircleBtn = document.getElementById('addCircleBtn');
 const addPolygonBtn = document.getElementById('addPolygonBtn');
 const addStarBtn = document.getElementById('addStarBtn');
+document.getElementById('addImageRectBtn').addEventListener('click', () => {
+  addShapeElement('image-rect');
+});
 
 if (addCircleBtn) addCircleBtn.addEventListener('click', () => addShapeElement('circle'));
 if (addPolygonBtn) addPolygonBtn.addEventListener('click', () => addShapeElement('polygon'));
