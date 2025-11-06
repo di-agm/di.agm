@@ -334,7 +334,6 @@
     <div class="container">
         <h1>Generador de Horarios</h1>
         
-        <!-- Configuración básica -->
         <div class="form-group">
             <label for="numDays">Número de días:</label>
             <input type="text" id="numDays" placeholder="Ej: 7 o 5+2">
@@ -346,7 +345,7 @@
         </div>
         
         <div class="form-group">
-            <label for="startDay">Día de inicio (1=Lunes, 7=Domingo):</label>
+            <label for="startDay">Día de inicio:</label>
             <select id="startDay">
                 <option value="1">Lunes</option>
                 <option value="2">Martes</option>
@@ -361,12 +360,12 @@
         <!-- Actividades -->
         <h3>Actividades</h3>
         <div id="activitiesContainer"></div>
-        <button type="button" class="add-btn" onclick="addActivity()">Agregar Actividad</button>
+        <button type="button" class="add-btn" onclick="addActivity()">✚</button>
         
         <!-- Bloques no accesibles -->
         <h3>Bloques No Accesibles</h3>
         <div id="blocksContainer"></div>
-        <button type="button" class="add-btn" onclick="addBlock()">Agregar Bloque</button>
+        <button type="button" class="add-btn" onclick="addBlock()">✚</button>
         
         <!-- Botón generar -->
         <button type="button" onclick="generateSchedule()">Generar Horario</button>
