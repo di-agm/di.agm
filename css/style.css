@@ -46,7 +46,7 @@ html, body {
         align-items: center;
 }
 
-#tt, #links, #stores {
+#tt, #links, #stores, #P {
         height: 100vh;
         overflow-y: auto;
 }
@@ -55,11 +55,6 @@ html, body {
     display: none;
     width: 0;
     height: 0;
-}
-        
-#P {
-  min-height: 100vh;
-  overflow-y: auto; /* allow vertical scroll */
 }
 
     h1 {
