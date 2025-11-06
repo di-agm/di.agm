@@ -181,11 +181,17 @@ function showPage(index) {
 
 function updatePageNumbers() {
   pages.forEach((page, i) => {
-    const pageNumberLabel = page.querySelector('.page-number-label');
-    if (pageNumberLabel) {
-      pageNumberLabel.textContent = i + 1;
+    page.setAttribute('data-page-number', i + 1);
+
+    const label = page.querySelector('.page-number-label, .page-number');
+    if (label) {
+      label.textContent = `Page ${i + 1}`;
     }
   });
+
+  if (typeof pageNumberDisplay !== 'undefined' && pageNumberDisplay) {
+    pageNumberDisplay.textContent = `Page ${currentPageIndex + 1}`;
+  }
 }
 
 function addPage() {
@@ -203,14 +209,26 @@ function addPage() {
   showPage(pages.length - 1);
 }
 
-function removePage(index) {
-  if (pages.length <= 1) return;
-  pages.splice(index, 1);
+function removePage() {
+  if (pages.length === 0) return;
+  const pageToRemove = pages[currentPageIndex];
+  if (pageToRemove && pageToRemove.parentElement) {
+    pageToRemove.parentElement.removeChild(pageToRemove);
+  }
+  pages.splice(currentPageIndex, 1);
+
   if (currentPageIndex >= pages.length) {
     currentPageIndex = pages.length - 1;
   }
-  showPage(currentPageIndex);
+
   updatePageNumbers();
+
+  if (pages.length > 0) {
+    showPage(currentPageIndex);
+  } else {
+    rectContainer.innerHTML = '';
+    pageNumberDisplay.textContent = 'No pages';
+  }
 }
 
 function duplicatePage(index = currentPageIndex) {
