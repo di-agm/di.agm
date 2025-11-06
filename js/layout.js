@@ -213,22 +213,31 @@ function removePage(index) {
   updatePageNumbers();
 }
 
-function duplicatePage() {
-  if (!pages[currentPageIndex]) return;
+function duplicatePage(index = currentPageIndex) {
+  if (!pages[index]) return;
 
-  const originalPage = pages[currentPageIndex];
+  const originalPage = pages[index];
   const clone = originalPage.cloneNode(true);
-  const newPageNumber = pages.length + 1;
-  clone.setAttribute('data-page-number', newPageNumber);
 
-  const pageNumberLabel = clone.querySelector('.page-number');
-  if (pageNumberLabel) {
-    pageNumberLabel.textContent = `Page ${newPageNumber}`;
-  }
+  const clonedElements = clone.querySelectorAll('.text-element, .shape-element, .image-element');
+  clonedElements.forEach(element => {
+    if (element.id) element.id = '';
 
+    makeElementDraggable(element);
+    makeRotatable(element);
+
+    element.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectElement(element);
+    });
+  });
+
+  pages.splice(index + 1, 0, clone);
   document.querySelector('.center-container').appendChild(clone);
-  pages.push(clone);
-  currentPageIndex = pages.length - 1;
+
+  updatePageNumbers();
+
+  currentPageIndex = index + 1;
   showPage(currentPageIndex);
 }
 
