@@ -294,7 +294,7 @@ function togglePageNumbers() {
     pages.forEach(page => {
         const pageContent = page.querySelector('.page-content');
         if (!pageContent) return;
-        const pageNumberLabel = page.querySelector('[style*="bottom: 8px;"][style*="right: 12px;"]');
+        const pageNumberLabel = page.querySelector('.page-number-label');
 
         if (pageNumberLabel) {
             pageNumberLabel.style.display = pageNumbersVisible ? 'block' : 'none';
