@@ -198,6 +198,59 @@ function generateSchedule() {
         }
     }
 
+let currentDay = 0;
+let currentTime = startTimeMinutes;
+
+for (const activity of activities) {
+    const slotsNeeded = Math.ceil(activity.duration / intervalMinutes);
+    let placed = 0;
+    let attempts = 0;
+
+    while (placed < activity.frequency && attempts < 200) {
+        attempts++;
+
+        const dayIndex = (startDayValue - 1 + currentDay) % 7;
+        const dayNumber = currentDay + 1;
+
+        let rowIndex = Math.floor((currentTime - startTimeMinutes) / intervalMinutes);
+        let foundSlot = false;
+
+        while (rowIndex + slotsNeeded <= tbody.rows.length) {
+            let conflict = false;
+
+            for (let s = 0; s < slotsNeeded; s++) {
+                const row = tbody.rows[rowIndex + s];
+                const cell = row.cells[dayNumber]; // columna de día (0 es la hora)
+                if (
+                    cell.classList.contains('blocked-slot') ||
+                    cell.textContent.trim() !== ''
+                ) {
+                    conflict = true;
+                    break;
+                }
+            }
+
+            if (!conflict) {
+                for (let s = 0; s < slotsNeeded; s++) {
+                    const row = tbody.rows[rowIndex + s];
+                    const cell = row.cells[dayNumber];
+                    cell.textContent = activity.name;
+                    cell.classList.add('activity-slot');
+                }
+                placed++;
+                foundSlot = true;
+                break;
+            }
+
+            rowIndex++;
+        }
+
+        currentDay = (currentDay + 1) % totalDays;
+        if (!foundSlot) currentTime += intervalMinutes;
+        if (currentTime >= endTimeMinutes) currentTime = startTimeMinutes;
+    }
+}
+
     scheduleTable.appendChild(table);
     document.getElementById('exportBtn').classList.remove('hidden');
 }
