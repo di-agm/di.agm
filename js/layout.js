@@ -174,7 +174,7 @@ function showPage(index) {
   rectContainer.innerHTML = '';
   currentPageIndex = index;
   rectContainer.appendChild(pages[currentPageIndex]);
-  pageNumberDisplay.textContent = `Page ${index + 1}`;
+  pageNumberDisplay.textContent = `${index + 1}`;
   updateRectSize(selector.value);
   deselectElement();
 }
