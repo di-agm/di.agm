@@ -218,7 +218,6 @@ function duplicatePage() {
 
   const originalPage = pages[currentPageIndex];
   const clone = originalPage.cloneNode(true);
-
   const newPageNumber = pages.length + 1;
   clone.setAttribute('data-page-number', newPageNumber);
 
