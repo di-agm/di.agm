@@ -185,7 +185,7 @@ function updatePageNumbers() {
 
     const label = page.querySelector('.page-number-label, .page-number');
     if (label) {
-      label.textContent = `Page ${i + 1}`;
+      label.textContent = `${i + 1}`;
     }
   });
 
