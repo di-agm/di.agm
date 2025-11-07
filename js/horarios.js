@@ -42,12 +42,20 @@ function addActivity() {
         <div class="form-group">
             <label>Duración (min):</label>
             <input type="number" class="activity-duration" min="10" step="5" value="60">
+            <select class="activity-duration-type">
+                <option value="per-session">Por sesión</option>
+                <option value="total">Total</option>
+            </select>
         </div>
         <div class="form-group">
             <label>Veces por semana:</label>
             <input type="number" class="activity-frequency" min="1" value="3">
         </div>
-        <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">✖</button>
+        <div class="button-row">
+            <button type="button" class="move-btn" onclick="moveActivity('up', 'activity-${activityCount}')">▲</button>
+            <button type="button" class="move-btn" onclick="moveActivity('down', 'activity-${activityCount}')">▼</button>
+            <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">Eliminar</button>
+        </div>
         <div class="form-group">
             <label>Inicio:</label>
             <select class="activity-start-type">
@@ -170,13 +178,22 @@ function generateSchedule() {
     const activities = [];
     document.querySelectorAll('.activity-group').forEach(group => {
         const name = group.querySelector('.activity-name').value.trim();
-        const duration = parseInt(group.querySelector('.activity-duration').value);
+        const durationInput = parseInt(group.querySelector('.activity-duration').value);
+        const durationType = group.querySelector('.activity-duration-type').value;
         const frequency = parseInt(group.querySelector('.activity-frequency').value);
         
-        if (name && duration > 0 && frequency > 0) {
-            const startType = group.querySelector('.activity-start-type').value;
-            const startRef = group.querySelector('.activity-start-ref').value.trim();
-            activities.push({ name, duration, frequency, startType, startRef });
+        if (name && durationInput > 0 && frequency > 0) {
+            // Convert total duration into per-session duration if necessary
+            let durationPerSession = durationInput;
+            if (durationType === 'total') {
+                durationPerSession = Math.max(5, Math.floor(durationInput / frequency)); // avoid zero
+            }
+            activities.push({
+                name,
+                duration: durationPerSession,
+                frequency,
+                durationType,
+            });
         }
     });
 
