@@ -14,6 +14,14 @@ function minutesToTime(totalMinutes) {
 let activityCount = 0;
 let blockCount = 0;
 
+function gcd(a, b) {
+    return b === 0 ? a : gcd(b, a % b);
+}
+
+function gcdArray(numbers) {
+    return numbers.reduce((acc, n) => gcd(acc, n));
+}
+
 function addActivity() {
     activityCount++;
     const container = document.getElementById('activitiesContainer');
@@ -162,8 +170,13 @@ function generateSchedule() {
     }
 
     const tbody = table.createTBody();
-    const intervalMinutes = 30; // Puedes ajustar el intervalo de tiempo
-
+    let intervalMinutes = 30; // valor por defecto
+    if (activities.length > 0) {
+        const durations = activities.map(a => a.duration);
+        intervalMinutes = gcdArray(durations);
+        if (intervalMinutes < 5) intervalMinutes = 5; // límite de seguridad
+    }
+    
     for (let current = startTimeMinutes; current < endTimeMinutes; current += intervalMinutes) {
         const row = tbody.insertRow();
         
