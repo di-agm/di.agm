@@ -48,13 +48,18 @@ function addActivity() {
             </select>
         </div>
         <div class="form-group">
-            <label>Veces por semana:</label>
+        <label>Veces por semana:</label>
             <input type="number" class="activity-frequency" min="1" value="3">
         </div>
-        <div class="button-row">
-            <button type="button" class="move-btn" onclick="moveActivity('up', 'activity-${activityCount}')">▲</button>
-            <button type="button" class="move-btn" onclick="moveActivity('down', 'activity-${activityCount}')">▼</button>
-            <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">Eliminar</button>
+        
+        <div class="form-group repeat-options">
+            <label><input type="checkbox" class="activity-repeat-check"> Repetir</label>
+            <select class="activity-repeat-type" disabled>
+                <option value="daily">Cada X días</option>
+                <option value="weekly">Semanalmente</option>
+                <option value="monthly">Mensualmente</option>
+            </select>
+            <input type="number" class="activity-repeat-interval" min="1" value="1" disabled style="width: 70px;"> 
         </div>
         <div class="form-group">
             <label>Inicio:</label>
@@ -66,9 +71,22 @@ function addActivity() {
             </select>
             <input type="text" class="activity-start-ref" placeholder="Ej: 2 o 'Clase de Inglés'">
         </div>
+        <div class="button-row">
+            <button type="button" class="move-btn" onclick="moveActivity('up', 'activity-${activityCount}')">▲</button>
+            <button type="button" class="move-btn" onclick="moveActivity('down', 'activity-${activityCount}')">▼</button>
+            <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">⌫</button>
+        </div>
         <hr>
     `;
     container.appendChild(activityDiv);
+    const repeatCheck = activityDiv.querySelector('.activity-repeat-check');
+    repeatCheck.addEventListener('change', () => {
+        const typeSelect = activityDiv.querySelector('.activity-repeat-type');
+        const intervalInput = activityDiv.querySelector('.activity-repeat-interval');
+        const enabled = repeatCheck.checked;
+        typeSelect.disabled = !enabled;
+        intervalInput.disabled = !enabled;
+    });
 }
 
 function addBlock() {
@@ -183,16 +201,23 @@ function generateSchedule() {
         const frequency = parseInt(group.querySelector('.activity-frequency').value);
         
         if (name && durationInput > 0 && frequency > 0) {
-            // Convert total duration into per-session duration if necessary
             let durationPerSession = durationInput;
             if (durationType === 'total') {
-                durationPerSession = Math.max(5, Math.floor(durationInput / frequency)); // avoid zero
+                durationPerSession = Math.max(5, Math.floor(durationInput / frequency));
             }
+        
+            const repeatEnabled = group.querySelector('.activity-repeat-check').checked;
+            const repeatType = group.querySelector('.activity-repeat-type').value;
+            const repeatInterval = parseInt(group.querySelector('.activity-repeat-interval').value) || 1;
+        
             activities.push({
                 name,
                 duration: durationPerSession,
                 frequency,
                 durationType,
+                repeatEnabled,
+                repeatType,
+                repeatInterval,
             });
         }
     });
