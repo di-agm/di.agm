@@ -25,60 +25,19 @@ function gcdArray(numbers) {
 function addActivity() {
     activityCount++;
     const container = document.getElementById('activitiesContainer');
-    const activityDiv = document.createElement('div');
-    activityDiv.className = 'activity-group';
-    activityDiv.id = `activity-${activityCount}`;
-    activityDiv.draggable = true;
+    const template = document.getElementById('activity-template');
+    const clone = template.content.cloneNode(true);
+    const activityDiv = clone.querySelector('.activity-group');
+    const activityId = `activity-${activityCount}`;
+    activityDiv.id = activityId;
     activityDiv.addEventListener('dragstart', handleDragStart);
     activityDiv.addEventListener('dragover', handleDragOver);
     activityDiv.addEventListener('drop', handleDrop);
-
-    activityDiv.innerHTML = `
-        <h4>Actividad ${activityCount}</h4>
-        <div class="form-group">
-            <label>Nombre:</label>
-            <input type="text" class="activity-name" placeholder="Ej: Clase de Matemáticas">
-        </div>
-        <div class="form-group">
-            <label>Duración (min):</label>
-            <input type="number" class="activity-duration" min="10" step="5" value="60">
-            <select class="activity-duration-type">
-                <option value="per-session">Por sesión</option>
-                <option value="total">Total</option>
-            </select>
-        </div>
-        <div class="form-group">
-        <label>Veces por semana:</label>
-            <input type="number" class="activity-frequency" min="1" value="3">
-        </div>
-        
-        <div class="form-group repeat-options">
-            <label><input type="checkbox" class="activity-repeat-check"> Repetir</label>
-            <select class="activity-repeat-type" disabled>
-                <option value="daily">Cada X días</option>
-                <option value="weekly">Semanalmente</option>
-                <option value="monthly">Mensualmente</option>
-            </select>
-            <input type="number" class="activity-repeat-interval" min="1" value="1" disabled style="width: 70px;"> 
-        </div>
-        <div class="form-group">
-            <label>Inicio:</label>
-            <select class="activity-start-type">
-                <option value="any">En cualquier momento</option>
-                <option value="day">A partir del día #</option>
-                <option value="after">Después de actividad</option>
-                <option value="mid">A mitad de actividad</option>
-            </select>
-            <input type="text" class="activity-start-ref" placeholder="Ej: 2 o 'Clase de Inglés'">
-        </div>
-        <div class="button-row">
-            <button type="button" class="move-btn" onclick="moveActivity('up', 'activity-${activityCount}')">▲</button>
-            <button type="button" class="move-btn" onclick="moveActivity('down', 'activity-${activityCount}')">▼</button>
-            <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">⌫</button>
-        </div>
-        <hr>
-    `;
-    container.appendChild(activityDiv);
+    activityDiv.querySelector('h4').textContent = `Actividad ${activityCount}`;
+    activityDiv.querySelector('.remove-btn').onclick = () => removeElement(activityId);
+    activityDiv.querySelector('.move-btn[data-action="up"]').onclick = () => moveActivity('up', activityId);
+    activityDiv.querySelector('.move-btn[data-action="down"]').onclick = () => moveActivity('down', activityId);
+    
     const repeatCheck = activityDiv.querySelector('.activity-repeat-check');
     repeatCheck.addEventListener('change', () => {
         const typeSelect = activityDiv.querySelector('.activity-repeat-type');
@@ -87,31 +46,29 @@ function addActivity() {
         typeSelect.disabled = !enabled;
         intervalInput.disabled = !enabled;
     });
+    container.appendChild(clone);
 }
 
 function addBlock() {
     blockCount++;
     const container = document.getElementById('blocksContainer');
-    const blockDiv = document.createElement('div');
-    blockDiv.className = 'block-group';
-    blockDiv.id = `block-${blockCount}`;
-
-    blockDiv.innerHTML = `
-        <h4>Bloque No Accesible ${blockCount}</h4>
-        <div class="form-group">
-            <label>Día:</label>
-            <select class="block-day">
-                ${DAYS_OF_WEEK.map((day, index) => `<option value="${index + 1}">${day}</option>`).join('')}
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Rango de hora (HH:MM - HH:MM):</label>
-            <input type="text" class="block-time-range" placeholder="Ej: 12:00 - 13:00">
-        </div>
-        <button type="button" class="remove-btn" onclick="removeElement('block-${blockCount}')">✖</button>
-        <hr>
-    `;
-    container.appendChild(blockDiv);
+    const template = document.getElementById('block-template');
+    const clone = template.content.cloneNode(true);
+    const blockDiv = clone.querySelector('.block-group');
+    const blockId = `block-${blockCount}`;
+    blockDiv.id = blockId;
+    blockDiv.querySelector('h4').textContent = `Bloque No Accesible ${blockCount}`;
+    blockDiv.querySelector('.remove-btn').onclick = () => removeElement(blockId);
+    
+    const daySelect = blockDiv.querySelector('.block-day');
+    DAYS_OF_WEEK.forEach((day, index) => {
+        const option = document.createElement('option');
+        option.value = index + 1; // Assuming 1=Lunes, 7=Domingo
+        option.textContent = day;
+        daySelect.appendChild(option);
+    });
+    
+    container.appendChild(clone);
 }
 
 function removeElement(id) {
