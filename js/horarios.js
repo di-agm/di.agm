@@ -28,6 +28,10 @@ function addActivity() {
     const activityDiv = document.createElement('div');
     activityDiv.className = 'activity-group';
     activityDiv.id = `activity-${activityCount}`;
+    activityDiv.draggable = true;
+    activityDiv.addEventListener('dragstart', handleDragStart);
+    activityDiv.addEventListener('dragover', handleDragOver);
+    activityDiv.addEventListener('drop', handleDrop);
 
     activityDiv.innerHTML = `
         <h4>Actividad ${activityCount}</h4>
@@ -44,6 +48,16 @@ function addActivity() {
             <input type="number" class="activity-frequency" min="1" value="3">
         </div>
         <button type="button" class="remove-btn" onclick="removeElement('activity-${activityCount}')">✖</button>
+        <div class="form-group">
+            <label>Inicio:</label>
+            <select class="activity-start-type">
+                <option value="any">En cualquier momento</option>
+                <option value="day">A partir del día #</option>
+                <option value="after">Después de actividad</option>
+                <option value="mid">A mitad de actividad</option>
+            </select>
+            <input type="text" class="activity-start-ref" placeholder="Ej: 2 o 'Clase de Inglés'">
+        </div>
         <hr>
     `;
     container.appendChild(activityDiv);
@@ -78,6 +92,43 @@ function removeElement(id) {
     const element = document.getElementById(id);
     if (element) {
         element.remove();
+    }
+}
+
+let draggedElement = null;
+
+function handleDragStart(e) {
+    draggedElement = this;
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    const container = this.parentNode;
+    const dragging = document.querySelector('.dragging');
+    const siblings = [...container.querySelectorAll('.activity-group:not(.dragging)')];
+    const next = siblings.find(sibling => {
+        return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+    });
+    container.insertBefore(dragging, next || null);
+}
+
+function handleDrop() {
+    this.classList.remove('dragging');
+    draggedElement = null;
+}
+
+function moveActivity(direction, id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    const container = element.parentNode;
+
+    if (direction === 'up' && element.previousElementSibling) {
+        container.insertBefore(element, element.previousElementSibling);
+    } 
+    else if (direction === 'down' && element.nextElementSibling) {
+        container.insertBefore(element.nextElementSibling, element);
     }
 }
 
@@ -123,7 +174,9 @@ function generateSchedule() {
         const frequency = parseInt(group.querySelector('.activity-frequency').value);
         
         if (name && duration > 0 && frequency > 0) {
-            activities.push({ name, duration, frequency });
+            const startType = group.querySelector('.activity-start-type').value;
+            const startRef = group.querySelector('.activity-start-ref').value.trim();
+            activities.push({ name, duration, frequency, startType, startRef });
         }
     });
 
@@ -208,6 +261,29 @@ let currentDay = 0;
 let currentTime = startTimeMinutes;
 
 for (const activity of activities) {
+    let startDay = 0;
+    let startMinute = startTimeMinutes;
+
+    if (activity.startType === "day") {
+        const dayNum = parseInt(activity.startRef);
+        if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= totalDays) {
+            startDay = dayNum - 1;
+        }
+    } 
+    else if (activity.startType === "after" || activity.startType === "mid") {
+        const target = activities.find(a =>
+            a.name.toLowerCase() === activity.startRef.toLowerCase()
+        );
+        if (target && target._placedSlots && target._placedSlots.length > 0) {
+            const refSlot = activity.startType === "after"
+                ? target._placedSlots[target._placedSlots.length - 1]
+                : target._placedSlots[Math.floor(target._placedSlots.length / 2)];
+            
+            startDay = refSlot.day;
+            startMinute = refSlot.end;
+        }
+    }
+    activity._placedSlots = [];
     const slotsNeeded = Math.ceil(activity.duration / intervalMinutes);
     let placed = 0;
     let attempts = 0;
@@ -242,6 +318,11 @@ for (const activity of activities) {
                     const cell = row.cells[dayNumber];
                     cell.textContent = activity.name;
                     cell.classList.add('activity-slot');
+                    activity._placedSlots.push({
+                        day: currentDay,
+                        start: currentTime,
+                        end: currentTime + activity.duration
+                    });
                 }
                 placed++;
                 foundSlot = true;
