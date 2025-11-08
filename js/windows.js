@@ -38,3 +38,12 @@ async function loadSection(path) {
     console.error("❌ Error loading section:", err);
   }
 }
+
+function showTool(id) {
+  document.querySelectorAll('#contentContainer > h1, #contentContainer > h2').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('#contentContainer > div').forEach(div => {
+    div.style.display = (div.id === id ? 'block' : 'none');
+  });
+  if (id === 'layout' && typeof initLayout === 'function') initLayout();
+  if (id === 'tt' && typeof initTimetable === 'function') initTimetable();
+}
