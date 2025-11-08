@@ -16,6 +16,330 @@
         <h2><a href="#LS">LS</a></h2>
         <h2><a href="schedule.html" class="tt">Time table</a></h2>
 </div>
+
+    <div id="layout" style="display:none;">
+    <div class="hamburger-menu" style="left: 20px;" id="leftMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <div class="hamburger-menu" style="right: 20px;" id="rightMenuBtn">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  
+  <div class="sidebar left-sidebar" id="leftSidebar">
+  <div class="sidebar-section">
+    <h3>Page Setup</h3>
+    <select id="sizeSelector" aria-label="Select paper size">
+      <option value="a4">A4</option>
+      <option value="letter">Letter</option>
+      <option value="tabloid">Tabloid</option>
+      <option value="custom">Custom Size</option>
+    </select>
+    <div id="customSizeInputs" style="display:none; margin-top:5px;">
+      <input type="number" id="customWidth" placeholder="Width">
+      <input type="number" id="customHeight" placeholder="Height">
+      <select id="customUnit">
+        <option value="px">px</option>
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="in">in</option>
+      </select>
+      <button id="applyCustomSize">Apply</button>
+    </div>
+    <div style="margin-top: 10px;"></div>
+    <button class="sidebar-btn full-width" id="orientationBtn">↺</button>
+  </div>
+
+  <div class="sidebar-section">
+    <button id="toggleRulersBtn">📏</button>
+    <button id="rulerUnitBtn">Unit</button>
+    <button id="toggleMarginsBtn">⌗</button>
+    <button id="togglePageNumbersBtn">#P</button>
+    <button id="zoomInBtn">🔎︎+</button>
+    <button id="zoomOutBtn">-🔍︎</button>
+    <button id="handBtn">✋︎</button>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Elements</h3>
+    <div class="sidebar-buttons">
+      <button id="addTextBtn">𝐓</button>
+      <button id="addCircleBtn">⬤</button>
+      <button id="addPolygonBtn">⬟</button>
+      <button id="addStarBtn">★</button>
+      <button id="addImageRectBtn">🖼</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Element Style</h3>
+
+    <!-- TEXT EDITOR -->
+    <div id="textEditor" class="editor-panel" style="display: none;">
+      <h4>Text Color</h4>
+      <div class="color-picker-container">
+        <label for="fontColorInput">Font color:</label>
+        <input type="color" id="fontColorInput" value="#000000" style="width: 40px; height: 30px; padding: 0; border: none;">
+      </div>
+
+      <h4>Font Size</h4>
+      <div class="font-size-options">
+        <label for="fontSizeInput">Font size:</label>
+        <input id="fontSizeInput" type="number" min="1" max="100" value="16">
+      </div>
+
+      <h4>Font Family</h4>
+      <select class="font-family-select" id="fontFamilySelect">
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="Verdana, sans-serif">Verdana</option>
+        <option value="Impact, sans-serif">Impact</option>
+        <option value="'Didact Gothic', sans-serif">Didact Gothic</option>
+        <option value="'Lora', serif">Lora</option>
+      </select>
+      <input type="file" id="fontFileInput" accept=".ttf,.otf" style="margin-top:5px;">
+    </div>
+
+    <!-- SHAPE EDITOR -->
+    <div id="shapeEditor" class="editor-panel" style="display: none;">
+      <h2>Shape Editor</h2>
+
+      <div class="editor-group mt-2">
+        <label for="shape-fill-type" class="block text-xs font-medium text-gray-700">Fill Type</label>
+        <select id="shape-fill-type" class="w-full border border-gray-300 rounded-md p-1">
+          <option value="color">Color</option>
+          <option value="image">Image</option>
+        </select>
+      </div>
+
+      <h3 class="mt-4 text-sm font-semibold">Fill Style</h3>
+
+      <div id="shape-color-controls">
+        <div class="editor-group mt-2">
+          <label for="shape-fill-color" class="block text-xs font-medium text-gray-700">Fill Color:</label>
+          <input type="color" id="shape-fill-color" class="w-full h-10 border border-gray-300 rounded-md p-0.5" value="#3b82f6">
+        </div>
+      </div>
+
+      <div class="editor-group mt-2" id="shape-fill-opacity-control">
+        <label for="shape-fill-opacity" class="block text-xs font-medium text-gray-700">
+          Fill Opacity: <span id="fill-opacity-value">1.0</span>
+        </label>
+        <input type="range" id="shape-fill-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
+      </div>
+
+      <div id="shape-image-controls" style="display: none;">
+        <div class="editor-group mt-2">
+          <label for="shape-image-url" class="block text-xs font-medium text-gray-700">Image URL:</label>
+          <input type="text" id="shape-image-url" placeholder="Paste image or enter URL" class="w-full border border-gray-300 rounded-md p-1">
+        </div>
+      </div>
+
+      <h3 class="mt-4 text-sm font-semibold">Border Style</h3>
+      <div class="editor-group mt-2">
+        <label for="shape-border-color">Border Color:</label>
+        <input type="color" id="shape-border-color" value="#1e3a8a" class="w-full h-10 border border-gray-300 rounded-md p-0.5">
+      </div>
+
+      <div class="editor-group mt-2">
+        <label for="shape-border-width">Border Width:</label>
+        <input type="number" id="shape-border-width" min="0" max="20" value="4" class="w-full border border-gray-300 rounded-md p-1">
+      </div>
+
+      <div class="editor-group mt-2">
+        <label for="shape-border-opacity">Border Opacity: <span id="border-opacity-value">1.0</span></label>
+        <input type="range" id="shape-border-opacity" min="0" max="1" step="0.01" value="1" class="w-full">
+      </div>
+    </div>
+
+    <div id="noElementSelected" style="opacity: 0; text-align: center; padding: 10px;">
+      Select an element to edit
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Pages</h3>
+    <div class="sidebar-buttons">
+      <button id="prevPageBtn">⮜</button>
+      <button id="nextPageBtn">⮞</button>
+      <button id="addPageBtn">✚</button>
+      <button id="removePageBtn">🗑</button>
+      <button id="duplicatePageBtn">⎘</button>
+    </div>
+  </div>
+      <p></p>
+ </div>
+  
+  <div class="sidebar right-sidebar" id="rightSidebar">
+    <div class="sidebar-section">
+      <h3>Export</h3>
+      <div class="sidebar-buttons">
+        <button id="exportPngBtn">PNG</button>
+        <button id="exportJpgBtn">JPG</button>
+        <button id="exportPdfBtn">PDF</button>
+        <button id="saveLayoutBtn">💾</button>
+          <p></p>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h3>Saved Layouts</h3>
+      <div id="savedLayouts" class="saved-layouts">
+        <div class="layout-item" style="opacity: 0.6; font-style: italic;">
+          No saved layouts
+        </div>
+      </div>
+      <div style="margin-top: 15px;"></div>
+      <button class="sidebar-btn full-width" id="importLayoutBtn">🗁 Import</button>
+    </div>
+  </div>
+  
+  <div class="modal" id="saveLayoutModal">
+    <div class="modal-content">
+      <h3>Save Layout</h3>
+      <input type="text" id="layoutNameInput" placeholder="Layout name">
+      <div class="modal-buttons">
+        <button class="sidebar-btn" id="cancelSaveBtn">Cancel</button>
+        <button class="sidebar-btn" id="confirmSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-container"><!-- Page will be inserted here by JS --></div>
+</div>
+    
+    <div id="textToolbar" class="toolbar" aria-hidden="true">
+      <button class="toolbar-btn" data-action="edit">✎</button>
+      <button class="toolbar-btn" data-action="delete">✖</button>
+      <button class="toolbar-btn" data-action="align">≡</button>
+      <button class="toolbar-btn" data-action="rotate">🗘</button>
+    </div>
+
+    <div id="shapeToolbar" class="toolbar" aria-hidden="true">
+      <button class="toolbar-btn" data-action="delete">✖</button>
+      <button class="toolbar-btn" data-action="rotate">🗘</button>
+    </div>
+
+    <div id="tt" style="display:none;">
+    <div class="container">
+        <h1>Generador de Horarios</h1>
+        
+        <div class="form-group">
+            <label for="numDays">Número de días:</label>
+            <input type="text" id="numDays" placeholder="Ej: 7 o 5+2">
+        </div>
+        
+        <div class="form-group">
+            <label for="timeRange">Hora de inicio y fin (HH:MM - HH:MM):</label>
+            <input type="text" id="timeRange" placeholder="Ej: 08:00 - 18:00">
+        </div>
+        
+        <div class="form-group">
+            <label for="startDay">Día de inicio:</label>
+            <select id="startDay">
+                <option value="1">Lunes</option>
+                <option value="2">Martes</option>
+                <option value="3">Miércoles</option>
+                <option value="4">Jueves</option>
+                <option value="5">Viernes</option>
+                <option value="6">Sábado</option>
+                <option value="7">Domingo</option>
+            </select>
+        </div>
+        
+        <!-- Actividades -->
+        <h3>Actividades</h3>
+        <div id="activitiesContainer"></div>
+        <template id="activity-template">
+          <div class="activity-group" draggable="true">
+            <h4>Actividad #</h4>
+            <div class="form-group">
+              <label>Nombre:</label>
+              <input type="text" class="activity-name" placeholder="Ej: Clase de Matemáticas">
+            </div>
+            <div class="form-group">
+              <label>Duración (min):</label>
+              <input type="number" class="activity-duration" min="10" step="5" value="60">
+              <select class="activity-duration-type">
+                <option value="per-session">Por sesión</option>
+                <option value="total">Total</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Veces por semana:</label>
+              <input type="number" class="activity-frequency" min="1" value="3">
+            </div>
+            <div class="form-group repeat-options">
+              <label><input type="checkbox" class="activity-repeat-check"> Repetir</label>
+              <select class="activity-repeat-type" disabled>
+                <option value="daily">Cada X días</option>
+                <option value="weekly">Semanalmente</option>
+                <option value="monthly">Mensualmente</option>
+              </select>
+              <input type="number" class="activity-repeat-interval" min="1" value="1" disabled style="width: 70px;">
+            </div>
+            <div class="form-group">
+              <label>Inicio:</label>
+              <select class="activity-start-type">
+                <option value="any">En cualquier momento</option>
+                <option value="day">A partir del día #</option>
+                <option value="after">Después de actividad</option>
+                <option value="mid">A mitad de actividad</option>
+              </select>
+              <input type="text" class="activity-start-ref" placeholder="Ej: 2 o 'Clase de Inglés'">
+            </div>
+            <div class="button-row">
+              <button type="button" class="move-btn" data-action="up">▲</button>
+              <button type="button" class="move-btn" data-action="down">▼</button>
+              <button type="button" class="remove-btn">⌫</button>
+            </div>
+            <hr>
+          </div>
+        </template>
+        <button type="button" class="add-btn" onclick="addActivity()">✚</button>
+        
+        <!-- Bloques no accesibles -->
+        <h3>Bloques No Accesibles</h3>
+        <div id="blocksContainer"></div>
+        <template id="block-template">
+          <div class="block-group">
+            <h4>Bloque No Accesible #</h4>
+            <div class="form-group">
+              <label>Día:</label>
+              <select class="block-day">
+                </select>
+            </div>
+            <div class="form-group">
+              <label>Rango de hora (HH:MM - HH:MM):</label>
+              <input type="text" class="block-time-range" placeholder="Ej: 12:00 - 13:00">
+            </div>
+            <button type="button" class="remove-btn">✖</button>
+            <hr>
+          </div>
+        </template>
+        <button type="button" class="add-btn" onclick="addBlock()">✚</button>
+        
+        <!-- Botón generar -->
+        <button type="button" onclick="generateSchedule()">Generar Horario</button>
+    </div>
+    
+    <!-- Resultado -->
+    <div class="container" id="scheduleResult">
+        <h2>Horario Generado</h2>
+        <div id="scheduleTable"></div>
+        <button type="button" onclick="exportToCSV()" class="hidden" id="exportBtn">Exportar a CSV</button>
+    </div>
+</div>
+    
     <script src="/di.agm/js/windows.js" defer></script>
     <script src="/di.agm/js/color.js" defer></script>
     <script src="/di.agm/js/translations.js" defer></script>
