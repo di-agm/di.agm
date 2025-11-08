@@ -17,3 +17,27 @@ function showSectionFromHash() {
 
 window.addEventListener("DOMContentLoaded", showSectionFromHash);
 window.addEventListener("hashchange", showSectionFromHash);
+
+async function loadSection(path) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error('File not found');
+    const html = await response.text();
+
+    // Insert the new section into the page
+    const container = document.getElementById('contentContainer');
+    container.innerHTML = html;
+
+    // Hide the menu (optional)
+    document.getElementById('menu').style.display = 'none';
+    
+    // You can call section-specific initializers here
+    if (path.includes('tools.html') && typeof initTools === 'function') {
+      initTools();
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('contentContainer').innerHTML = '<p>Error loading section.</p>';
+  }
+}
