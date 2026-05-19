@@ -43,28 +43,51 @@
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#P img').forEach(img => {
+          
+          // 1. Wrap each image in a relative container so we can position the text over it
+          let wrapper = document.createElement('div');
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline-block'; 
+          // Move the image inside the wrapper
+          img.parentNode.insertBefore(wrapper, img);
+          wrapper.appendChild(img);
+
           img.style.cursor = 'pointer';
+
           img.addEventListener('click', function() {
             // Check if a caption is already open and close it
-            let nextEl = this.nextElementSibling;
-            if (nextEl && nextEl.className === 'img-caption') {
-               nextEl.remove(); 
+            let existingCaption = wrapper.querySelector('.img-caption');
+            if (existingCaption) {
+               existingCaption.remove(); 
             } else {
-               // Create a new caption box
+               // Create the overlay caption
                let caption = document.createElement('div');
                caption.className = 'img-caption';
-               caption.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-               caption.style.color = '#fff';
-               caption.style.padding = '10px';
-               caption.style.marginTop = '5px';
-               caption.style.marginBottom = '15px';
-               caption.style.borderRadius = '5px';
-               caption.style.display = 'inline-block';
-               caption.style.maxWidth = '80%';
                caption.innerText = this.getAttribute('data-description');
                
-               // Insert it right after the clicked image
-               this.parentNode.insertBefore(caption, this.nextSibling);
+               // Styling to make it cover the image perfectly
+               caption.style.position = 'absolute';
+               caption.style.top = '0';
+               caption.style.left = '0';
+               caption.style.width = '100%';
+               caption.style.height = '100%';
+               caption.style.backgroundColor = 'rgba(0, 0, 0, 0.75)'; // Semi-transparent black
+               caption.style.color = '#ffffff';
+               caption.style.display = 'flex';
+               caption.style.alignItems = 'center';
+               caption.style.justifyContent = 'center';
+               caption.style.textAlign = 'center';
+               caption.style.padding = '15px';
+               caption.style.boxSizing = 'border-box';
+               caption.style.cursor = 'pointer'; // Lets the user know they can click it
+
+               // Clicking the caption itself will close it
+               caption.addEventListener('click', function() {
+                 this.remove();
+               });
+               
+               // Insert the overlay into the wrapper, right on top of the image
+               wrapper.appendChild(caption);
             }
           });
         });
