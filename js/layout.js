@@ -11,6 +11,7 @@ let isPanning = false;
 let startX, startY, scrollLeft, scrollTop;
 let customPageWidthMM = null;
 let customPageHeightMM = null;
+let currentRulerUnit = 'px';
 
 const DPI = 96;
 const MM_PER_INCH = 25.4;
@@ -157,6 +158,26 @@ function applyCustomSize(widthMM, heightMM) {
   }
 
   if (rulersVisible) drawRulers();
+}
+
+function convertToPx(value, unit) {
+    if (unit === 'px') return value;
+    if (unit === 'in') return value * 96;
+    if (unit === 'cm') return (value / 2.54) * 96;
+    if (unit === 'mm') return (value / 25.4) * 96;
+    return value;
+}
+
+const rulerUnitBtn = document.getElementById('rulerUnitBtn');
+if (rulerUnitBtn) {
+    rulerUnitBtn.textContent = currentRulerUnit.toUpperCase(); // Set initial text
+    rulerUnitBtn.addEventListener('click', () => {
+        const units = ['px', 'mm', 'cm', 'in'];
+        let idx = units.indexOf(currentRulerUnit);
+        currentRulerUnit = units[(idx + 1) % units.length];
+        rulerUnitBtn.textContent = currentRulerUnit.toUpperCase();
+        if (rulersVisible) drawRulers(); // Redraw instantly if visible
+    });
 }
 
 function updateRectSizeOnResize() {
@@ -335,56 +356,74 @@ function drawRulers() {
   if (!rulersVisible) return;
 
   const page = pages[currentPageIndex];
-  if (!page) return;
+  const container = page.parentElement; // The center-container
+  if (!page || !container) return;
+
+  // Make sure container has relative positioning for perfect absolute placement
+  container.style.position = 'relative';
 
   const pageRect = page.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  // Calculate exact visual coordinates considering scroll and scale
+  const visualLeft = pageRect.left - containerRect.left + container.scrollLeft;
+  const visualTop = pageRect.top - containerRect.top + container.scrollTop;
 
   const hRuler = document.createElement("div");
   hRuler.className = "ruler horizontal";
   hRuler.style.width = pageRect.width + "px";
-  hRuler.style.left = page.offsetLeft + "px";
-  hRuler.style.top = (page.offsetTop - 25) + "px"; // 20px ruler + 2px gap
-  page.parentElement.appendChild(hRuler);
+  hRuler.style.left = visualLeft + "px";
+  hRuler.style.top = Math.max(0, visualTop - 22) + "px"; 
+  container.appendChild(hRuler);
 
   const vRuler = document.createElement("div");
   vRuler.className = "ruler vertical";
   vRuler.style.height = pageRect.height + "px";
-  vRuler.style.top = page.offsetTop + "px";
-  vRuler.style.left = (page.offsetLeft - 25) + "px"; // 20px ruler + 2px gap
-  page.parentElement.appendChild(vRuler);
+  vRuler.style.top = visualTop + "px";
+  vRuler.style.left = Math.max(0, visualLeft - 22) + "px";
+  container.appendChild(vRuler);
 
-  const spacing = convertToPx(10, currentRulerUnit); // minor ticks every 10 units
-  const maxX = pageRect.width;
-  const maxY = pageRect.height;
+  // Apply zoom scaling to the rulers
+  const baseSpacing = convertToPx(10, currentRulerUnit); 
+  const maxX = page.offsetWidth; 
+  const maxY = page.offsetHeight; 
 
-  for (let x = 0; x <= maxX; x += spacing) {
+  // Draw Horizontal Ticks
+  for (let x = 0; x <= maxX; x += baseSpacing) {
+    const scaledX = x * zoomLevel;
     const tick = document.createElement("div");
     tick.className = "tick";
-    tick.style.left = x + "px";
-    tick.style.height = (x % (spacing * 5) === 0) ? "10px" : "6px"; // longer tick every 5
+    tick.style.left = scaledX + "px";
+
+    const isMajor = Math.round(x) % Math.round(baseSpacing * 5) === 0;
+    tick.style.height = isMajor ? "12px" : "6px";
     hRuler.appendChild(tick);
 
-    if (x % (spacing * 5) === 0) {
+    if (isMajor) {
       const label = document.createElement("div");
       label.style.position = "absolute";
-      label.style.left = x + 2 + "px";
+      label.style.left = (scaledX + 2) + "px";
       label.style.bottom = "10px";
       label.textContent = Math.round(x / convertToPx(1, currentRulerUnit));
       hRuler.appendChild(label);
     }
   }
 
-  for (let y = 0; y <= maxY; y += spacing) {
+  // Draw Vertical Ticks
+  for (let y = 0; y <= maxY; y += baseSpacing) {
+    const scaledY = y * zoomLevel;
     const tick = document.createElement("div");
     tick.className = "tick";
-    tick.style.top = y + "px";
-    tick.style.width = (y % (spacing * 5) === 0) ? "10px" : "6px";
+    tick.style.top = scaledY + "px";
+
+    const isMajor = Math.round(y) % Math.round(baseSpacing * 5) === 0;
+    tick.style.width = isMajor ? "12px" : "6px";
     vRuler.appendChild(tick);
 
-    if (y % (spacing * 5) === 0) {
+    if (isMajor) {
       const label = document.createElement("div");
       label.style.position = "absolute";
-      label.style.top = y + "px";
+      label.style.top = (scaledY + 2) + "px";
       label.style.right = "12px";
       label.textContent = Math.round(y / convertToPx(1, currentRulerUnit));
       vRuler.appendChild(label);
@@ -857,6 +896,7 @@ if (zoomInBtn) {
   zoomInBtn.addEventListener("click", () => {
     zoomLevel *= 1.1;
     if (pages[currentPageIndex]) pages[currentPageIndex].style.transform = `scale(${zoomLevel})`;
+    drawRulers(); // Redraw rulers on zoom
   });
 }
 
@@ -864,6 +904,7 @@ if (zoomOutBtn) {
   zoomOutBtn.addEventListener("click", () => {
     zoomLevel /= 1.1;
     if (pages[currentPageIndex]) pages[currentPageIndex].style.transform = `scale(${zoomLevel})`;
+    drawRulers(); // Redraw rulers on zoom
   });
 }
 
