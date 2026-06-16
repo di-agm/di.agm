@@ -1,5 +1,20 @@
 const DAYS_OF_WEEK = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
+// --- Safe Math Parser ---
+function evaluateMath(input) {
+    if (!input) return 0;
+    try {
+        // Strip out everything except numbers, basic math operators, and parentheses
+        const sanitized = String(input).replace(/[^0-9+\-*/.()]/g, '');
+        if (!sanitized) return 0;
+        
+        // Safely evaluate the mathematical string
+        const result = new Function(`return ${sanitized}`)();
+        return Math.max(0, Math.round(result)); // Ensure we return a positive whole number
+    } catch (error) {
+        return 0; // Return 0 if the user types an invalid equation (like "5+*2")
+    }
+}
 // --- Time Utilities ---
 function timeToMinutes(timeStr) {
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -127,9 +142,12 @@ function generateSchedule() {
         return;
     }
 
-    const parts = numDaysInput.split('+');
-    const totalDays = parts.reduce((sum, part) => sum + parseInt(part.trim() || 0), 0);
-    const workDays = parseInt(parts[0].trim() || 0);
+    // Evaluates full math like "14/2" or "10-3"
+    const totalDays = evaluateMath(numDaysInput);
+    
+    // Grabs the very first number in the equation to represent standard "workdays"
+    const workDaysMatch = numDaysInput.match(/\d+/); 
+    const workDays = workDaysMatch ? parseInt(workDaysMatch[0]) : totalDays;
     
     if (totalDays <= 0 || totalDays > 7) return alert("El número de días debe ser entre 1 y 7.");
 
@@ -144,9 +162,10 @@ function generateSchedule() {
     const activities = [];
     document.querySelectorAll('.activity-group').forEach(group => {
         const name = group.querySelector('.activity-name').value.trim();
-        const durationInput = parseInt(group.querySelector('.activity-duration').value);
+        // Uses our new math evaluator for both fields
+        const durationInput = evaluateMath(group.querySelector('.activity-duration').value);
         const durationType = group.querySelector('.activity-duration-type').value;
-        const frequency = parseInt(group.querySelector('.activity-frequency').value);
+        const frequency = evaluateMath(group.querySelector('.activity-frequency').value);
         
         if (name && durationInput > 0 && frequency > 0) {
             let durationPerSession = durationInput;
