@@ -1,8 +1,9 @@
 const DAYS_OF_WEEK = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
+// --- Time Utilities ---
 function timeToMinutes(timeStr) {
     const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 60 + minutes;
+    return (hours || 0) * 60 + (minutes || 0);
 }
 
 function minutesToTime(totalMinutes) {
@@ -11,16 +12,19 @@ function minutesToTime(totalMinutes) {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-let activityCount = 0;
-let blockCount = 0;
-
 function gcd(a, b) {
     return b === 0 ? a : gcd(b, a % b);
 }
 
 function gcdArray(numbers) {
+    if (numbers.length === 0) return 30; // default interval
     return numbers.reduce((acc, n) => gcd(acc, n));
 }
+
+// --- UI State & Setup ---
+let activityCount = 0;
+let blockCount = 0;
+let draggedElement = null;
 
 function addActivity() {
     activityCount++;
@@ -28,24 +32,29 @@ function addActivity() {
     const template = document.getElementById('activity-template');
     const clone = template.content.cloneNode(true);
     const activityDiv = clone.querySelector('.activity-group');
+    
     const activityId = `activity-${activityCount}`;
     activityDiv.id = activityId;
+    
+    // Drag & Drop
     activityDiv.addEventListener('dragstart', handleDragStart);
     activityDiv.addEventListener('dragover', handleDragOver);
     activityDiv.addEventListener('drop', handleDrop);
+    
     activityDiv.querySelector('h4').textContent = `Actividad ${activityCount}`;
-    activityDiv.querySelector('.remove-btn').onclick = () => removeElement(activityId);
+    activityDiv.querySelector('.remove-btn').onclick = () => activityDiv.remove();
     activityDiv.querySelector('.move-btn[data-action="up"]').onclick = () => moveActivity('up', activityId);
     activityDiv.querySelector('.move-btn[data-action="down"]').onclick = () => moveActivity('down', activityId);
     
+    // Repeat Toggle
     const repeatCheck = activityDiv.querySelector('.activity-repeat-check');
     repeatCheck.addEventListener('change', () => {
         const typeSelect = activityDiv.querySelector('.activity-repeat-type');
         const intervalInput = activityDiv.querySelector('.activity-repeat-interval');
-        const enabled = repeatCheck.checked;
-        typeSelect.disabled = !enabled;
-        intervalInput.disabled = !enabled;
+        typeSelect.disabled = !repeatCheck.checked;
+        intervalInput.disabled = !repeatCheck.checked;
     });
+    
     container.appendChild(clone);
 }
 
@@ -55,15 +64,15 @@ function addBlock() {
     const template = document.getElementById('block-template');
     const clone = template.content.cloneNode(true);
     const blockDiv = clone.querySelector('.block-group');
-    const blockId = `block-${blockCount}`;
-    blockDiv.id = blockId;
+    
+    blockDiv.id = `block-${blockCount}`;
     blockDiv.querySelector('h4').textContent = `Bloque No Accesible ${blockCount}`;
-    blockDiv.querySelector('.remove-btn').onclick = () => removeElement(blockId);
+    blockDiv.querySelector('.remove-btn').onclick = () => blockDiv.remove();
     
     const daySelect = blockDiv.querySelector('.block-day');
     DAYS_OF_WEEK.forEach((day, index) => {
         const option = document.createElement('option');
-        option.value = index + 1; // Assuming 1=Lunes, 7=Domingo
+        option.value = index + 1; // 1=Lunes, 7=Domingo
         option.textContent = day;
         daySelect.appendChild(option);
     });
@@ -71,15 +80,7 @@ function addBlock() {
     container.appendChild(clone);
 }
 
-function removeElement(id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.remove();
-    }
-}
-
-let draggedElement = null;
-
+// --- Drag & Drop Handlers ---
 function handleDragStart(e) {
     draggedElement = this;
     this.classList.add('dragging');
@@ -91,9 +92,7 @@ function handleDragOver(e) {
     const container = this.parentNode;
     const dragging = document.querySelector('.dragging');
     const siblings = [...container.querySelectorAll('.activity-group:not(.dragging)')];
-    const next = siblings.find(sibling => {
-        return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
-    });
+    const next = siblings.find(sibling => e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2);
     container.insertBefore(dragging, next || null);
 }
 
@@ -106,18 +105,19 @@ function moveActivity(direction, id) {
     const element = document.getElementById(id);
     if (!element) return;
     const container = element.parentNode;
-
     if (direction === 'up' && element.previousElementSibling) {
         container.insertBefore(element, element.previousElementSibling);
-    } 
-    else if (direction === 'down' && element.nextElementSibling) {
+    } else if (direction === 'down' && element.nextElementSibling) {
         container.insertBefore(element.nextElementSibling, element);
     }
 }
 
+// --- Core Generator Logic ---
 function generateSchedule() {
     const scheduleTable = document.getElementById('scheduleTable');
     scheduleTable.innerHTML = ''; 
+
+    // 1. Gather & Validate Base Inputs
     const numDaysInput = document.getElementById('numDays').value.trim();
     const timeRangeInput = document.getElementById('timeRange').value.trim();
     const startDayValue = parseInt(document.getElementById('startDay').value);
@@ -131,25 +131,16 @@ function generateSchedule() {
     const totalDays = parts.reduce((sum, part) => sum + parseInt(part.trim() || 0), 0);
     const workDays = parseInt(parts[0].trim() || 0);
     
-    if (totalDays <= 0 || totalDays > 7) {
-        alert("El número total de días debe ser entre 1 y 7.");
-        return;
-    }
+    if (totalDays <= 0 || totalDays > 7) return alert("El número de días debe ser entre 1 y 7.");
 
     const timeParts = timeRangeInput.split('-').map(t => t.trim());
-    if (timeParts.length !== 2) {
-        alert("El 'Rango de hora' debe tener el formato HH:MM - HH:MM.");
-        return;
-    }
+    if (timeParts.length !== 2) return alert("Formato de hora incorrecto (HH:MM - HH:MM).");
 
     const startTimeMinutes = timeToMinutes(timeParts[0]);
     const endTimeMinutes = timeToMinutes(timeParts[1]);
+    if (startTimeMinutes >= endTimeMinutes) return alert("La hora de inicio debe ser anterior a la de fin.");
 
-    if (startTimeMinutes >= endTimeMinutes) {
-        alert("La hora de inicio debe ser anterior a la hora de fin.");
-        return;
-    }
-
+    // 2. Gather Activities
     const activities = [];
     document.querySelectorAll('.activity-group').forEach(group => {
         const name = group.querySelector('.activity-name').value.trim();
@@ -162,185 +153,193 @@ function generateSchedule() {
             if (durationType === 'total') {
                 durationPerSession = Math.max(5, Math.floor(durationInput / frequency));
             }
-        
-            const repeatEnabled = group.querySelector('.activity-repeat-check').checked;
-            const repeatType = group.querySelector('.activity-repeat-type').value;
-            const repeatInterval = parseInt(group.querySelector('.activity-repeat-interval').value) || 1;
-        
+            
             activities.push({
                 name,
                 duration: durationPerSession,
                 frequency,
-                durationType,
-                repeatEnabled,
-                repeatType,
-                repeatInterval,
+                startType: group.querySelector('.activity-start-type').value,
+                startRef: group.querySelector('.activity-start-ref').value.trim(),
+                placedCount: 0
             });
         }
     });
 
-    if (activities.length === 0) {
-         alert("Por favor, agrega al menos una actividad.");
-         return;
-    }
+    if (activities.length === 0) return alert("Por favor, agrega al menos una actividad válida.");
 
+    // 3. Gather Blocks
     const blocks = [];
     document.querySelectorAll('.block-group').forEach(group => {
-        const day = parseInt(group.querySelector('.block-day').value);
+        const day = parseInt(group.querySelector('.block-day').value); // 1 to 7
         const timeRange = group.querySelector('.block-time-range').value.trim();
-        
         if (timeRange) {
             const blockTimes = timeRange.split('-').map(t => t.trim());
-            const start = timeToMinutes(blockTimes[0]);
-            const end = timeToMinutes(blockTimes[1]);
+            blocks.push({ day, start: timeToMinutes(blockTimes[0]), end: timeToMinutes(blockTimes[1]) });
+        }
+    });
 
-            if (start < end) {
-                blocks.push({ day, start, end });
+    // 4. Grid Setup
+    // Calculate smallest interval (e.g., 15 mins or 30 mins) based on activity lengths
+    let intervalMinutes = gcdArray(activities.map(a => a.duration));
+    intervalMinutes = Math.min(Math.max(intervalMinutes, 10), 60); // Clamp between 10m and 60m
+    
+    const totalSlots = Math.ceil((endTimeMinutes - startTimeMinutes) / intervalMinutes);
+    const grid = Array.from({ length: totalDays }, () => Array(totalSlots).fill(null));
+
+    // 5. Apply Blocks to Grid
+    for (let dayCol = 0; dayCol < totalDays; dayCol++) {
+        const currentWeekDay = ((startDayValue - 1) + dayCol) % 7 + 1; // 1=Lunes
+        for (let slot = 0; slot < totalSlots; slot++) {
+            const slotStart = startTimeMinutes + (slot * intervalMinutes);
+            const slotEnd = slotStart + intervalMinutes;
+            
+            const isBlocked = blocks.some(b => b.day === currentWeekDay && slotStart >= b.start && slotEnd <= b.end);
+            if (isBlocked) grid[dayCol][slot] = " ";
+        }
+    }
+
+    // 6. Placement Algorithm (Smart Greed)
+    activities.forEach(activity => {
+        const slotsNeeded = Math.ceil(activity.duration / intervalMinutes);
+        
+        while (activity.placedCount < activity.frequency) {
+            let placedThisRound = false;
+
+            // Try to find a free column (day) to place the activity, spreading them out
+            for (let dayCol = 0; dayCol < totalDays; dayCol++) {
+                
+                // Avoid scheduling same activity twice on the same day if possible
+                if (grid[dayCol].includes(activity.name)) continue;
+
+                // Search vertical slots on this day
+                for (let slot = 0; slot <= totalSlots - slotsNeeded; slot++) {
+                    let canFit = true;
+                    
+                    // Check if consecutive slots are free
+                    for (let s = 0; s < slotsNeeded; s++) {
+                        if (grid[dayCol][slot + s] !== null) {
+                            canFit = false;
+                            break;
+                        }
+                    }
+
+                    if (canFit) {
+                        for (let s = 0; s < slotsNeeded; s++) {
+                            grid[dayCol][slot + s] = activity.name;
+                        }
+                        activity.placedCount++;
+                        placedThisRound = true;
+                        break; // Move to next required frequency placement
+                    }
+                }
+                if (placedThisRound) break;
+            }
+
+            // Fallback: If it couldn't be placed cleanly (e.g., ran out of days without the activity)
+            // Just force it into the first absolutely free space.
+            if (!placedThisRound) {
+                let forcedPlacement = false;
+                for (let dayCol = 0; dayCol < totalDays; dayCol++) {
+                    for (let slot = 0; slot <= totalSlots - slotsNeeded; slot++) {
+                        let canFit = true;
+                        for (let s = 0; s < slotsNeeded; s++) {
+                            if (grid[dayCol][slot + s] !== null) { canFit = false; break; }
+                        }
+                        if (canFit) {
+                            for (let s = 0; s < slotsNeeded; s++) grid[dayCol][slot + s] = activity.name;
+                            activity.placedCount++;
+                            forcedPlacement = true;
+                            break;
+                        }
+                    }
+                    if (forcedPlacement) break;
+                }
+                // If it STILL doesn't fit, there's mathematically no room left on the schedule.
+                if (!forcedPlacement) break; 
             }
         }
     });
 
+    // 7. Render Table from Grid
     const table = document.createElement('table');
     table.className = 'schedule-table';
-  
+    
+    // Build Header
     const thead = table.createTHead();
     const headerRow = thead.insertRow();
     headerRow.insertCell().textContent = 'Hora';
-  
-    for (let i = 0; i < totalDays; i++) {
-        const dayIndex = (startDayValue - 1 + i) % 7;
-        const dayName = DAYS_OF_WEEK[dayIndex];
-        
+    
+    for (let dayCol = 0; dayCol < totalDays; dayCol++) {
+        const currentWeekDay = ((startDayValue - 1) + dayCol) % 7;
         const th = document.createElement('th');
-        th.textContent = dayName;
-        
-        if (i >= workDays) {
-            th.classList.add('weekend-day');
-        }
-
+        th.textContent = DAYS_OF_WEEK[currentWeekDay];
+        if (dayCol >= workDays) th.classList.add('weekend-day');
         headerRow.appendChild(th);
     }
 
+    // Build Body
     const tbody = table.createTBody();
-    let intervalMinutes = 30; // valor por defecto
-    if (activities.length > 0) {
-        const durations = activities.map(a => a.duration);
-        intervalMinutes = gcdArray(durations);
-        if (intervalMinutes < 5) intervalMinutes = 5; // límite de seguridad
-    }
-    
-    for (let current = startTimeMinutes; current < endTimeMinutes; current += intervalMinutes) {
+    for (let slot = 0; slot < totalSlots; slot++) {
         const row = tbody.insertRow();
+        const slotStart = startTimeMinutes + (slot * intervalMinutes);
+        const slotEnd = slotStart + intervalMinutes;
         
         const timeCell = row.insertCell();
-        timeCell.textContent = `${minutesToTime(current)} - ${minutesToTime(current + intervalMinutes)}`;
+        timeCell.textContent = `${minutesToTime(slotStart)} - ${minutesToTime(slotEnd)}`;
         timeCell.classList.add('time-label');
 
-        for (let i = 0; i < totalDays; i++) {
+        for (let dayCol = 0; dayCol < totalDays; dayCol++) {
             const cell = row.insertCell();
             cell.classList.add('schedule-slot');
-
-             if (i >= workDays) {
-                cell.classList.add('weekend-slot');
-            }
-            const dayToCheck = (startDayValue + i); // El día de la semana (1-7)
-            const isBlocked = blocks.some(block => 
-                block.day === dayToCheck && current >= block.start && (current + intervalMinutes) <= block.end
-            );
+            if (dayCol >= workDays) cell.classList.add('weekend-slot');
             
-            if (isBlocked) {
-                cell.textContent = 'Bloqueado';
+            const content = grid[dayCol][slot];
+            if (content === "BLOQUEADO") {
+                cell.textContent = "Bloqueado";
                 cell.classList.add('blocked-slot');
+                cell.style.backgroundColor = "#ffcccc";
+            } else if (content !== null) {
+                cell.textContent = content;
+                cell.classList.add('activity-slot');
+                cell.style.backgroundColor = "#e0f7fa";
             }
-
         }
     }
-
-let currentDay = 0;
-let currentTime = startTimeMinutes;
-
-for (const activity of activities) {
-    let startDay = 0;
-    let startMinute = startTimeMinutes;
-
-    if (activity.startType === "day") {
-        const dayNum = parseInt(activity.startRef);
-        if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= totalDays) {
-            startDay = dayNum - 1;
-        }
-    } 
-    else if (activity.startType === "after" || activity.startType === "mid") {
-        const target = activities.find(a =>
-            a.name.toLowerCase() === activity.startRef.toLowerCase()
-        );
-        if (target && target._placedSlots && target._placedSlots.length > 0) {
-            const refSlot = activity.startType === "after"
-                ? target._placedSlots[target._placedSlots.length - 1]
-                : target._placedSlots[Math.floor(target._placedSlots.length / 2)];
-            
-            startDay = refSlot.day;
-            startMinute = refSlot.end;
-        }
-    }
-    activity._placedSlots = [];
-    const slotsNeeded = Math.ceil(activity.duration / intervalMinutes);
-    let placed = 0;
-    let attempts = 0;
-
-    while (placed < activity.frequency && attempts < 200) {
-        attempts++;
-
-        const dayIndex = (startDayValue - 1 + currentDay) % 7;
-        const dayNumber = currentDay + 1;
-
-        let rowIndex = Math.floor((currentTime - startTimeMinutes) / intervalMinutes);
-        let foundSlot = false;
-
-        while (rowIndex + slotsNeeded <= tbody.rows.length) {
-            let conflict = false;
-
-            for (let s = 0; s < slotsNeeded; s++) {
-                const row = tbody.rows[rowIndex + s];
-                const cell = row.cells[dayNumber]; // columna de día (0 es la hora)
-                if (
-                    cell.classList.contains('blocked-slot') ||
-                    cell.textContent.trim() !== ''
-                ) {
-                    conflict = true;
-                    break;
-                }
-            }
-
-            if (!conflict) {
-                for (let s = 0; s < slotsNeeded; s++) {
-                    const row = tbody.rows[rowIndex + s];
-                    const cell = row.cells[dayNumber];
-                    cell.textContent = activity.name;
-                    cell.classList.add('activity-slot');
-                    activity._placedSlots.push({
-                        day: currentDay,
-                        start: currentTime,
-                        end: currentTime + activity.duration
-                    });
-                }
-                placed++;
-                foundSlot = true;
-                break;
-            }
-
-            rowIndex++;
-        }
-
-        currentDay = (currentDay + 1) % totalDays;
-        if (!foundSlot) currentTime += intervalMinutes;
-        if (currentTime >= endTimeMinutes) currentTime = startTimeMinutes;
-    }
-}
 
     scheduleTable.appendChild(table);
     document.getElementById('exportBtn').classList.remove('hidden');
 }
 
+// --- CSV Export Function ---
+function exportToCSV() {
+    let csvData = [];
+    const table = document.querySelector(".schedule-table");
+    if (!table) return alert("Genera un horario primero.");
+
+    const rows = table.querySelectorAll("tr");
+    for (let i = 0; i < rows.length; i++) {
+        let rowData = [];
+        const cols = rows[i].querySelectorAll("td, th");
+        for (let j = 0; j < cols.length; j++) {
+            // Escape quotes by replacing double quotes with double-double quotes for CSV format
+            let data = cols[j].innerText.replace(/"/g, '""');
+            rowData.push('"' + data + '"');
+        }
+        csvData.push(rowData.join(","));
+    }
+
+    // Download Logic
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvData.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Mi_Horario.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Ensure at least one activity block exists when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     addActivity();
 });
