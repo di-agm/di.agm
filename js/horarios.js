@@ -149,7 +149,7 @@ function generateSchedule() {
     const workDaysMatch = numDaysInput.match(/\d+/); 
     const workDays = workDaysMatch ? parseInt(workDaysMatch[0]) : totalDays;
     
-    if (totalDays <= 0 || totalDays > 7) return alert("El número de días debe ser entre 1 y 7.");
+    if (totalDays <= 0) return alert("El número de días debe ser mayor o igual a 1.");
 
     const timeParts = timeRangeInput.split('-').map(t => t.trim());
     if (timeParts.length !== 2) return alert("Formato de hora incorrecto (HH:MM - HH:MM).");
