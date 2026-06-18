@@ -132,7 +132,7 @@ function generateSchedule() {
     const scheduleTable = document.getElementById('scheduleTable');
     scheduleTable.innerHTML = ''; 
 
-    // 1. Gather & Validate Base Inputs
+    // 1. Validar Entradas Base y usar el Evaluador Matemático
     const numDaysInput = document.getElementById('numDays').value.trim();
     const timeRangeInput = document.getElementById('timeRange').value.trim();
     const startDayValue = parseInt(document.getElementById('startDay').value);
@@ -142,14 +142,11 @@ function generateSchedule() {
         return;
     }
 
-    // Evaluates full math like "14/2" or "10-3"
     const totalDays = evaluateMath(numDaysInput);
-    
-    // Grabs the very first number in the equation to represent standard "workdays"
     const workDaysMatch = numDaysInput.match(/\d+/); 
     const workDays = workDaysMatch ? parseInt(workDaysMatch[0]) : totalDays;
     
-    if (totalDays <= 0) return alert("El número de días debe ser mayor o igual a 1.");
+    if (totalDays <= 0 || totalDays > 14) return alert("El número de días debe ser entre 1 y 14."); 
 
     const timeParts = timeRangeInput.split('-').map(t => t.trim());
     if (timeParts.length !== 2) return alert("Formato de hora incorrecto (HH:MM - HH:MM).");
@@ -158,11 +155,10 @@ function generateSchedule() {
     const endTimeMinutes = timeToMinutes(timeParts[1]);
     if (startTimeMinutes >= endTimeMinutes) return alert("La hora de inicio debe ser anterior a la de fin.");
 
-    // 2. Gather Activities
+    // 2. Extraer Actividades (AQUÍ ESTÁ LA MAGIA NUEVA: Recuperamos Inicio y Repetir)
     const activities = [];
     document.querySelectorAll('.activity-group').forEach(group => {
         const name = group.querySelector('.activity-name').value.trim();
-        // Uses our new math evaluator for both fields
         const durationInput = evaluateMath(group.querySelector('.activity-duration').value);
         const durationType = group.querySelector('.activity-duration-type').value;
         const frequency = evaluateMath(group.querySelector('.activity-frequency').value);
@@ -179,17 +175,21 @@ function generateSchedule() {
                 frequency,
                 startType: group.querySelector('.activity-start-type').value,
                 startRef: group.querySelector('.activity-start-ref').value.trim(),
-                placedCount: 0
+                repeatEnabled: group.querySelector('.activity-repeat-check').checked,
+                repeatType: group.querySelector('.activity-repeat-type').value,
+                repeatInterval: evaluateMath(group.querySelector('.activity-repeat-interval').value) || 1,
+                placedCount: 0,
+                placedSlots: [] // Guardamos en memoria dónde se puso para que otras dependan de esta
             });
         }
     });
 
     if (activities.length === 0) return alert("Por favor, agrega al menos una actividad válida.");
 
-    // 3. Gather Blocks
+    // 3. Extraer Bloques
     const blocks = [];
     document.querySelectorAll('.block-group').forEach(group => {
-        const day = parseInt(group.querySelector('.block-day').value); // 1 to 7
+        const day = parseInt(group.querySelector('.block-day').value); // 1 a 7
         const timeRange = group.querySelector('.block-time-range').value.trim();
         if (timeRange) {
             const blockTimes = timeRange.split('-').map(t => t.trim());
@@ -197,93 +197,136 @@ function generateSchedule() {
         }
     });
 
-    // 4. Grid Setup
-    // Calculate smallest interval (e.g., 15 mins or 30 mins) based on activity lengths
+    // 4. Configurar Cuadrícula
     let intervalMinutes = gcdArray(activities.map(a => a.duration));
-    intervalMinutes = Math.min(Math.max(intervalMinutes, 10), 60); // Clamp between 10m and 60m
+    intervalMinutes = Math.min(Math.max(intervalMinutes, 5), 60); // Limitar entre 5 y 60 min
     
     const totalSlots = Math.ceil((endTimeMinutes - startTimeMinutes) / intervalMinutes);
     const grid = Array.from({ length: totalDays }, () => Array(totalSlots).fill(null));
 
-    // 5. Apply Blocks to Grid
+    // 5. Aplicar Bloques a la cuadrícula
     for (let dayCol = 0; dayCol < totalDays; dayCol++) {
-        const currentWeekDay = ((startDayValue - 1) + dayCol) % 7 + 1; // 1=Lunes
+        const currentWeekDay = ((startDayValue - 1) + dayCol) % 7 + 1; 
         for (let slot = 0; slot < totalSlots; slot++) {
             const slotStart = startTimeMinutes + (slot * intervalMinutes);
             const slotEnd = slotStart + intervalMinutes;
             
             const isBlocked = blocks.some(b => b.day === currentWeekDay && slotStart >= b.start && slotEnd <= b.end);
-            if (isBlocked) grid[dayCol][slot] = " ";
+            if (isBlocked) grid[dayCol][slot] = "BLOQUEADO";
         }
     }
 
-    // 6. Placement Algorithm (Smart Greed)
+    // 6. Algoritmo de Posicionamiento Inteligente
+    // Ordenamos: Las actividades dependientes ('después de') se posicionan al último.
+    activities.sort((a, b) => {
+        const aDep = (a.startType === 'after' || a.startType === 'mid') ? 1 : 0;
+        const bDep = (b.startType === 'after' || b.startType === 'mid') ? 1 : 0;
+        return aDep - bDep;
+    });
+
     activities.forEach(activity => {
         const slotsNeeded = Math.ceil(activity.duration / intervalMinutes);
         
-        while (activity.placedCount < activity.frequency) {
+        // --- A. Resolver "Inicio" (Reglas de Dependencia) ---
+        let minDayCol = 0;
+        let minSlot = 0;
+        
+        if (activity.startType === 'day') {
+            const dayNum = evaluateMath(activity.startRef);
+            if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= totalDays) {
+                minDayCol = dayNum - 1; // Ajustamos al índice base-0
+            }
+        } else if (activity.startType === 'after' || activity.startType === 'mid') {
+            const target = activities.find(a => a.name.toLowerCase() === activity.startRef.toLowerCase());
+            if (target && target.placedSlots.length > 0) {
+                const refIdx = activity.startType === 'after' 
+                    ? target.placedSlots.length - 1  // Después de la ÚLTIMA sesión
+                    : Math.floor(target.placedSlots.length / 2); // En MEDIO de la programación
+                
+                const refSlot = target.placedSlots[refIdx];
+                minDayCol = refSlot.dayCol;
+                minSlot = refSlot.endSlot; // Iniciar justo cuando acaba la otra
+            }
+        }
+
+        // --- B. Resolver "Repetir" (Intervalos) ---
+        let dayStep = 1;
+        if (activity.repeatEnabled) {
+            if (activity.repeatType === 'daily') dayStep = activity.repeatInterval;
+            else if (activity.repeatType === 'weekly') dayStep = activity.repeatInterval * 7;
+            else if (activity.repeatType === 'monthly') dayStep = activity.repeatInterval * 30; 
+        } else {
+            // Distribución automática equitativa (si quieres 3 en 7 días, salta 2 días)
+            if (activity.frequency > 1 && activity.frequency <= totalDays) {
+                dayStep = Math.floor(totalDays / activity.frequency);
+            } else if (activity.frequency > totalDays) {
+                dayStep = 0; // Permitir que haya múltiples sesiones en un mismo día
+            }
+        }
+
+        // --- C. Plantar sobre la Cuadrícula ---
+        let currentDayCol = minDayCol;
+        let attempts = 0;
+
+        while (activity.placedCount < activity.frequency && attempts < 1000) {
+            attempts++;
+            
+            // Si nos quedamos sin días hacia adelante, volvemos al principio de la semana
+            if (currentDayCol >= totalDays) {
+                currentDayCol = 0; 
+                dayStep = 1; 
+                minDayCol = 0; 
+                minSlot = 0;
+            }
+            
+            let startSearchingSlot = (currentDayCol === minDayCol) ? minSlot : 0;
             let placedThisRound = false;
 
-            // Try to find a free column (day) to place the activity, spreading them out
-            for (let dayCol = 0; dayCol < totalDays; dayCol++) {
-                
-                // Avoid scheduling same activity twice on the same day if possible
-                if (grid[dayCol].includes(activity.name)) continue;
-
-                // Search vertical slots on this day
-                for (let slot = 0; slot <= totalSlots - slotsNeeded; slot++) {
-                    let canFit = true;
-                    
-                    // Check if consecutive slots are free
-                    for (let s = 0; s < slotsNeeded; s++) {
-                        if (grid[dayCol][slot + s] !== null) {
-                            canFit = false;
-                            break;
-                        }
-                    }
-
-                    if (canFit) {
-                        for (let s = 0; s < slotsNeeded; s++) {
-                            grid[dayCol][slot + s] = activity.name;
-                        }
-                        activity.placedCount++;
-                        placedThisRound = true;
-                        break; // Move to next required frequency placement
-                    }
-                }
-                if (placedThisRound) break;
+            // Prevenir duplicados en un mismo día a menos que el usuario obligue
+            const alreadyOnThisDay = grid[currentDayCol].includes(activity.name);
+            if (alreadyOnThisDay && activity.frequency <= totalDays && !activity.repeatEnabled) {
+                 currentDayCol++;
+                 continue;
             }
 
-            // Fallback: If it couldn't be placed cleanly (e.g., ran out of days without the activity)
-            // Just force it into the first absolutely free space.
-            if (!placedThisRound) {
-                let forcedPlacement = false;
-                for (let dayCol = 0; dayCol < totalDays; dayCol++) {
-                    for (let slot = 0; slot <= totalSlots - slotsNeeded; slot++) {
-                        let canFit = true;
-                        for (let s = 0; s < slotsNeeded; s++) {
-                            if (grid[dayCol][slot + s] !== null) { canFit = false; break; }
-                        }
-                        if (canFit) {
-                            for (let s = 0; s < slotsNeeded; s++) grid[dayCol][slot + s] = activity.name;
-                            activity.placedCount++;
-                            forcedPlacement = true;
-                            break;
-                        }
+            // Buscar espacio vertical
+            for (let slot = startSearchingSlot; slot <= totalSlots - slotsNeeded; slot++) {
+                let canFit = true;
+                for (let s = 0; s < slotsNeeded; s++) {
+                    if (grid[currentDayCol][slot + s] !== null) {
+                        canFit = false; break;
                     }
-                    if (forcedPlacement) break;
                 }
-                // If it STILL doesn't fit, there's mathematically no room left on the schedule.
-                if (!forcedPlacement) break; 
+
+                // Si cabe, ¡plantamos la actividad!
+                if (canFit) {
+                    for (let s = 0; s < slotsNeeded; s++) {
+                        grid[currentDayCol][slot + s] = activity.name;
+                    }
+                    activity.placedSlots.push({ dayCol: currentDayCol, startSlot: slot, endSlot: slot + slotsNeeded });
+                    activity.placedCount++;
+                    placedThisRound = true;
+                    break;
+                }
+            }
+
+            // Avanzar al siguiente objetivo
+            if (placedThisRound) {
+                if (dayStep === 0) {
+                     // Si permitimos múltiples por día, nos quedamos en la misma columna
+                } else {
+                    currentDayCol += dayStep; // Saltamos a la siguiente repetición dictada
+                }
+            } else {
+                currentDayCol++; // Tratamos al día siguiente si aquí no cupo
             }
         }
     });
 
-    // 7. Render Table from Grid
+    // 7. Dibujar la Tabla en HTML
     const table = document.createElement('table');
     table.className = 'schedule-table';
     
-    // Build Header
     const thead = table.createTHead();
     const headerRow = thead.insertRow();
     headerRow.insertCell().textContent = 'Hora';
@@ -296,7 +339,6 @@ function generateSchedule() {
         headerRow.appendChild(th);
     }
 
-    // Build Body
     const tbody = table.createTBody();
     for (let slot = 0; slot < totalSlots; slot++) {
         const row = tbody.insertRow();
