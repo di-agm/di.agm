@@ -1,4 +1,4 @@
-const DAYS_OF_WEEK = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const DAYS_OF_WEEK = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 // --- Safe Math Parser ---
 function evaluateMath(input) {
@@ -216,7 +216,7 @@ function generateSchedule() {
         }
     }
 
-    // 6. Algoritmo de Posicionamiento Inteligente
+// 6. Algoritmo de Posicionamiento Inteligente (CORREGIDO)
     // Ordenamos: Las actividades dependientes ('después de') se posicionan al último.
     activities.sort((a, b) => {
         const aDep = (a.startType === 'after' || a.startType === 'mid') ? 1 : 0;
@@ -234,7 +234,7 @@ function generateSchedule() {
         if (activity.startType === 'day') {
             const dayNum = evaluateMath(activity.startRef);
             if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= totalDays) {
-                minDayCol = dayNum - 1; // Ajustamos al índice base-0
+                minDayCol = dayNum - 1; // Ajustamos al índice base-0 (Ej: Día 3 es columna 2)
             }
         } else if (activity.startType === 'after' || activity.startType === 'mid') {
             const target = activities.find(a => a.name.toLowerCase() === activity.startRef.toLowerCase());
@@ -256,11 +256,12 @@ function generateSchedule() {
             else if (activity.repeatType === 'weekly') dayStep = activity.repeatInterval * 7;
             else if (activity.repeatType === 'monthly') dayStep = activity.repeatInterval * 30; 
         } else {
-            // Distribución automática equitativa (si quieres 3 en 7 días, salta 2 días)
-            if (activity.frequency > 1 && activity.frequency <= totalDays) {
-                dayStep = Math.floor(totalDays / activity.frequency);
-            } else if (activity.frequency > totalDays) {
-                dayStep = 0; // Permitir que haya múltiples sesiones en un mismo día
+            // Distribución automática equitativa en los días restantes disponibles
+            const remainingDays = totalDays - minDayCol;
+            if (activity.frequency > 1 && activity.frequency <= remainingDays) {
+                dayStep = Math.floor(remainingDays / activity.frequency);
+            } else if (activity.frequency > remainingDays) {
+                dayStep = 0; // Permitir múltiples sesiones por día si la frecuencia es alta
             }
         }
 
@@ -271,25 +272,23 @@ function generateSchedule() {
         while (activity.placedCount < activity.frequency && attempts < 1000) {
             attempts++;
             
-            // Si nos quedamos sin días hacia adelante, volvemos al principio de la semana
+            // FIX: Si supera el total de días, regresa al día mínimo permitido (minDayCol), NO a 0
             if (currentDayCol >= totalDays) {
-                currentDayCol = 0; 
-                dayStep = 1; 
-                minDayCol = 0; 
-                minSlot = 0;
+                currentDayCol = minDayCol; 
+                // Mantenemos minSlot para la primera columna si regresa ahí
             }
             
             let startSearchingSlot = (currentDayCol === minDayCol) ? minSlot : 0;
             let placedThisRound = false;
 
-            // Prevenir duplicados en un mismo día a menos que el usuario obligue
+            // Prevenir duplicados en un mismo día si hay suficientes días adelante
             const alreadyOnThisDay = grid[currentDayCol].includes(activity.name);
-            if (alreadyOnThisDay && activity.frequency <= totalDays && !activity.repeatEnabled) {
+            if (alreadyOnThisDay && activity.frequency <= (totalDays - minDayCol) && dayStep > 0) {
                  currentDayCol++;
                  continue;
             }
 
-            // Buscar espacio vertical
+            // Buscar espacio vertical en la columna actual
             for (let slot = startSearchingSlot; slot <= totalSlots - slotsNeeded; slot++) {
                 let canFit = true;
                 for (let s = 0; s < slotsNeeded; s++) {
@@ -298,7 +297,7 @@ function generateSchedule() {
                     }
                 }
 
-                // Si cabe, ¡plantamos la actividad!
+                // Si cabe, registramos la sesión
                 if (canFit) {
                     for (let s = 0; s < slotsNeeded; s++) {
                         grid[currentDayCol][slot + s] = activity.name;
@@ -310,15 +309,45 @@ function generateSchedule() {
                 }
             }
 
-            // Avanzar al siguiente objetivo
+            // Avanzar según la estrategia establecida
             if (placedThisRound) {
                 if (dayStep === 0) {
-                     // Si permitimos múltiples por día, nos quedamos en la misma columna
+                    // Si se permiten varias por día, seguimos intentando en el mismo día (avanzando slots)
+                    minSlot = activity.placedSlots[activity.placedSlots.length - 1].endSlot;
                 } else {
-                    currentDayCol += dayStep; // Saltamos a la siguiente repetición dictada
+                    currentDayCol += dayStep; 
                 }
             } else {
-                currentDayCol++; // Tratamos al día siguiente si aquí no cupo
+                currentDayCol++; // Si no cupo en este día, saltamos al siguiente
+            }
+        }
+
+        // --- D. Fallback de Fuerza Mayor (CORREGIDO) ---
+        // Si el algoritmo estructurado no logró colocar todas las sesiones requeridas por falta de espacio,
+        // busca cualquier hueco restante pero empezando estrictamente desde minDayCol en adelante.
+        while (activity.placedCount < activity.frequency) {
+            let forcedPlacement = false;
+            for (let dayCol = minDayCol; dayCol < totalDays; dayCol++) {
+                let startSlot = (dayCol === minDayCol) ? minSlot : 0;
+                for (let slot = startSlot; slot <= totalSlots - slotsNeeded; slot++) {
+                    let canFit = true;
+                    for (let s = 0; s < slotsNeeded; s++) {
+                        if (grid[dayCol][slot + s] !== null) { canFit = false; break; }
+                    }
+                    if (canFit) {
+                        for (let s = 0; s < slotsNeeded; s++) grid[dayCol][slot + s] = activity.name;
+                        activity.placedSlots.push({ dayCol, startSlot: slot, endSlot: slot + slotsNeeded });
+                        activity.placedCount++;
+                        forcedPlacement = true;
+                        break;
+                    }
+                }
+                if (forcedPlacement) break;
+            }
+            // Si ya no hay espacio matemático absoluto a partir de ese día, rompemos para evitar congelamiento
+            if (!forcedPlacement) {
+                console.warn(`No se pudieron agendar ${activity.frequency - activity.placedCount} sesiones para: ${activity.name} por restricciones de espacio.`);
+                break;
             }
         }
     });
