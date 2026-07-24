@@ -1,0 +1,56 @@
+/* Estructura y Renderizado Visual */
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+#pantalla-texto {
+    width: 90%;
+    height: 80vh;
+    margin-top: 20px;
+    font-size: 5vw; /* Escala dinámicamente con la pantalla */
+    line-height: 1.4;
+    overflow-y: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Oculta la barra de desplazamiento para un layout más limpio */
+#pantalla-texto::-webkit-scrollbar {
+    display: none;
+}
+
+.escuchando {
+    color: #888888;
+}
+
+.confirmado {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Botón de control fijo en la parte inferior */
+#btn-microfono {
+    position: fixed;
+    bottom: 20px;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #e50914;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#btn-microfono:hover {
+    opacity: 0.8;
+}
